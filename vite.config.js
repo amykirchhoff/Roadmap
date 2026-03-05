@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // Set this to your GitHub repo name, e.g. '/roadmap-explorer/'
 // If you rename the repo, update this value to match.
-const BASE_PATH = '/roadmap-explorer/'
+const BASE_PATH = '/roadmap/'
 
 export default defineConfig({
   plugins: [react()],
