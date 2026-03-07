@@ -144,9 +144,9 @@ export default function App() {
         <Stat label="Single-Industry Tasks" value={uniqueOnly.length} sub={pct(uniqueOnly.length,DATA.totalDiffTasks)+" of diff. tasks"} color={C.red} />
       </div>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:20}}>
-        <Stat label="Zero diff. tasks" value={diffStats.zeroDiff.length} sub={fmt(diffStats.zeroDiffUsers)+" users get generic roadmap"} color={C.red} />
-        <Stat label="Shared tasks only" value={diffStats.noUnique.length} sub={fmt(diffStats.noUniqueUsers)+" users"} color={C.orange} />
-        <Stat label="Has unique tasks" value={diffStats.hasUnique.length} sub="Truly differentiated" color={C.green} />
+        <Stat label="Industries w/ Zero Diff. Tasks" value={diffStats.zeroDiff.length} sub={fmt(diffStats.zeroDiffUsers)+" users get generic roadmap"} color={C.red} />
+        <Stat label="Industries w/ Shared Tasks Only" value={diffStats.noUnique.length} sub={fmt(diffStats.noUniqueUsers)+" users"} color={C.orange} />
+        <Stat label="Industries w/ Unique Tasks" value={diffStats.hasUnique.length} sub="Truly differentiated roadmaps" color={C.green} />
       </div>
       <Sec title="Users vs. Differentiating Tasks" sub="Each dot is one industry. Color = degree of uniqueness. Click for details.">
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:14}}>
