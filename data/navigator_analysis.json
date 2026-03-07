@@ -1,176 +1,156 @@
 {
   "industries": {
-    "engineering": {
-      "name": "Engineering and Land Surveying",
-      "defaultSectorId": "construction",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "541330, 541370 ",
-      "nonEssentialQuestionsIds": [
-        "weights-measures",
-        "planning-services"
-      ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true
-      },
-      "roadmapStepCount": 10,
-      "webflowId": "656a13621861f431fc9765d2"
-    },
-    "electrical-contractor": {
-      "name": "Electrical Contractor",
+    "acupuncture": {
+      "name": "Acupuncture",
       "defaultSectorId": "other-services",
       "isEnabled": true,
       "canHavePermanentLocation": true,
-      "naicsCodes": "238210",
-      "nonEssentialQuestionsIds": [
-        "weights-measures",
-        "cdl-neq",
-        "selfgenerator-transporter-registration"
-      ],
+      "naicsCodes": "621399",
+      "nonEssentialQuestionsIds": [],
       "industryOnboardingQuestions": {
         "canBeHomeBased": true
       },
       "roadmapStepCount": 9,
-      "webflowId": "656a1363297de0dd0051e8df"
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "manage-business-vehicles",
+        "rmw-generator-registration"
+      ],
+      "webflowId": "656a136266a0b2c046a17462"
     },
-    "retail": {
-      "name": "Retail",
-      "defaultSectorId": "retail-trade-and-ecommerce",
+    "architecture": {
+      "name": "Architecture and Urban Planning ",
+      "defaultSectorId": "construction",
       "isEnabled": true,
       "canHavePermanentLocation": true,
-      "naicsCodes": "459920, 441330, 445320, 459210, 458110, 445131, 456120, 455110, 449210, 445250, 449121, 459310, 456191, 449110, 459420, 444140, 459120, 458310, 458320, 445240, 441227, 459140, 444240, 459410, 456130, 444180, 444230, 459910, 459130, 458210, 459110, 441340, 459991, 459510, 455211, 449122, 455219, 456199, 449129, 459999, 445298",
+      "naicsCodes": "541310, 925120",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 12,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "architect-license",
+        "architect-are-exam",
+        "authorization-architect-firm",
+        "professional-planner-license",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a13629e1c371e9fc59cbd"
+    },
+    "auto-body-repair": {
+      "name": "Auto-Body Repair",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "811121, 811111, 811198, 811114",
       "nonEssentialQuestionsIds": [
-        "ticket-broker-resell",
         "weights-measures",
-        "cigarette-manufacture-sell",
-        "other-businesses-CRTK-survey",
-        "retail-pesticide-dealer-licensing",
+        "vehicle-dealership-q",
+        "ust-reg",
+        "flashing-light-permit"
+      ],
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 12,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "auto-body-repair-license",
+        "spray-paint-booth-permit-auto-body-repair",
+        "community-right-to-know-survey",
+        "env-requirements",
+        "resale-tax-certificate-operating",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a13624544e5127379fdf2"
+    },
+    "cannabis": {
+      "name": "Cannabis",
+      "defaultSectorId": "cannabis",
+      "isEnabled": true,
+      "canHavePermanentLocation": false,
+      "naicsCodes": "111419, 111998, 424590, 459991",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
         "inspect-boiler",
         "business-vehicle-irp",
         "inspect-pv",
         "inspect-fridge",
-        "sell-milk-question",
-        "cdl-neq",
-        "streamlined-sales-tax-registration"
-      ],
-      "industryOnboardingQuestions": {},
-      "roadmapStepCount": 11,
-      "webflowId": "656a13629d57077e647ddf9f"
-    },
-    "food-truck": {
-      "name": "Food Truck",
-      "defaultSectorId": "accommodation-and-food-services",
-      "isEnabled": true,
-      "canHavePermanentLocation": false,
-      "naicsCodes": "722330",
-      "nonEssentialQuestionsIds": [
-        "weights-measures"
-      ],
-      "industryOnboardingQuestions": {},
-      "roadmapStepCount": 19,
-      "webflowId": "656a136253b505573055370f"
-    },
-    "home-baker": {
-      "name": "Home Baker",
-      "defaultSectorId": "accommodation-and-food-services",
-      "isEnabled": true,
-      "canHavePermanentLocation": false,
-      "naicsCodes": "311811, 311821 ",
-      "nonEssentialQuestionsIds": [
-        "weights-measures"
+        "bus-initial-inspection",
+        "cdl-neq"
       ],
       "industryOnboardingQuestions": {
-        "canBeHomeBased": true
+        "isCannabisLicenseTypeApplicable": true
       },
-      "roadmapStepCount": 10,
-      "webflowId": "656a1363059ec5def0e98fd9"
-    },
-    "restaurant": {
-      "name": "Restaurant",
-      "defaultSectorId": "accommodation-and-food-services",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "722511, 722310, 722320, 722410, 722513, 722514, 722515",
-      "nonEssentialQuestionsIds": [
-        "weights-measures",
-        "inspect-boiler",
-        "inspect-pv",
-        "inspect-fridge",
-        "sell-milk-question"
+      "roadmapStepCount": 15,
+      "roadmapTaskNames": [
+        "cannabis-evaluate-location",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "cannabis-bank-account",
+        "cannabis-insurance-policy",
+        "priority-status-cannabis",
+        "zoning-cannabis",
+        "cannabis-sign-lease",
+        "cannabis-site-requirements",
+        "building-permit",
+        "town-mercantile-license",
+        "manage-business-vehicles",
+        "env-requirements"
       ],
-      "industryOnboardingQuestions": {
-        "isLiquorLicenseApplicable": true
-      },
-      "roadmapStepCount": 12,
-      "webflowId": "656a1362e1f1359c3c90e9eb"
+      "webflowId": "656a1362657b7f011c19dc79"
     },
-    "remediation-waste": {
-      "name": "Remediation and Waste Services",
-      "defaultSectorId": "waste-management-and-Remediation",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "562910, 562111, 562112, 562119, 562211, 562212, 562213, 562219, 562920, 562991, 562998",
-      "nonEssentialQuestionsIds": [
-        "weights-measures",
-        "asbestos-abatement-question",
-        "waste-transporter-license-a-901",
-        "flashing-light-permit"
-      ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true,
-        "isCannabisLicenseTypeApplicable": false,
-        "isCpaRequiredApplicable": false,
-        "isCarServiceApplicable": false,
-        "isInterstateMovingApplicable": false,
-        "petCareHousing": false,
-        "isLiquorLicenseApplicable": false,
-        "isInterstateLogisticsApplicable": false,
-        "isRealEstateAppraisalManagementApplicable": false,
-        "isChildcareForSixOrMore": false,
-        "willSellPetCareItems": false,
-        "isTransportation": true,
-        "isCertifiedInteriorDesignerApplicable": false,
-        "isProvidesStaffingServicesApplicable": false
-      },
-      "roadmapStepCount": 7,
-      "webflowId": "68a7501fbf7e85d7b58fcc9f"
-    },
-    "printing-business": {
-      "name": "Printing Business",
-      "defaultSectorId": "digital-and-print-media",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "323111, 323117, 323113",
-      "nonEssentialQuestionsIds": [
-        "weights-measures"
-      ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true
-      },
-      "roadmapStepCount": 10,
-      "webflowId": "656a13628899de7accc4fd89"
-    },
-    "moving-company": {
-      "name": "Moving Company",
+    "car-rental": {
+      "name": "Car Rental and Dealerships ",
       "defaultSectorId": "other-services",
       "isEnabled": true,
       "canHavePermanentLocation": true,
-      "naicsCodes": "484210",
+      "naicsCodes": "532111, 441110, 441120",
       "nonEssentialQuestionsIds": [
         "weights-measures",
-        "resale-tax-cert",
-        "vehicle-dealership-q"
+        "bus-initial-inspection"
       ],
       "industryOnboardingQuestions": {
-        "canBeHomeBased": true,
-        "isTransportation": true,
-        "isInterstateMovingApplicable": true
+        "canBeHomeBased": false
       },
       "roadmapStepCount": 12,
-      "webflowId": "656a136257239e597fcb93da"
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "transportation-entity-id",
+        "mvc-title-task",
+        "mvc-registration-task",
+        "vehicle-dealership",
+        "community-right-to-know-survey"
+      ],
+      "webflowId": "656a136212e59f3e1bcf4cc5"
     },
-    "school-bus": {
-      "name": "School Bus",
+    "car-service": {
+      "name": "Transportation and Car Service",
       "defaultSectorId": "other-services",
       "isEnabled": true,
       "canHavePermanentLocation": true,
@@ -178,69 +158,110 @@
       "nonEssentialQuestionsIds": [
         "weights-measures",
         "business-vehicle-irp",
-        "vehicle-dealership-q"
+        "bus-initial-inspection",
+        "vehicle-dealership-q",
+        "cdl-neq"
       ],
       "industryOnboardingQuestions": {
         "canBeHomeBased": true,
+        "isCarServiceApplicable": true,
         "isTransportation": true
       },
-      "roadmapStepCount": 13,
-      "webflowId": "656a1362295cb540cf06fe19"
+      "roadmapStepCount": 14,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "transportation-entity-id",
+        "mvc-title-task",
+        "transportation-cpcn",
+        "transportation-inspection",
+        "trucking-irp",
+        "trucking-ifta",
+        "mvc-registration-task",
+        "passenger-transport-cdl"
+      ],
+      "webflowId": "656a1362f637cd08076d3599"
     },
-    "freight-forwarding": {
-      "name": "Freight Forwarding",
+    "cemetery": {
+      "name": "Cemetery",
       "defaultSectorId": "other-services",
       "isEnabled": true,
       "canHavePermanentLocation": true,
-      "naicsCodes": "493110, 493190, 493120, 493130",
+      "naicsCodes": "812220",
       "nonEssentialQuestionsIds": [
-        "weights-measures",
-        "vehicle-dealership-q"
+        "mvc-cpcn"
       ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true,
-        "isCpaRequiredApplicable": false,
-        "isCarServiceApplicable": false,
-        "isInterstateMovingApplicable": false,
-        "isLiquorLicenseApplicable": false,
-        "isInterstateLogisticsApplicable": false,
-        "isRealEstateAppraisalManagementApplicable": false,
-        "isTransportation": false,
-        "isCertifiedInteriorDesignerApplicable": false,
-        "isProvidesStaffingServicesApplicable": false
-      },
-      "roadmapStepCount": 13,
-      "webflowId": "656a13623df6c55c9cca76d4"
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 11,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "cemetery-certificate",
+        "cemetery-sales",
+        "cemetery-branch",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "68a7501ebf7e85d7b58fcc50"
     },
-    "photography": {
-      "name": "Photography",
-      "defaultSectorId": "digital-and-print-media",
+    "certified-public-accountant": {
+      "name": "Accounting, Bookkeeping, and Tax Preparation",
+      "defaultSectorId": "finance-and-insurance",
       "isEnabled": true,
       "canHavePermanentLocation": true,
-      "naicsCodes": "541921",
+      "naicsCodes": "541211",
       "nonEssentialQuestionsIds": [],
       "industryOnboardingQuestions": {
-        "canBeHomeBased": true
+        "canBeHomeBased": true,
+        "isCpaRequiredApplicable": true
       },
       "roadmapStepCount": 9,
-      "webflowId": "656a1362d699210e3fd468e8"
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "register-accounting-firm",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a1362227f321008b482eb"
     },
-    "hvac-contractor": {
-      "name": "HVAC Contractor",
-      "defaultSectorId": "professional-scientific-and-technical-services",
+    "cleaning-janitorial-services": {
+      "name": "Cleaning and Janitorial Services",
+      "defaultSectorId": "other-services",
       "isEnabled": true,
       "canHavePermanentLocation": true,
-      "naicsCodes": "238220",
+      "naicsCodes": "561720",
       "nonEssentialQuestionsIds": [
         "weights-measures",
-        "cdl-neq",
-        "selfgenerator-transporter-registration"
+        "pesticides-applicator-licensing"
       ],
       "industryOnboardingQuestions": {
         "canBeHomeBased": true
       },
       "roadmapStepCount": 8,
-      "webflowId": "656a1362ec40f516ab69a690"
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a136212e59f3e1bcf4cc3"
     },
     "commercial-construction": {
       "name": "Construction",
@@ -263,6 +284,16 @@
         "isConstructionTypeApplicable": true
       },
       "roadmapStepCount": 8,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "env-requirements",
+        "manage-business-vehicles"
+      ],
       "webflowId": "65b41d2d3d0fa463cd97855a"
     },
     "cosmetology": {
@@ -276,7 +307,77 @@
       ],
       "industryOnboardingQuestions": {},
       "roadmapStepCount": 12,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "apply-for-shop-license",
+        "cosmetology-license",
+        "resale-tax-certificate-operating",
+        "env-requirements",
+        "manage-business-vehicles"
+      ],
       "webflowId": "656a13627f0131f68c389665"
+    },
+    "courier": {
+      "name": "Courier Service",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "492110, 491110, 492210",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "courier-CRTK-survey",
+        "business-vehicle-irp",
+        "bus-initial-inspection",
+        "vehicle-dealership-q",
+        "cdl-neq"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 7,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a136211d2436d60683a37"
+    },
+    "daycare": {
+      "name": "Childcare Center",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": false,
+      "naicsCodes": "624410",
+      "nonEssentialQuestionsIds": [
+        "mvc-cpcn",
+        "cdl-neq"
+      ],
+      "industryOnboardingQuestions": {
+        "isChildcareForSixOrMore": true
+      },
+      "roadmapStepCount": 9,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "env-requirements",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a1362065390a761c33567"
     },
     "demo-only": {
       "name": "Demo Only",
@@ -305,125 +406,307 @@
         "isProvidesStaffingServicesApplicable": false
       },
       "roadmapStepCount": 3,
+      "roadmapTaskNames": [
+        "health-club-registration",
+        "home-health-aide-license",
+        "business-structure"
+      ],
       "webflowId": ""
     },
-    "acupuncture": {
-      "name": "Acupuncture",
-      "defaultSectorId": "other-services",
+    "detective": {
+      "name": "Detective Agency",
+      "defaultSectorId": "professional-scientific-and-technical-services",
       "isEnabled": true,
       "canHavePermanentLocation": true,
-      "naicsCodes": "621399",
-      "nonEssentialQuestionsIds": [],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true
-      },
-      "roadmapStepCount": 9,
-      "webflowId": "656a136266a0b2c046a17462"
-    },
-    "telemarketing": {
-      "name": "Telemarketing",
-      "defaultSectorId": "other-services",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "561422 ",
+      "naicsCodes": "561611",
       "nonEssentialQuestionsIds": [],
       "industryOnboardingQuestions": {
         "canBeHomeBased": true
       },
       "roadmapStepCount": 10,
-      "webflowId": "668d747f9da2941b65705860"
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "detective-agency-license",
+        "detective-employees",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a136282b07990fab8d438"
     },
-    "lawn-care": {
-      "name": "Lawn Care",
+    "domestic-employer": {
+      "name": "Domestic Employer",
       "defaultSectorId": "other-services",
       "isEnabled": true,
       "canHavePermanentLocation": true,
-      "naicsCodes": "561730",
+      "naicsCodes": "814110",
+      "nonEssentialQuestionsIds": [
+        "business-vehicle-title-reg"
+      ],
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 3,
+      "roadmapTaskNames": [
+        "determine-naics-code",
+        "register-for-ein-domestic-employer",
+        "domestic-employer-register-for-taxes"
+      ],
+      "webflowId": "668d747e8623c6105ee139cf"
+    },
+    "e-commerce": {
+      "name": "Online Business",
+      "defaultSectorId": "retail-trade-and-ecommerce",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "459920,441330,445320,459210,458110,445131,456120,455110,449210,445250,449121,459310,456191,449110,459420,444140,459120,458310,458320,445240,441227,459140,444240,459410,456130,444180,444230,459910,459130,458210,459110,441340,459991,459510,455211,449122,455219,456199,449129,459999,445298",
       "nonEssentialQuestionsIds": [
         "weights-measures",
-        "lawn-businesses-CRTK-survey",
-        "pesticides-applicator-licensing",
+        "cigarette-manufacture-sell",
+        "other-businesses-CRTK-survey",
+        "streamlined-sales-tax-registration"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 9,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "resale-tax-certificate-operating",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a13625bf066c2e6d815e9"
+    },
+    "electrical-contractor": {
+      "name": "Electrical Contractor",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "238210",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "cdl-neq",
+        "selfgenerator-transporter-registration"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 9,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "electrical-business-license",
+        "community-right-to-know-survey",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a1363297de0dd0051e8df"
+    },
+    "employment-agency": {
+      "name": "Employment Agency",
+      "defaultSectorId": "administrative-and-employment-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "561311",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isEmploymentAndPersonnelTypeApplicable": true
+      },
+      "roadmapStepCount": 9,
+      "roadmapTaskNames": [
+        "business-plan",
+        "understand-license-requirements-employment-agency",
+        "business-structure",
+        "determine-naics-code",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a13625bf066c2e6d815e7"
+    },
+    "engineering": {
+      "name": "Engineering and Land Surveying",
+      "defaultSectorId": "construction",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541330, 541370 ",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "planning-services"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 10,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "license-engineer",
+        "firm-engineer",
+        "land-surveyor-license",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a13621861f431fc9765d2"
+    },
+    "event-planning": {
+      "name": "Event Planning",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "561920, 561990, 711320, 532289",
+      "nonEssentialQuestionsIds": [
+        "business-vehicle-irp",
+        "bus-initial-inspection",
+        "mvc-cpcn",
         "cdl-neq"
       ],
       "industryOnboardingQuestions": {
         "canBeHomeBased": true
       },
       "roadmapStepCount": 8,
-      "webflowId": "656a13620578cfd34294c82f"
-    },
-    "architecture": {
-      "name": "Architecture and Urban Planning ",
-      "defaultSectorId": "construction",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "541310, 925120",
-      "nonEssentialQuestionsIds": [],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true
-      },
-      "roadmapStepCount": 12,
-      "webflowId": "656a13629e1c371e9fc59cbd"
-    },
-    "pest-control": {
-      "name": "Pest Control",
-      "defaultSectorId": "other-services",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "561710",
-      "nonEssentialQuestionsIds": [
-        "pest-pesticide-dealer-licensing"
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "manage-business-vehicles"
       ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true
-      },
-      "roadmapStepCount": 11,
-      "webflowId": "656a13628934eb2330f44bcb"
+      "webflowId": "656a13620578cfd34294c820"
     },
-    "cannabis": {
-      "name": "Cannabis",
-      "defaultSectorId": "cannabis",
+    "finance-insurance": {
+      "name": "Finance and Insurance",
+      "defaultSectorId": "finance-and-insurance",
       "isEnabled": true,
-      "canHavePermanentLocation": false,
-      "naicsCodes": "111419, 111998, 424590, 459991",
+      "canHavePermanentLocation": true,
+      "naicsCodes": "524210, 524126, 524128, 524298, 524127, 524114, 524113, 525190, 524291, 522220, 524298",
       "nonEssentialQuestionsIds": [
         "weights-measures",
-        "inspect-boiler",
-        "business-vehicle-irp",
-        "inspect-pv",
-        "inspect-fridge",
-        "bus-initial-inspection",
-        "cdl-neq"
+        "insurance-producer"
       ],
-      "industryOnboardingQuestions": {
-        "isCannabisLicenseTypeApplicable": true
-      },
-      "roadmapStepCount": 15,
-      "webflowId": "656a1362657b7f011c19dc79"
-    },
-    "notary-public": {
-      "name": "Notary Public",
-      "defaultSectorId": "other-services",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "541120",
-      "nonEssentialQuestionsIds": [],
       "industryOnboardingQuestions": {
         "canBeHomeBased": true
       },
       "roadmapStepCount": 9,
-      "webflowId": "656a1362d0d78023552ba48c"
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "search-licenses",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a13628934eb2330f44bcb"
     },
-    "security": {
-      "name": "Security",
+    "food-truck": {
+      "name": "Food Truck",
+      "defaultSectorId": "accommodation-and-food-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": false,
+      "naicsCodes": "722330",
+      "nonEssentialQuestionsIds": [
+        "weights-measures"
+      ],
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 19,
+      "roadmapTaskNames": [
+        "business-plan",
+        "evaluate-your-location",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "apply-for-food-truck-license",
+        "zoning-food-truck",
+        "sign-lease-food-truck",
+        "get-insurance",
+        "transportation-entity-id",
+        "mvc-title-task",
+        "mvc-registration-task",
+        "fire-permit-food-truck",
+        "town-mercantile-license",
+        "resale-tax-certificate-operating",
+        "food-safety-course",
+        "trucking-cdl"
+      ],
+      "webflowId": "656a136253b505573055370f"
+    },
+    "freight-forwarding": {
+      "name": "Freight Forwarding",
       "defaultSectorId": "other-services",
       "isEnabled": true,
       "canHavePermanentLocation": true,
-      "naicsCodes": "561622, 561621",
+      "naicsCodes": "493110, 493190, 493120, 493130",
       "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "vehicle-dealership-q"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isCpaRequiredApplicable": false,
+        "isCarServiceApplicable": false,
+        "isInterstateMovingApplicable": false,
+        "isLiquorLicenseApplicable": false,
+        "isInterstateLogisticsApplicable": false,
+        "isRealEstateAppraisalManagementApplicable": false,
+        "isTransportation": false,
+        "isCertifiedInteriorDesignerApplicable": false,
+        "isProvidesStaffingServicesApplicable": false
+      },
+      "roadmapStepCount": 13,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "transportation-entity-id",
+        "mvc-title-task",
+        "trucking-irp",
+        "trucking-ifta",
+        "mvc-registration-task",
+        "trucking-cdl"
+      ],
+      "webflowId": "656a13623df6c55c9cca76d4"
+    },
+    "funeral": {
+      "name": "Funeral Services",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "812210",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "crematory",
         "bus-initial-inspection",
-        "vehicle-dealership-q",
-        "cdl-neq",
-        "flashing-light-permit"
+        "mvc-cpcn",
+        "cdl-neq"
       ],
       "industryOnboardingQuestions": {
         "canBeHomeBased": true,
@@ -442,44 +725,85 @@
         "isProvidesStaffingServicesApplicable": false
       },
       "roadmapStepCount": 11,
-      "webflowId": "68a7501fcc861e3cfeea14af"
-    },
-    "non-medical-transport": {
-      "name": "Non-Medical Transport",
-      "defaultSectorId": "health-care-and-social-assistance",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "485999",
-      "nonEssentialQuestionsIds": [
-        "weights-measures",
-        "business-vehicle-irp",
-        "vehicle-dealership-q"
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "funeral-registration",
+        "mortuary-practitioner",
+        "env-requirements",
+        "rmw-generator-registration",
+        "manage-business-vehicles"
       ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true
-      },
-      "roadmapStepCount": 15,
-      "webflowId": "656a1363d721d75bf1eae1f4"
+      "webflowId": "6761e57d7cf913c3dc28724d"
     },
-    "courier": {
-      "name": "Courier Service",
+    "generic": {
+      "name": "All Other Businesses",
       "defaultSectorId": "other-services",
       "isEnabled": true,
       "canHavePermanentLocation": true,
-      "naicsCodes": "492110, 491110, 492210",
+      "naicsCodes": "",
       "nonEssentialQuestionsIds": [
         "weights-measures",
-        "courier-CRTK-survey",
+        "cds-lab-research ",
+        "cds-supply",
+        "other-businesses-CRTK-survey",
+        "inspect-boiler",
+        "regulated-medical-waste-question",
         "business-vehicle-irp",
+        "inspect-fridge",
+        "inspect-pv",
         "bus-initial-inspection",
-        "vehicle-dealership-q",
-        "cdl-neq"
+        "resale-tax-cert",
+        "ust-reg",
+        "streamlined-sales-tax-registration",
+        "flashing-light-permit",
+        "crtk-applicable-naics-codes"
       ],
       "industryOnboardingQuestions": {
         "canBeHomeBased": true
       },
-      "roadmapStepCount": 7,
-      "webflowId": "656a136211d2436d60683a37"
+      "roadmapStepCount": 9,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "search-licenses",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a13628934eb2330f44bcb"
+    },
+    "graphic-design": {
+      "name": "Graphic Design",
+      "defaultSectorId": "digital-and-print-media",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541430",
+      "nonEssentialQuestionsIds": [
+        "resale-tax-cert"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 8,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a1362d7cc059b165c4385"
     },
     "health-club": {
       "name": "Health Club",
@@ -500,272 +824,19 @@
         "canBeHomeBased": false
       },
       "roadmapStepCount": 10,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "health-club-registration",
+        "env-requirements",
+        "manage-business-vehicles"
+      ],
       "webflowId": "660d922207f6969e35490f1a"
-    },
-    "e-commerce": {
-      "name": "Online Business",
-      "defaultSectorId": "retail-trade-and-ecommerce",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "459920,441330,445320,459210,458110,445131,456120,455110,449210,445250,449121,459310,456191,449110,459420,444140,459120,458310,458320,445240,441227,459140,444240,459410,456130,444180,444230,459910,459130,458210,459110,441340,459991,459510,455211,449122,455219,456199,449129,459999,445298",
-      "nonEssentialQuestionsIds": [
-        "weights-measures",
-        "cigarette-manufacture-sell",
-        "other-businesses-CRTK-survey",
-        "streamlined-sales-tax-registration"
-      ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true
-      },
-      "roadmapStepCount": 9,
-      "webflowId": "656a13625bf066c2e6d815e9"
-    },
-    "lodging": {
-      "name": "Lodging",
-      "defaultSectorId": "other-services",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "721110, 721191, 721199, 721310",
-      "nonEssentialQuestionsIds": [
-        "hotel-register",
-        "rooming-boarding-house-owner",
-        "hotel-food",
-        "hotel-liquor",
-        "inspect-boiler",
-        "business-vehicle-irp",
-        "inspect-pv",
-        "inspect-fridge",
-        "bus-initial-inspection",
-        "mvc-cpcn",
-        "cdl-neq"
-      ],
-      "industryOnboardingQuestions": {},
-      "roadmapStepCount": 9,
-      "webflowId": "662a86cad07b4acada82449d"
-    },
-    "travel-agent": {
-      "name": "Travel Agency",
-      "defaultSectorId": "other-services",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "561510",
-      "nonEssentialQuestionsIds": [
-        "bus-initial-inspection",
-        "mvc-cpcn",
-        "cdl-neq"
-      ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true
-      },
-      "roadmapStepCount": 8,
-      "webflowId": "656a13621bdc1e1600ec8734"
-    },
-    "logistics": {
-      "name": "Logistics",
-      "defaultSectorId": "other-services",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "493110, 493190, 493120, 493130",
-      "nonEssentialQuestionsIds": [
-        "weights-measures",
-        "logistics-CRTK-survey",
-        "regulated-medical-waste-question",
-        "vehicle-dealership-q",
-        "flashing-light-permit"
-      ],
-      "industryOnboardingQuestions": {
-        "isInterstateLogisticsApplicable": true
-      },
-      "roadmapStepCount": 11,
-      "webflowId": "656a1363f32acabce37d60c9"
-    },
-    "massage-therapy": {
-      "name": "Massage Therapy",
-      "defaultSectorId": "health-care-and-social-assistance",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "621399",
-      "nonEssentialQuestionsIds": [
-        "resale-tax-cert"
-      ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true
-      },
-      "roadmapStepCount": 10,
-      "webflowId": "656a1362f58a7269b112bdc8"
-    },
-    "cemetery": {
-      "name": "Cemetery",
-      "defaultSectorId": "other-services",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "812220",
-      "nonEssentialQuestionsIds": [
-        "mvc-cpcn"
-      ],
-      "industryOnboardingQuestions": {},
-      "roadmapStepCount": 11,
-      "webflowId": "68a7501ebf7e85d7b58fcc50"
-    },
-    "car-rental": {
-      "name": "Car Rental and Dealerships ",
-      "defaultSectorId": "other-services",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "532111, 441110, 441120",
-      "nonEssentialQuestionsIds": [
-        "weights-measures",
-        "bus-initial-inspection"
-      ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": false
-      },
-      "roadmapStepCount": 12,
-      "webflowId": "656a136212e59f3e1bcf4cc5"
-    },
-    "real-estate-broker": {
-      "name": "Real Estate Brokerage",
-      "defaultSectorId": "real-estate",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "531210",
-      "nonEssentialQuestionsIds": [
-        "weights-measures"
-      ],
-      "industryOnboardingQuestions": {},
-      "roadmapStepCount": 9,
-      "webflowId": "656a136289170f00e544e8f8"
-    },
-    "management-consulting": {
-      "name": "Management Consulting",
-      "defaultSectorId": "organizational-or-financial-management",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "541611,541618",
-      "nonEssentialQuestionsIds": [],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true,
-        "isProvidesStaffingServicesApplicable": true
-      },
-      "roadmapStepCount": 8,
-      "webflowId": "656a1362d7ab8badbc8736ed"
-    },
-    "residential-landlord": {
-      "name": "Residential Landlord",
-      "defaultSectorId": "other-services",
-      "isEnabled": true,
-      "canHavePermanentLocation": false,
-      "naicsCodes": "531110",
-      "nonEssentialQuestionsIds": [
-        "multiple-dwelling-register",
-        "inspect-boiler",
-        "inspect-fridge",
-        "inspect-pv"
-      ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": false,
-        "whatIsPropertyLeaseType": true,
-        "canHaveThreeOrMoreRentalUnits": true
-      },
-      "roadmapStepCount": 9,
-      "webflowId": "656a13628934eb2330f44bcb"
-    },
-    "pharmacy": {
-      "name": "Pharmacy",
-      "defaultSectorId": "health-care-and-social-assistance",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "456110",
-      "nonEssentialQuestionsIds": [
-        "weights-measures",
-        "business-vehicle-irp",
-        "sell-milk-question",
-        "cdl-neq"
-      ],
-      "industryOnboardingQuestions": {},
-      "roadmapStepCount": 15,
-      "webflowId": "656a1363a68882853497486e"
-    },
-    "home-health-aide": {
-      "name": "Home Health Aide Placement",
-      "defaultSectorId": "health-care-and-social-assistance",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "621610",
-      "nonEssentialQuestionsIds": [
-        "weights-measures",
-        "bus-initial-inspection",
-        "mvc-cpcn",
-        "cdl-neq"
-      ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true
-      },
-      "roadmapStepCount": 10,
-      "webflowId": "656a13624020a38de9cbd8eb"
-    },
-    "finance-insurance": {
-      "name": "Finance and Insurance",
-      "defaultSectorId": "finance-and-insurance",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "524210, 524126, 524128, 524298, 524127, 524114, 524113, 525190, 524291, 522220, 524298",
-      "nonEssentialQuestionsIds": [
-        "weights-measures",
-        "insurance-producer"
-      ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true
-      },
-      "roadmapStepCount": 9,
-      "webflowId": "656a13628934eb2330f44bcb"
-    },
-    "marketing-pr-consulting": {
-      "name": "Marketing and PR Consulting",
-      "defaultSectorId": "digital-and-print-media",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "541613,541820",
-      "nonEssentialQuestionsIds": [],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true,
-        "isProvidesStaffingServicesApplicable": true
-      },
-      "roadmapStepCount": 8,
-      "webflowId": "656a1362d61cbaa67af3ac81"
-    },
-    "real-estate-appraisals": {
-      "name": "Real Estate Appraisals",
-      "defaultSectorId": "real-estate",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "",
-      "nonEssentialQuestionsIds": [
-        "weights-measures"
-      ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true,
-        "isRealEstateAppraisalManagementApplicable": true
-      },
-      "roadmapStepCount": 10,
-      "webflowId": "656a1362227f321008b482f5"
-    },
-    "interior-designer": {
-      "name": "Interior Design",
-      "defaultSectorId": "construction",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "541410",
-      "nonEssentialQuestionsIds": [
-        "weights-measures",
-        "selfgenerator-transporter-registration"
-      ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true,
-        "isCertifiedInteriorDesignerApplicable": true
-      },
-      "roadmapStepCount": 9,
-      "webflowId": "656a1363ce71bd6be5205c65"
     },
     "healthcare": {
       "name": "Healthcare",
@@ -794,132 +865,134 @@
         "canBeHomeBased": true
       },
       "roadmapStepCount": 13,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "healthcare-license",
+        "cds-healthcare",
+        "community-right-to-know-survey",
+        "env-requirements",
+        "rmw-generator-registration",
+        "manage-business-vehicles"
+      ],
       "webflowId": "656a13622828697d87e05e99"
     },
-    "car-service": {
-      "name": "Transportation and Car Service",
-      "defaultSectorId": "other-services",
+    "home-baker": {
+      "name": "Home Baker",
+      "defaultSectorId": "accommodation-and-food-services",
       "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "485999, 485210, 485310, 485320, 485410, 485510",
+      "canHavePermanentLocation": false,
+      "naicsCodes": "311811, 311821 ",
       "nonEssentialQuestionsIds": [
-        "weights-measures",
-        "business-vehicle-irp",
-        "bus-initial-inspection",
-        "vehicle-dealership-q",
-        "cdl-neq"
+        "weights-measures"
       ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true,
-        "isCarServiceApplicable": true,
-        "isTransportation": true
-      },
-      "roadmapStepCount": 14,
-      "webflowId": "656a1362f637cd08076d3599"
-    },
-    "domestic-employer": {
-      "name": "Domestic Employer",
-      "defaultSectorId": "other-services",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "814110",
-      "nonEssentialQuestionsIds": [
-        "business-vehicle-title-reg"
-      ],
-      "industryOnboardingQuestions": {},
-      "roadmapStepCount": 3,
-      "webflowId": "668d747e8623c6105ee139cf"
-    },
-    "it-consultant": {
-      "name": "IT Consulting",
-      "defaultSectorId": "technology",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "541690",
-      "nonEssentialQuestionsIds": [],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true,
-        "isProvidesStaffingServicesApplicable": true
-      },
-      "roadmapStepCount": 9,
-      "webflowId": "656a13629927b9c3c306ff69"
-    },
-    "real-estate-investor": {
-      "name": "Real Estate Investing",
-      "defaultSectorId": "real-estate",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "531390, 523999",
-      "nonEssentialQuestionsIds": [
-        "multiple-dwelling-register",
-        "inspect-boiler",
-        "inspect-fridge",
-        "inspect-pv"
-      ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true
-      },
-      "roadmapStepCount": 8,
-      "webflowId": "656a1362a0fc64e8e4c8e30d"
-    },
-    "certified-public-accountant": {
-      "name": "Accounting, Bookkeeping, and Tax Preparation",
-      "defaultSectorId": "finance-and-insurance",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "541211",
-      "nonEssentialQuestionsIds": [],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true,
-        "isCpaRequiredApplicable": true
-      },
-      "roadmapStepCount": 9,
-      "webflowId": "656a1362227f321008b482eb"
-    },
-    "graphic-design": {
-      "name": "Graphic Design",
-      "defaultSectorId": "digital-and-print-media",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "541430",
-      "nonEssentialQuestionsIds": [
-        "resale-tax-cert"
-      ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true
-      },
-      "roadmapStepCount": 8,
-      "webflowId": "656a1362d7cc059b165c4385"
-    },
-    "detective": {
-      "name": "Detective Agency",
-      "defaultSectorId": "professional-scientific-and-technical-services",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "561611",
-      "nonEssentialQuestionsIds": [],
       "industryOnboardingQuestions": {
         "canBeHomeBased": true
       },
       "roadmapStepCount": 10,
-      "webflowId": "656a136282b07990fab8d438"
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "home-baker-license",
+        "resale-tax-certificate-operating",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a1363059ec5def0e98fd9"
     },
-    "landscape-architecture": {
-      "name": "Landscape Architecture",
+    "home-contractor": {
+      "name": "Home Improvement Contractor",
       "defaultSectorId": "construction",
       "isEnabled": true,
       "canHavePermanentLocation": true,
-      "naicsCodes": "541320",
+      "naicsCodes": "238990,238390,238910,238350,238340,238330,238320,238310,238290,238220,238210,238190,238170,238160,238150,238140,238130,238120,238110,236118",
       "nonEssentialQuestionsIds": [
         "weights-measures",
-        "planning-services",
-        "pesticides-applicator-licensing"
+        "cdl-neq",
+        "selfgenerator-transporter-registration"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 9,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance-home-contractor",
+        "register-home-contractor",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a13623bf23c3979606d9d"
+    },
+    "home-health-aide": {
+      "name": "Home Health Aide Placement",
+      "defaultSectorId": "health-care-and-social-assistance",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "621610",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "bus-initial-inspection",
+        "mvc-cpcn",
+        "cdl-neq"
       ],
       "industryOnboardingQuestions": {
         "canBeHomeBased": true
       },
       "roadmapStepCount": 10,
-      "webflowId": "656a13628934eb2330f44bcb"
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "individual-staff-licenses-health-aide",
+        "home-health-aide-license",
+        "rmw-generator-registration"
+      ],
+      "webflowId": "656a13624020a38de9cbd8eb"
+    },
+    "hvac-contractor": {
+      "name": "HVAC Contractor",
+      "defaultSectorId": "professional-scientific-and-technical-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "238220",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "cdl-neq",
+        "selfgenerator-transporter-registration"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 8,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "hvac-insurance-surety-bond",
+        "hvac-license"
+      ],
+      "webflowId": "656a1362ec40f516ab69a690"
     },
     "independent-artist": {
       "name": "Entertainment",
@@ -954,7 +1027,411 @@
         "isProvidesStaffingServicesApplicable": false
       },
       "roadmapStepCount": 8,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "manage-business-vehicles"
+      ],
       "webflowId": "656a1363b58e709cb5828632"
+    },
+    "interior-designer": {
+      "name": "Interior Design",
+      "defaultSectorId": "construction",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541410",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "selfgenerator-transporter-registration"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isCertifiedInteriorDesignerApplicable": true
+      },
+      "roadmapStepCount": 9,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "certified-interior-designer",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a1363ce71bd6be5205c65"
+    },
+    "it-consultant": {
+      "name": "IT Consulting",
+      "defaultSectorId": "technology",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541690",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isProvidesStaffingServicesApplicable": true
+      },
+      "roadmapStepCount": 9,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "resale-tax-certificate-operating",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a13629927b9c3c306ff69"
+    },
+    "landscape-architecture": {
+      "name": "Landscape Architecture",
+      "defaultSectorId": "construction",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541320",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "planning-services",
+        "pesticides-applicator-licensing"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 10,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "landscape-architect-license",
+        "authorization-landscape-architect-firm",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a13628934eb2330f44bcb"
+    },
+    "law-firm": {
+      "name": "Legal Services",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541110, 541199",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 9,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "state-bar-attorney",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a13621af61e584bd4e074"
+    },
+    "lawn-care": {
+      "name": "Lawn Care",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "561730",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "lawn-businesses-CRTK-survey",
+        "pesticides-applicator-licensing",
+        "cdl-neq"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 8,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "manage-business-vehicles",
+        "env-requirements"
+      ],
+      "webflowId": "656a13620578cfd34294c82f"
+    },
+    "lodging": {
+      "name": "Lodging",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "721110, 721191, 721199, 721310",
+      "nonEssentialQuestionsIds": [
+        "hotel-register",
+        "rooming-boarding-house-owner",
+        "hotel-food",
+        "hotel-liquor",
+        "inspect-boiler",
+        "business-vehicle-irp",
+        "inspect-pv",
+        "inspect-fridge",
+        "bus-initial-inspection",
+        "mvc-cpcn",
+        "cdl-neq"
+      ],
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 9,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "env-requirements",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "662a86cad07b4acada82449d"
+    },
+    "logistics": {
+      "name": "Logistics",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "493110, 493190, 493120, 493130",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "logistics-CRTK-survey",
+        "regulated-medical-waste-question",
+        "vehicle-dealership-q",
+        "flashing-light-permit"
+      ],
+      "industryOnboardingQuestions": {
+        "isInterstateLogisticsApplicable": true
+      },
+      "roadmapStepCount": 11,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "transportation-entity-id",
+        "mvc-title-task",
+        "mvc-registration-task",
+        "trucking-cdl",
+        "env-requirements"
+      ],
+      "webflowId": "656a1363f32acabce37d60c9"
+    },
+    "management-consulting": {
+      "name": "Management Consulting",
+      "defaultSectorId": "organizational-or-financial-management",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541611,541618",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isProvidesStaffingServicesApplicable": true
+      },
+      "roadmapStepCount": 8,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a1362d7ab8badbc8736ed"
+    },
+    "marketing-pr-consulting": {
+      "name": "Marketing and PR Consulting",
+      "defaultSectorId": "digital-and-print-media",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541613,541820",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isProvidesStaffingServicesApplicable": true
+      },
+      "roadmapStepCount": 8,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a1362d61cbaa67af3ac81"
+    },
+    "massage-therapy": {
+      "name": "Massage Therapy",
+      "defaultSectorId": "health-care-and-social-assistance",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "621399",
+      "nonEssentialQuestionsIds": [
+        "resale-tax-cert"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 10,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "insurance-massage-therapy",
+        "license-massage-therapy",
+        "verify-license-massage-therapy",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a1362f58a7269b112bdc8"
+    },
+    "moving-company": {
+      "name": "Moving Company",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "484210",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "resale-tax-cert",
+        "vehicle-dealership-q"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isTransportation": true,
+        "isInterstateMovingApplicable": true
+      },
+      "roadmapStepCount": 12,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "moving-company-insurance",
+        "moving-company-license",
+        "transportation-entity-id",
+        "mvc-title-task",
+        "mvc-registration-task",
+        "trucking-cdl"
+      ],
+      "webflowId": "656a136257239e597fcb93da"
+    },
+    "non-medical-transport": {
+      "name": "Non-Medical Transport",
+      "defaultSectorId": "health-care-and-social-assistance",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "485999",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "business-vehicle-irp",
+        "vehicle-dealership-q"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 15,
+      "roadmapTaskNames": [
+        "business-plan",
+        "payment-structure-non-medical-trans",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "logisticare",
+        "transportation-entity-id",
+        "mvc-title-task",
+        "transportation-cpcn",
+        "transportation-inspection",
+        "mvc-registration-task",
+        "passenger-transport-cdl"
+      ],
+      "webflowId": "656a1363d721d75bf1eae1f4"
+    },
+    "notary-public": {
+      "name": "Notary Public",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541120",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 9,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "notary-register",
+        "get-insurance",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a1362d0d78023552ba48c"
+    },
+    "pest-control": {
+      "name": "Pest Control",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "561710",
+      "nonEssentialQuestionsIds": [
+        "pest-pesticide-dealer-licensing"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 11,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "search-licenses",
+        "pest-applicator-business-license",
+        "commercial-pest-applicator-license",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a13628934eb2330f44bcb"
     },
     "petcare": {
       "name": "Pet Care",
@@ -974,67 +1451,369 @@
         "willSellPetCareItems": true
       },
       "roadmapStepCount": 10,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "rmw-generator-registration",
+        "resale-tax-certificate-operating",
+        "env-requirements",
+        "manage-business-vehicles"
+      ],
       "webflowId": "656a1362f58a7269b112bdc6"
     },
-    "home-contractor": {
-      "name": "Home Improvement Contractor",
-      "defaultSectorId": "construction",
+    "pharmacy": {
+      "name": "Pharmacy",
+      "defaultSectorId": "health-care-and-social-assistance",
       "isEnabled": true,
       "canHavePermanentLocation": true,
-      "naicsCodes": "238990,238390,238910,238350,238340,238330,238320,238310,238290,238220,238210,238190,238170,238160,238150,238140,238130,238120,238110,236118",
+      "naicsCodes": "456110",
       "nonEssentialQuestionsIds": [
         "weights-measures",
-        "cdl-neq",
-        "selfgenerator-transporter-registration"
+        "business-vehicle-irp",
+        "sell-milk-question",
+        "cdl-neq"
       ],
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 15,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "pharmacy-prepare",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "pharmacy-license",
+        "pharmacy-cds",
+        "pharmacy-staff-licenses",
+        "community-right-to-know-survey",
+        "env-requirements",
+        "rmw-generator-registration",
+        "manage-business-vehicles",
+        "resale-tax-certificate-operating"
+      ],
+      "webflowId": "656a1363a68882853497486e"
+    },
+    "photography": {
+      "name": "Photography",
+      "defaultSectorId": "digital-and-print-media",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541921",
+      "nonEssentialQuestionsIds": [],
       "industryOnboardingQuestions": {
         "canBeHomeBased": true
       },
       "roadmapStepCount": 9,
-      "webflowId": "656a13623bf23c3979606d9d"
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "manage-business-vehicles",
+        "resale-tax-certificate-operating"
+      ],
+      "webflowId": "656a1362d699210e3fd468e8"
     },
-    "daycare": {
-      "name": "Childcare Center",
+    "printing-business": {
+      "name": "Printing Business",
+      "defaultSectorId": "digital-and-print-media",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "323111, 323117, 323113",
+      "nonEssentialQuestionsIds": [
+        "weights-measures"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 10,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "community-right-to-know-survey",
+        "env-requirements",
+        "resale-tax-certificate-operating",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a13628899de7accc4fd89"
+    },
+    "real-estate-appraisals": {
+      "name": "Real Estate Appraisals",
+      "defaultSectorId": "real-estate",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "",
+      "nonEssentialQuestionsIds": [
+        "weights-measures"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isRealEstateAppraisalManagementApplicable": true
+      },
+      "roadmapStepCount": 10,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "appraiser-license",
+        "general-appraiser-certification",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a1362227f321008b482f5"
+    },
+    "real-estate-broker": {
+      "name": "Real Estate Brokerage",
+      "defaultSectorId": "real-estate",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "531210",
+      "nonEssentialQuestionsIds": [
+        "weights-measures"
+      ],
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 9,
+      "roadmapTaskNames": [
+        "business-plan",
+        "license-broker",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a136289170f00e544e8f8"
+    },
+    "real-estate-investor": {
+      "name": "Real Estate Investing",
+      "defaultSectorId": "real-estate",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "531390, 523999",
+      "nonEssentialQuestionsIds": [
+        "multiple-dwelling-register",
+        "inspect-boiler",
+        "inspect-fridge",
+        "inspect-pv"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 8,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a1362a0fc64e8e4c8e30d"
+    },
+    "remediation-waste": {
+      "name": "Remediation and Waste Services",
+      "defaultSectorId": "waste-management-and-Remediation",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "562910, 562111, 562112, 562119, 562211, 562212, 562213, 562219, 562920, 562991, 562998",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "asbestos-abatement-question",
+        "waste-transporter-license-a-901",
+        "flashing-light-permit"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isCannabisLicenseTypeApplicable": false,
+        "isCpaRequiredApplicable": false,
+        "isCarServiceApplicable": false,
+        "isInterstateMovingApplicable": false,
+        "petCareHousing": false,
+        "isLiquorLicenseApplicable": false,
+        "isInterstateLogisticsApplicable": false,
+        "isRealEstateAppraisalManagementApplicable": false,
+        "isChildcareForSixOrMore": false,
+        "willSellPetCareItems": false,
+        "isTransportation": true,
+        "isCertifiedInteriorDesignerApplicable": false,
+        "isProvidesStaffingServicesApplicable": false
+      },
+      "roadmapStepCount": 7,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "68a7501fbf7e85d7b58fcc9f"
+    },
+    "residential-landlord": {
+      "name": "Residential Landlord",
       "defaultSectorId": "other-services",
       "isEnabled": true,
       "canHavePermanentLocation": false,
-      "naicsCodes": "624410",
+      "naicsCodes": "531110",
       "nonEssentialQuestionsIds": [
-        "mvc-cpcn",
-        "cdl-neq"
+        "multiple-dwelling-register",
+        "inspect-boiler",
+        "inspect-fridge",
+        "inspect-pv"
       ],
       "industryOnboardingQuestions": {
-        "isChildcareForSixOrMore": true
+        "canBeHomeBased": false,
+        "whatIsPropertyLeaseType": true,
+        "canHaveThreeOrMoreRentalUnits": true
       },
       "roadmapStepCount": 9,
-      "webflowId": "656a1362065390a761c33567"
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "residential-lease-agreement",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a13628934eb2330f44bcb"
     },
-    "employment-agency": {
-      "name": "Employment Agency",
-      "defaultSectorId": "administrative-and-employment-services",
+    "restaurant": {
+      "name": "Restaurant",
+      "defaultSectorId": "accommodation-and-food-services",
       "isEnabled": true,
       "canHavePermanentLocation": true,
-      "naicsCodes": "561311",
-      "nonEssentialQuestionsIds": [],
+      "naicsCodes": "722511, 722310, 722320, 722410, 722513, 722514, 722515",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "inspect-boiler",
+        "inspect-pv",
+        "inspect-fridge",
+        "sell-milk-question"
+      ],
       "industryOnboardingQuestions": {
-        "canBeHomeBased": true,
-        "isEmploymentAndPersonnelTypeApplicable": true
+        "isLiquorLicenseApplicable": true
       },
-      "roadmapStepCount": 9,
-      "webflowId": "656a13625bf066c2e6d815e7"
+      "roadmapStepCount": 12,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "floor-plan-approval-doh",
+        "food-safety-course",
+        "env-requirements",
+        "resale-tax-certificate-operating",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a1362e1f1359c3c90e9eb"
     },
-    "funeral": {
-      "name": "Funeral Services",
+    "retail": {
+      "name": "Retail",
+      "defaultSectorId": "retail-trade-and-ecommerce",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "459920, 441330, 445320, 459210, 458110, 445131, 456120, 455110, 449210, 445250, 449121, 459310, 456191, 449110, 459420, 444140, 459120, 458310, 458320, 445240, 441227, 459140, 444240, 459410, 456130, 444180, 444230, 459910, 459130, 458210, 459110, 441340, 459991, 459510, 455211, 449122, 455219, 456199, 449129, 459999, 445298",
+      "nonEssentialQuestionsIds": [
+        "ticket-broker-resell",
+        "weights-measures",
+        "cigarette-manufacture-sell",
+        "other-businesses-CRTK-survey",
+        "retail-pesticide-dealer-licensing",
+        "inspect-boiler",
+        "business-vehicle-irp",
+        "inspect-pv",
+        "inspect-fridge",
+        "sell-milk-question",
+        "cdl-neq",
+        "streamlined-sales-tax-registration"
+      ],
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 11,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "search-licenses-retail",
+        "env-requirements",
+        "resale-tax-certificate-operating",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a13629d57077e647ddf9f"
+    },
+    "school-bus": {
+      "name": "School Bus",
       "defaultSectorId": "other-services",
       "isEnabled": true,
       "canHavePermanentLocation": true,
-      "naicsCodes": "812210",
+      "naicsCodes": "485999, 485210, 485310, 485320, 485410, 485510",
       "nonEssentialQuestionsIds": [
         "weights-measures",
-        "crematory",
+        "business-vehicle-irp",
+        "vehicle-dealership-q"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isTransportation": true
+      },
+      "roadmapStepCount": 13,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "school-bus-insurance",
+        "trucking-parking",
+        "transportation-entity-id",
+        "mvc-title-task",
+        "transportation-inspection",
+        "mvc-registration-task",
+        "passenger-transport-cdl"
+      ],
+      "webflowId": "656a1362295cb540cf06fe19"
+    },
+    "security": {
+      "name": "Security",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "561622, 561621",
+      "nonEssentialQuestionsIds": [
         "bus-initial-inspection",
-        "mvc-cpcn",
-        "cdl-neq"
+        "vehicle-dealership-q",
+        "cdl-neq",
+        "flashing-light-permit"
       ],
       "industryOnboardingQuestions": {
         "canBeHomeBased": true,
@@ -1053,45 +1832,53 @@
         "isProvidesStaffingServicesApplicable": false
       },
       "roadmapStepCount": 11,
-      "webflowId": "6761e57d7cf913c3dc28724d"
-    },
-    "cleaning-janitorial-services": {
-      "name": "Cleaning and Janitorial Services",
-      "defaultSectorId": "other-services",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "561720",
-      "nonEssentialQuestionsIds": [
-        "weights-measures",
-        "pesticides-applicator-licensing"
+      "roadmapTaskNames": [
+        "alarm-locksmith-business-license",
+        "alarm-locksmith-license",
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "resale-tax-certificate-operating",
+        "manage-business-vehicles"
       ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true
-      },
-      "roadmapStepCount": 8,
-      "webflowId": "656a136212e59f3e1bcf4cc3"
+      "webflowId": "68a7501fcc861e3cfeea14af"
     },
-    "law-firm": {
-      "name": "Legal Services",
+    "telemarketing": {
+      "name": "Telemarketing",
       "defaultSectorId": "other-services",
       "isEnabled": true,
       "canHavePermanentLocation": true,
-      "naicsCodes": "541110, 541199",
+      "naicsCodes": "561422 ",
       "nonEssentialQuestionsIds": [],
       "industryOnboardingQuestions": {
         "canBeHomeBased": true
       },
-      "roadmapStepCount": 9,
-      "webflowId": "656a13621af61e584bd4e074"
+      "roadmapStepCount": 10,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "telemarketing-license",
+        "resale-tax-certificate-operating",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "668d747f9da2941b65705860"
     },
-    "event-planning": {
-      "name": "Event Planning",
+    "travel-agent": {
+      "name": "Travel Agency",
       "defaultSectorId": "other-services",
       "isEnabled": true,
       "canHavePermanentLocation": true,
-      "naicsCodes": "561920, 561990, 711320, 532289",
+      "naicsCodes": "561510",
       "nonEssentialQuestionsIds": [
-        "business-vehicle-irp",
         "bus-initial-inspection",
         "mvc-cpcn",
         "cdl-neq"
@@ -1100,66 +1887,17 @@
         "canBeHomeBased": true
       },
       "roadmapStepCount": 8,
-      "webflowId": "656a13620578cfd34294c820"
-    },
-    "vending-machine": {
-      "name": "Vending Machine",
-      "defaultSectorId": "accommodation-and-food-services",
-      "isEnabled": true,
-      "canHavePermanentLocation": false,
-      "naicsCodes": "445132, 454210",
-      "nonEssentialQuestionsIds": [
-        "weights-measures",
-        "sell-milk-question"
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "manage-business-vehicles"
       ],
-      "industryOnboardingQuestions": {},
-      "roadmapStepCount": 10,
-      "webflowId": "656a1362b4c9c3096676539c"
-    },
-    "auto-body-repair": {
-      "name": "Auto-Body Repair",
-      "defaultSectorId": "other-services",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "811121, 811111, 811198, 811114",
-      "nonEssentialQuestionsIds": [
-        "weights-measures",
-        "vehicle-dealership-q",
-        "ust-reg",
-        "flashing-light-permit"
-      ],
-      "industryOnboardingQuestions": {},
-      "roadmapStepCount": 12,
-      "webflowId": "656a13624544e5127379fdf2"
-    },
-    "generic": {
-      "name": "All Other Businesses",
-      "defaultSectorId": "other-services",
-      "isEnabled": true,
-      "canHavePermanentLocation": true,
-      "naicsCodes": "",
-      "nonEssentialQuestionsIds": [
-        "weights-measures",
-        "cds-lab-research ",
-        "cds-supply",
-        "other-businesses-CRTK-survey",
-        "inspect-boiler",
-        "regulated-medical-waste-question",
-        "business-vehicle-irp",
-        "inspect-fridge",
-        "inspect-pv",
-        "bus-initial-inspection",
-        "resale-tax-cert",
-        "ust-reg",
-        "streamlined-sales-tax-registration",
-        "flashing-light-permit",
-        "crtk-applicable-naics-codes"
-      ],
-      "industryOnboardingQuestions": {
-        "canBeHomeBased": true
-      },
-      "roadmapStepCount": 9,
-      "webflowId": "656a13628934eb2330f44bcb"
+      "webflowId": "656a13621bdc1e1600ec8734"
     },
     "trucking": {
       "name": "Trucking",
@@ -1177,7 +1915,51 @@
         "isTransportation": true
       },
       "roadmapStepCount": 16,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "trucking-insurance",
+        "trucking-boc3",
+        "trucking-usdot",
+        "transportation-entity-id",
+        "mvc-title-task",
+        "trucking-irp",
+        "trucking-ifta",
+        "mvc-registration-task",
+        "trucking-cdl",
+        "env-requirements"
+      ],
       "webflowId": "656a13624bda6c773dde8d2f"
+    },
+    "vending-machine": {
+      "name": "Vending Machine",
+      "defaultSectorId": "accommodation-and-food-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": false,
+      "naicsCodes": "445132, 454210",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "sell-milk-question"
+      ],
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 10,
+      "roadmapTaskNames": [
+        "business-plan",
+        "determine-naics-code",
+        "business-structure",
+        "register-for-ein",
+        "register-for-taxes",
+        "bank-account",
+        "get-insurance",
+        "agreement-vending-machine",
+        "resale-tax-certificate-operating",
+        "manage-business-vehicles"
+      ],
+      "webflowId": "656a1362b4c9c3096676539c"
     }
   },
   "sectors": {
@@ -1296,84 +2078,35 @@
     }
   },
   "addons": {
-    "short-term-rental-registration": {
+    "amber-light": {
       "taskCount": 1,
       "modifications": []
     },
-    "healthcare-tpa": {
+    "boiler": {
       "taskCount": 1,
       "modifications": []
     },
-    "lodging-liquor": {
-      "taskCount": 1,
-      "modifications": [
-        {
-          "taskToReplaceFilename": "town-mercantile-license",
-          "replaceWithFilename": "town-mercantile-license-liquor"
-        }
-      ]
+    "business-vehicle": {
+      "taskCount": 3,
+      "modifications": []
     },
-    "construction-home-renovation": {
+    "cannabis-annual": {
       "taskCount": 1,
       "modifications": []
     },
-    "employment-agency-temporary": {
+    "cannabis-conditional": {
       "taskCount": 2,
       "modifications": []
     },
-    "cosmetology-electrologist-license": {
-      "taskCount": 2,
-      "modifications": []
-    },
-    "cdl-addOnWhenYes": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "vehicle-cpcn": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "planner": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "home-based-transportation": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "planned-renovation": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "foreign-remote-worker": {
+    "car-service-high-capacity": {
       "taskCount": 4,
       "modifications": []
     },
-    "raffle-bingo-games": {
-      "taskCount": 1,
+    "car-service-standard": {
+      "taskCount": 3,
       "modifications": []
     },
-    "entertainment-carnival-fire-licenses": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "petcare-license": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "regulated-medical-waste-generator-registration": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "healthcare-freestanding-facility-license": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "residential-landlord-long-term-few-units": {
-      "taskCount": 2,
-      "modifications": []
-    },
-    "cpa": {
+    "cdl-addOnWhenYes": {
       "taskCount": 1,
       "modifications": []
     },
@@ -1381,71 +2114,11 @@
       "taskCount": 1,
       "modifications": []
     },
-    "nonprofit-and-corp-foreign": {
+    "community-rtk-survey": {
       "taskCount": 1,
       "modifications": []
     },
-    "foreign-remote-seller": {
-      "taskCount": 3,
-      "modifications": []
-    },
-    "entertainment-agency-registration": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "llc": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "healthcare-xray-reg": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "other-cds-supply": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "produce-insurance": {
-      "taskCount": 2,
-      "modifications": []
-    },
-    "nj-seller-streamlined-sales-tax": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "car-service-high-capacity": {
-      "taskCount": 4,
-      "modifications": []
-    },
-    "waste-transporter-license": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "construction-well-driller-license": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "retail-pesticide-dealer-license": {
-      "taskCount": 2,
-      "modifications": []
-    },
-    "refrigeration-certificate": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "petcare-trainer": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "permanent-location-business-landlord": {
-      "taskCount": 5,
-      "modifications": []
-    },
-    "pv-certificate": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "crematory-application-funeral": {
+    "construction-home-renovation": {
       "taskCount": 1,
       "modifications": []
     },
@@ -1453,40 +2126,59 @@
       "taskCount": 1,
       "modifications": []
     },
-    "lodging-hotel-registration": {
+    "construction-well-driller-license": {
       "taskCount": 1,
       "modifications": []
     },
-    "healthcare-dentist": {
+    "cosmetology-electrologist-license": {
       "taskCount": 2,
       "modifications": []
     },
-    "community-rtk-survey": {
+    "cpa": {
       "taskCount": 1,
       "modifications": []
     },
-    "liquor-license": {
+    "crematory-application-funeral": {
       "taskCount": 1,
-      "modifications": [
-        {
-          "taskToReplaceFilename": "town-mercantile-license",
-          "replaceWithFilename": "town-mercantile-license-liquor"
-        }
-      ]
+      "modifications": []
     },
-    "car-service-standard": {
+    "daycare": {
       "taskCount": 3,
       "modifications": []
     },
-    "registration-selfgenerator-waste-transp": {
+    "dental-waste-exemption": {
       "taskCount": 1,
       "modifications": []
     },
-    "amber-light": {
+    "dental-waste-registration": {
       "taskCount": 1,
       "modifications": []
     },
-    "public-works-contractor": {
+    "elevator-owning-business": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "employment-agency-employers-both": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "employment-agency-permanent": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "employment-agency-temporary": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "employment-agency-job-seekers": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "entertainment-agency-registration": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "entertainment-carnival-fire-licenses": {
       "taskCount": 1,
       "modifications": []
     },
@@ -1494,69 +2186,11 @@
       "taskCount": 2,
       "modifications": []
     },
-    "weights-measures-add": {
+    "env-requirements": {
       "taskCount": 1,
       "modifications": []
-    },
-    "oos-pharmacy": {
-      "taskCount": 0,
-      "modifications": [
-        {
-          "step": 4,
-          "taskToReplaceFilename": "pharmacy-license",
-          "replaceWithFilename": "oos-pharmacy-registration"
-        }
-      ]
     },
     "family-daycare": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "scorp": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "notify-asbestos": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "cannabis-annual": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "interstate-moving": {
-      "taskCount": 4,
-      "modifications": []
-    },
-    "vehicle-irp": {
-      "taskCount": 2,
-      "modifications": []
-    },
-    "business-vehicle": {
-      "taskCount": 3,
-      "modifications": []
-    },
-    "healthcare-dental-specialty": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "will-sell-pet-care-items": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "multi-pest-applicator-license": {
-      "taskCount": 2,
-      "modifications": []
-    },
-    "boiler": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "lodging-food": {
-      "taskCount": 2,
-      "modifications": []
-    },
-    "employment-agency-permanent": {
       "taskCount": 1,
       "modifications": []
     },
@@ -1573,43 +2207,81 @@
         }
       ]
     },
-    "lodging-rooming-boarding-house": {
-      "taskCount": 1,
+    "foreign-remote-seller": {
+      "taskCount": 3,
       "modifications": []
     },
-    "env-requirements": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "dental-waste-registration": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "real-estate-appraiser": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "sell-milk": {
-      "taskCount": 1,
+    "foreign-remote-worker": {
+      "taskCount": 4,
       "modifications": []
     },
     "healthcare-dental-hygienist": {
       "taskCount": 2,
       "modifications": []
     },
-    "other-lab-research": {
+    "healthcare-dental-specialty": {
       "taskCount": 1,
       "modifications": []
     },
-    "transportation-initial-inspection": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "real-estate-appraisal-management": {
+    "healthcare-dentist": {
       "taskCount": 2,
       "modifications": []
     },
-    "public-record-filing": {
+    "healthcare-freestanding-facility-license": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "healthcare-tpa": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "healthcare-xray-reg": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "home-based-transportation": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "interstate-logistics": {
+      "taskCount": 4,
+      "modifications": []
+    },
+    "interstate-moving": {
+      "taskCount": 4,
+      "modifications": []
+    },
+    "liquor-license": {
+      "taskCount": 1,
+      "modifications": [
+        {
+          "taskToReplaceFilename": "town-mercantile-license",
+          "replaceWithFilename": "town-mercantile-license-liquor"
+        }
+      ]
+    },
+    "llc": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "lodging-food": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "lodging-hotel-registration": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "lodging-liquor": {
+      "taskCount": 1,
+      "modifications": [
+        {
+          "taskToReplaceFilename": "town-mercantile-license",
+          "replaceWithFilename": "town-mercantile-license-liquor"
+        }
+      ]
+    },
+    "lodging-rooming-boarding-house": {
       "taskCount": 1,
       "modifications": []
     },
@@ -1622,44 +2294,20 @@
         }
       ]
     },
-    "resale-certificate": {
-      "taskCount": 1,
+    "multi-pest-applicator-license": {
+      "taskCount": 2,
       "modifications": []
     },
     "multiple-dwelling-registration": {
       "taskCount": 1,
       "modifications": []
     },
-    "pest-pesticide-dealer-license": {
-      "taskCount": 2,
-      "modifications": []
-    },
-    "ticket-broker-reseller": {
+    "nj-seller-streamlined-sales-tax": {
       "taskCount": 1,
       "modifications": []
     },
-    "employment-agency-job-seekers": {
+    "nonprofit-and-corp-foreign": {
       "taskCount": 1,
-      "modifications": []
-    },
-    "employment-agency-employers-both": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "dental-waste-exemption": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "vehicle-dealership-neq": {
-      "taskCount": 1,
-      "modifications": []
-    },
-    "daycare": {
-      "taskCount": 3,
-      "modifications": []
-    },
-    "interstate-logistics": {
-      "taskCount": 4,
       "modifications": []
     },
     "nonprofit": {
@@ -1671,7 +2319,41 @@
         }
       ]
     },
-    "public-record-filing-foreign": {
+    "notify-asbestos": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "oos-pharmacy": {
+      "taskCount": 0,
+      "modifications": [
+        {
+          "step": 4,
+          "taskToReplaceFilename": "pharmacy-license",
+          "replaceWithFilename": "oos-pharmacy-registration"
+        }
+      ]
+    },
+    "other-cds-supply": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "other-lab-research": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "permanent-location-business-landlord": {
+      "taskCount": 5,
+      "modifications": []
+    },
+    "permanent-location-business": {
+      "taskCount": 6,
+      "modifications": []
+    },
+    "pest-pesticide-dealer-license": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "petcare-license": {
       "taskCount": 1,
       "modifications": []
     },
@@ -1679,7 +2361,91 @@
       "taskCount": 1,
       "modifications": []
     },
+    "petcare-trainer": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "planned-renovation": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "planner": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "produce-insurance": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "public-record-filing-foreign": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "public-record-filing": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "public-works-contractor": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "pv-certificate": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "raffle-bingo-games": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "real-estate-appraisal-management": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "real-estate-appraiser": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "refrigeration-certificate": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "registration-selfgenerator-waste-transp": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "regulated-medical-waste-generator-registration": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "resale-certificate": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "residential-landlord-long-term-few-units": {
+      "taskCount": 2,
+      "modifications": []
+    },
     "residential-landlord-long-term-many-units": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "retail-pesticide-dealer-license": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "scorp": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "sell-milk": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "short-term-rental-registration": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "ticket-broker-reseller": {
       "taskCount": 1,
       "modifications": []
     },
@@ -1687,16 +2453,32 @@
       "taskCount": 1,
       "modifications": []
     },
-    "elevator-owning-business": {
+    "transportation-initial-inspection": {
       "taskCount": 1,
       "modifications": []
     },
-    "permanent-location-business": {
-      "taskCount": 6,
+    "vehicle-cpcn": {
+      "taskCount": 1,
       "modifications": []
     },
-    "cannabis-conditional": {
+    "vehicle-dealership-neq": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "vehicle-irp": {
       "taskCount": 2,
+      "modifications": []
+    },
+    "waste-transporter-license": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "weights-measures-add": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "will-sell-pet-care-items": {
+      "taskCount": 1,
       "modifications": []
     }
   },
@@ -3771,5 +4553,14 @@
     "funeral": "health-care-and-social-assistance",
     "petcare": "health-care-and-social-assistance",
     "residential-landlord": "real-estate"
-  }
+  },
+  "universalTasks": [
+    "bank-account",
+    "business-plan",
+    "business-structure",
+    "determine-naics-code",
+    "manage-business-vehicles",
+    "register-for-ein",
+    "register-for-taxes"
+  ]
 }
