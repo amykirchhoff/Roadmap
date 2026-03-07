@@ -118,13 +118,13 @@ export default function App() {
           </div>
         </div>
       </Sec>
-      <Sec title="Mismatched Industries" sub="Sorted by user count. Shows additional AAs that would become visible if sector were corrected.">
+      <Sec title="Mismatched Industries" sub="Sorted by user count. The tag shows how many anytime actions are currently invisible to these users due to the mismatch.">
         <div style={{display:"grid",gap:4}}>{mismatchInds.sort((a,b)=>b.users-a.users).map(ind=>(
           <div key={ind.id} onClick={()=>goDetail(ind)} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"10px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:10,fontSize:12,fontFamily:C.sans}} onMouseEnter={e=>e.currentTarget.style.background=C.cardHover} onMouseLeave={e=>e.currentTarget.style.background=C.card}>
             <span style={{flex:1,color:C.text,fontWeight:600}}>{ind.name}</span>
             <span style={{color:C.accent,fontFamily:C.mono,fontSize:13}}>{fmt(ind.users)}</span>
             <span style={{color:C.red,fontSize:10}}>{ind.sectorName}</span><span style={{color:C.muted}}>→</span><span style={{color:C.green,fontSize:10}}>{ind.sectorMismatchName}</span>
-            {ind.ifFixed.missedAA>0&&<Tag color={C.red}>+{ind.ifFixed.missedAA} AA</Tag>}
+            {ind.ifFixed.missedAA>0&&<Tag color={C.red}>{ind.ifFixed.missedAA} AA missing</Tag>}
           </div>
         ))}</div>
       </Sec>
@@ -210,8 +210,8 @@ export default function App() {
     const formed=pm["FORMED"]||0,upR=pm["UP_AND_RUNNING"]||0;
     return (<div>
       <Alert color={C.orange}><strong>The graduation cliff:</strong> {fmt(formed)} users are in FORMED but only {fmt(upR)} graduated to UP_AND_RUNNING — a <strong>{pct(upR,formed)}</strong> conversion. The operate content serves just <strong>{pct(phases.seesAAFunding,totalBiz)}</strong> of all users.</Alert>
-      <Insight><strong>Two products in one:</strong> The roadmap system (plan/start tasks) serves ~{fmt(phases.seesRoadmap)} users and is clearly working — {fmt((tp.find(t=>t.task==="Select Your Business Structure")||{}).completed||0)} completed business structure, {fmt((tp.find(t=>t.task.includes("Authorize Your Business"))||{}).completed||0)} formed entities. But the operate system (AAs, fundings, calendar) only reaches ~{fmt(phases.seesAAFunding)} users. You've built two content systems: one serves 76% of your base and one serves 16%. The investment in the second — 64 AAs, 64 fundings, 9 certifications — is large relative to its audience.</Insight>
-      <Insight><strong>Where users stall:</strong> {fmt(pm["GUEST_MODE"]||0)} in Guest Mode + {fmt(pm["GUEST_MODE_WITH_BUSINESS_STRUCTURE"]||0)} picked a structure but stopped = ~{fmt((pm["GUEST_MODE"]||0)+(pm["GUEST_MODE_WITH_BUSINESS_STRUCTURE"]||0))} stalled early. Another {fmt(pm["NEEDS_TO_FORM"]||0)} know they need to form but haven't. Showing fundings or anytime actions earlier in the journey could motivate these users forward.</Insight>
+      <Insight><strong>Two products in one:</strong> The roadmap system (plan/start tasks) serves ~{fmt(phases.seesRoadmap)} users and is clearly working — {fmt((tp.find(t=>t.task==="Select Your Business Structure")||{}).completed||0)} completed business structure, {fmt((tp.find(t=>t.task.includes("Authorize Your Business"))||{}).completed||0)} formed entities. But the operate system (AAs, fundings, calendar) only reaches ~{fmt(phases.seesAAFunding)} users. We've effectively built two content systems: one serves 76% of our base and one serves 16%. The investment in the second — 64 AAs, 64 fundings, 9 certifications — is large relative to its audience.</Insight>
+      <Insight><strong>Where users stall:</strong> {fmt(pm["GUEST_MODE"]||0)} in Guest Mode + {fmt(pm["GUEST_MODE_WITH_BUSINESS_STRUCTURE"]||0)} picked a structure but stopped = ~{fmt((pm["GUEST_MODE"]||0)+(pm["GUEST_MODE_WITH_BUSINESS_STRUCTURE"]||0))} stalled early. Another {fmt(pm["NEEDS_TO_FORM"]||0)} know they need to form but haven't. These {fmt((pm["GUEST_MODE"]||0)+(pm["GUEST_MODE_WITH_BUSINESS_STRUCTURE"]||0)+(pm["NEEDS_TO_FORM"]||0))} users have no access to fundings or anytime actions at their current operating phase.</Insight>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
         <Stat label="Total Businesses" value={fmt(totalBiz)} small />
         <Stat label="See Roadmap" value={fmt(phases.seesRoadmap)} sub={pct(phases.seesRoadmap,totalBiz)} color={C.accent} small />
@@ -287,7 +287,7 @@ export default function App() {
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:20}}>
         <Stat label="Users" value={fmt(ind.users)} /><Stat label="Roadmap Tasks" value={ind.roadmapTasks} color={C.accent} /><Stat label="Diff. Tasks" value={ind.totalDiffTasks} color={C.orange} /><Stat label="Unique" value={ind.uniqueTasks} color={C.red} /><Stat label="Shared" value={ind.sharedTasks} color={C.cyan} />
       </div>
-      {ind.sectorMismatch&&<Alert color={C.red}><strong>Sector mismatch:</strong> Assigned "{ind.sectorName}" but content implies "{ind.sectorMismatchName}."{fix.missedAA>0&&<span> Fixing surfaces <strong>{fix.missedAA} more AAs</strong>.</span>}{fix.missedFund!==0&&<span> Fundings: <strong>{fix.missedFund>0?"+":""}{fix.missedFund}</strong>.</span>}</Alert>}
+      {ind.sectorMismatch&&<Alert color={C.red}><strong>Sector mismatch:</strong> Assigned "{ind.sectorName}" but content implies "{ind.sectorMismatchName}."{fix.missedAA>0&&<span> These users are missing <strong>{fix.missedAA} anytime actions</strong> tagged to the correct sector.</span>}{fix.missedFund!==0&&<span> Funding count difference: <strong>{fix.missedFund>0?"+":""}{fix.missedFund}</strong>.</span>}</Alert>}
       {ind.totalDiffTasks===0&&<Alert color={C.red}><strong>Zero differentiating tasks.</strong> Identical to generic baseline. {fmt(ind.users)} users get no industry-specific guidance.</Alert>}
       {(ind.uniqueTaskNames||[]).length>0&&<Sec title="Unique Tasks" sub="Only this industry."><div style={{display:"flex",flexWrap:"wrap",gap:4}}>{ind.uniqueTaskNames.map(t=><Tag key={t} color={C.red}>{taskFmt(t)}</Tag>)}</div></Sec>}
       {(ind.sharedTaskNames||[]).length>0&&<Sec title="Shared Tasks" sub="Click to see which industries share.">
