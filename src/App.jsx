@@ -298,10 +298,42 @@ export default function App() {
       <button onClick={()=>setView("industries")} style={{background:"transparent",border:"none",color:C.accent,cursor:"pointer",fontSize:12,padding:0,fontFamily:C.sans,marginBottom:12}}>← Back</button>
       <h2 style={{color:C.text,fontSize:22,fontWeight:700,margin:"0 0 4px",fontFamily:C.sans}}>{ind.name}</h2>
       <div style={{fontSize:12,color:C.muted,marginBottom:16,fontFamily:C.sans}}>Sector: <span style={{color:ind.sectorMismatch?C.red:C.text}}>{ind.sectorName}</span>{ind.sectorMismatch&&<span> → <span style={{color:C.green}}>{ind.sectorMismatchName}</span></span>}</div>
+      <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:8}}>
+        <Stat label="Businesses" value={fmt(ind.users)} sub={pct(ind.users,totalBiz)+" of all businesses on the platform"} />
+        <Stat label="Roadmap Tasks" value={ind.roadmapTasks} sub="Total steps in this industry's roadmap (including universal)" color={C.accent} />
+        <Stat label="Differentiating Tasks" value={ind.totalDiffTasks} sub="Tasks that aren't shared by every industry" color={C.orange} />
+        <Stat label="Unique Tasks" value={ind.uniqueTasks} sub="Tasks that only appear in this industry's roadmap" color={C.red} />
+      </div>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:20}}>
-        <Stat label="Users" value={fmt(ind.users)} /><Stat label="Roadmap Tasks" value={ind.roadmapTasks} color={C.accent} /><Stat label="Diff. Tasks" value={ind.totalDiffTasks} color={C.orange} /><Stat label="Unique" value={ind.uniqueTasks} color={C.red} /><Stat label="Shared" value={ind.sharedTasks} color={C.cyan} />
+        <Stat label="Shared Tasks" value={ind.sharedTasks} sub="Differentiating tasks also found in other industries" color={C.cyan} />
+        <Stat label="Anytime Actions (Starting)" value={s.aaTotal} sub={s.aaByIndustry+" by industryId, "+s.aaBySector+" by sectorId, "+s.aaUniversal+" universal"} color={C.cyan} />
+        <Stat label="Fundings Visible (Starting)" value={s.fundings} sub={"Matched via the '"+ind.sectorName+"' sector"} color={C.green} />
+        <Stat label="Non-Essential Questions" value={ind.nonEssentialQs} sub="Profile questions asked of this industry that trigger add-on tasks" color={C.muted} />
       </div>
       {ind.sectorMismatch&&<Alert color={C.red}><strong>Sector mismatch:</strong> Assigned "{ind.sectorName}" but content implies "{ind.sectorMismatchName}."{fix.missedAA>0&&<span> These users are missing <strong>{fix.missedAA} anytime actions</strong> tagged to the correct sector.</span>}{fix.missedFund!==0&&<span> Funding count difference: <strong>{fix.missedFund>0?"+":""}{fix.missedFund}</strong>.</span>}</Alert>}
+      {ind.sectorMismatch&&(()=>{
+        const currentAll = new Set([...(s.aaNamesByIndustry||[]),...(s.aaNamesBySector||[])]);
+        const correctedSectorAAs = (o.aaNamesBySector||[]).filter(n=>!currentAll.has(n));
+        const lostSectorAAs = (s.aaNamesBySector||[]).filter(n=>!(o.aaNamesBySector||[]).includes(n));
+        return (correctedSectorAAs.length>0||lostSectorAAs.length>0) ? (
+          <Sec title={"If Sector Were Corrected to '"+ind.sectorMismatchName+"'"} sub={"Currently assigned to '"+ind.sectorName+"'. Here's what changes for STARTING users in this industry."}>
+            <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:12}}>
+              <Stat label="Current AAs (Starting)" value={s.aaTotal} color={C.muted} small />
+              <Stat label="AAs After Correction" value={fix.aaTotal} color={C.green} small />
+              <Stat label="Current Fundings" value={s.fundings} color={C.muted} small />
+              <Stat label="Fundings After Correction" value={fix.fundings} color={fix.fundings>s.fundings?C.green:fix.fundings<s.fundings?C.orange:C.muted} small />
+            </div>
+            {correctedSectorAAs.length>0&&<div style={{marginBottom:10}}>
+              <div style={{fontSize:11,color:C.green,marginBottom:4,fontFamily:C.sans}}>Anytime actions these users currently cannot see ({correctedSectorAAs.length}):</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:3}}>{correctedSectorAAs.map(n=><Tag key={n} color={C.green}>{n}</Tag>)}</div>
+            </div>}
+            {lostSectorAAs.length>0&&<div style={{marginBottom:10}}>
+              <div style={{fontSize:11,color:C.orange,marginBottom:4,fontFamily:C.sans}}>Anytime actions they currently see via '{ind.sectorName}' that would no longer match ({lostSectorAAs.length}):</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:3}}>{lostSectorAAs.map(n=><Tag key={n} color={C.orange}>{n}</Tag>)}</div>
+            </div>}
+          </Sec>
+        ) : null;
+      })()}
       {ind.totalDiffTasks===0&&<Alert color={C.red}><strong>Zero differentiating tasks.</strong> Identical to generic baseline. {fmt(ind.users)} users get no industry-specific guidance.</Alert>}
       {(ind.uniqueTaskNames||[]).length>0&&<Sec title="Unique Tasks" sub="Only this industry."><div style={{display:"flex",flexWrap:"wrap",gap:4}}>{ind.uniqueTaskNames.map(t=><Tag key={t} color={C.red}>{taskFmt(t)}</Tag>)}</div></Sec>}
       {(ind.sharedTaskNames||[]).length>0&&<Sec title="Shared Tasks" sub="Click to see which industries share.">
