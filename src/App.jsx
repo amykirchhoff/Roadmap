@@ -338,8 +338,9 @@ export default function App() {
       <div style={{fontSize:12,color:C.muted,marginBottom:16,fontFamily:C.sans}}>Sector: <span style={{color:ind.sectorMismatch?C.red:C.text}}>{ind.sectorName}</span>{ind.sectorMismatch&&<span> → <span style={{color:C.green}}>{ind.sectorMismatchName}</span></span>}</div>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:8}}>
         <Stat label="Businesses" value={fmt(ind.users)} sub={pct(ind.users,totalBiz)+" of all businesses on the platform"} />
-        <Stat label="Roadmap Tasks" value={ind.roadmapTasks} sub="Total steps in this industry's roadmap (including universal)" color={C.accent} />
-        <Stat label="Differentiating Tasks" value={ind.totalDiffTasks} sub="Tasks that aren't shared by every industry" color={C.orange} />
+        <Stat label="Roadmap Tasks" value={ind.roadmapTasks} sub={(ind.roadmapTasks-ind.totalDiffTasks)+" universal + "+ind.totalDiffTasks+" differentiating"} color={C.accent} />
+        <Stat label="Universal Tasks" value={ind.roadmapTasks - ind.totalDiffTasks} sub="Tasks shared by every industry (business plan, structure, NAICS, EIN, etc.)" color={C.muted} />
+        <Stat label="Differentiating Tasks" value={ind.totalDiffTasks} sub={ind.uniqueTasks+" unique + "+ind.sharedTasks+" shared"} color={C.orange} />
         <Stat label="Unique Tasks" value={ind.uniqueTasks} sub="Tasks that only appear in this industry's roadmap" color={C.red} />
       </div>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:20}}>
