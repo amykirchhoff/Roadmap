@@ -5018,5 +5018,384 @@
     "haul-waste-hic": 5,
     "weights-measures-registration": 38,
     "search-licenses-retail": 1
-  }
+  },
+  "questionIndustryCount": {
+    "weights-measures": 38,
+    "vehicle-dealership-q": 11,
+    "ust-reg": 2,
+    "flashing-light-permit": 7,
+    "inspect-boiler": 9,
+    "business-vehicle-irp": 12,
+    "inspect-pv": 9,
+    "inspect-fridge": 9,
+    "bus-initial-inspection": 14,
+    "cdl-neq": 18,
+    "mvc-cpcn": 9,
+    "pesticides-applicator-licensing": 4,
+    "well-driller": 1,
+    "selfgenerator-transporter-registration": 5,
+    "waste-transporter-license-a-901": 2,
+    "electrologist": 3,
+    "courier-CRTK-survey": 1,
+    "business-vehicle-title-reg": 1,
+    "cigarette-manufacture-sell": 2,
+    "other-businesses-CRTK-survey": 3,
+    "streamlined-sales-tax-registration": 36,
+    "planning-services": 2,
+    "insurance-producer": 1,
+    "crematory": 1,
+    "cds-lab-research ": 1,
+    "cds-supply": 1,
+    "regulated-medical-waste-question": 2,
+    "resale-tax-cert": 34,
+    "crtk-applicable-naics-codes": 1,
+    "dentist": 1,
+    "dental-amalgam-waste": 1,
+    "freestanding-residential-health-care-license": 1,
+    "healthcare-xray-regis": 1,
+    "healthcare-optometrist ": 1,
+    "dental-hygienist": 1,
+    "special-permit-dentistry": 1,
+    "carnival-fire-licenses": 1,
+    "carnival-ride-permitting": 1,
+    "ticket-broker-resell": 2,
+    "entertainment-agency-register": 1,
+    "lawn-businesses-CRTK-survey": 1,
+    "hotel-register": 1,
+    "rooming-boarding-house-owner": 1,
+    "hotel-food": 1,
+    "hotel-liquor": 1,
+    "logistics-CRTK-survey": 1,
+    "pest-pesticide-dealer-licensing": 1,
+    "petcare-cds-shelter": 1,
+    "petcare-cds-trainer": 1,
+    "sell-milk-question": 4,
+    "multiple-dwelling-register": 2,
+    "asbestos-abatement-question": 1,
+    "retail-pesticide-dealer-licensing": 1
+  },
+  "questionIdToName": {},
+  "distinctPaths": [
+    {
+      "id": "healthcare",
+      "name": "Healthcare",
+      "distinctPaths": 512
+    },
+    {
+      "id": "retail",
+      "name": "Retail",
+      "distinctPaths": 256
+    },
+    {
+      "id": "commercial-construction",
+      "name": "Construction",
+      "distinctPaths": 128
+    },
+    {
+      "id": "generic",
+      "name": "All Other Businesses",
+      "distinctPaths": 128
+    },
+    {
+      "id": "health-club",
+      "name": "Health Club",
+      "distinctPaths": 64
+    },
+    {
+      "id": "independent-artist",
+      "name": "Entertainment",
+      "distinctPaths": 64
+    },
+    {
+      "id": "pharmacy",
+      "name": "Pharmacy",
+      "distinctPaths": 64
+    },
+    {
+      "id": "restaurant",
+      "name": "Restaurant",
+      "distinctPaths": 64
+    },
+    {
+      "id": "cannabis",
+      "name": "Cannabis",
+      "distinctPaths": 32
+    },
+    {
+      "id": "courier",
+      "name": "Courier Service",
+      "distinctPaths": 32
+    },
+    {
+      "id": "funeral",
+      "name": "Funeral Services",
+      "distinctPaths": 32
+    },
+    {
+      "id": "lodging",
+      "name": "Lodging",
+      "distinctPaths": 32
+    },
+    {
+      "id": "remediation-waste",
+      "name": "Remediation and Waste Services",
+      "distinctPaths": 32
+    },
+    {
+      "id": "auto-body-repair",
+      "name": "Auto-Body Repair",
+      "distinctPaths": 16
+    },
+    {
+      "id": "car-rental",
+      "name": "Car Rental and Dealerships ",
+      "distinctPaths": 16
+    },
+    {
+      "id": "car-service",
+      "name": "Transportation and Car Service",
+      "distinctPaths": 16
+    },
+    {
+      "id": "cleaning-janitorial-services",
+      "name": "Cleaning and Janitorial Services",
+      "distinctPaths": 16
+    },
+    {
+      "id": "cosmetology",
+      "name": "Cosmetology",
+      "distinctPaths": 16
+    },
+    {
+      "id": "domestic-employer",
+      "name": "Domestic Employer",
+      "distinctPaths": 16
+    },
+    {
+      "id": "e-commerce",
+      "name": "Online Business",
+      "distinctPaths": 16
+    },
+    {
+      "id": "electrical-contractor",
+      "name": "Electrical Contractor",
+      "distinctPaths": 16
+    },
+    {
+      "id": "engineering",
+      "name": "Engineering and Land Surveying",
+      "distinctPaths": 16
+    },
+    {
+      "id": "event-planning",
+      "name": "Event Planning",
+      "distinctPaths": 16
+    },
+    {
+      "id": "finance-insurance",
+      "name": "Finance and Insurance",
+      "distinctPaths": 16
+    },
+    {
+      "id": "freight-forwarding",
+      "name": "Freight Forwarding",
+      "distinctPaths": 16
+    },
+    {
+      "id": "home-contractor",
+      "name": "Home Improvement Contractor",
+      "distinctPaths": 16
+    },
+    {
+      "id": "home-health-aide",
+      "name": "Home Health Aide Placement",
+      "distinctPaths": 16
+    },
+    {
+      "id": "hvac-contractor",
+      "name": "HVAC Contractor",
+      "distinctPaths": 16
+    },
+    {
+      "id": "interior-designer",
+      "name": "Interior Design",
+      "distinctPaths": 16
+    },
+    {
+      "id": "landscape-architecture",
+      "name": "Landscape Architecture",
+      "distinctPaths": 16
+    },
+    {
+      "id": "lawn-care",
+      "name": "Lawn Care",
+      "distinctPaths": 16
+    },
+    {
+      "id": "logistics",
+      "name": "Logistics",
+      "distinctPaths": 16
+    },
+    {
+      "id": "moving-company",
+      "name": "Moving Company",
+      "distinctPaths": 16
+    },
+    {
+      "id": "non-medical-transport",
+      "name": "Non-Medical Transport",
+      "distinctPaths": 16
+    },
+    {
+      "id": "petcare",
+      "name": "Pet Care",
+      "distinctPaths": 16
+    },
+    {
+      "id": "printing-business",
+      "name": "Printing Business",
+      "distinctPaths": 16
+    },
+    {
+      "id": "real-estate-appraisals",
+      "name": "Real Estate Appraisals",
+      "distinctPaths": 16
+    },
+    {
+      "id": "real-estate-broker",
+      "name": "Real Estate Brokerage",
+      "distinctPaths": 16
+    },
+    {
+      "id": "real-estate-investor",
+      "name": "Real Estate Investing",
+      "distinctPaths": 16
+    },
+    {
+      "id": "school-bus",
+      "name": "School Bus",
+      "distinctPaths": 16
+    },
+    {
+      "id": "trucking",
+      "name": "Trucking",
+      "distinctPaths": 16
+    },
+    {
+      "id": "vending-machine",
+      "name": "Vending Machine",
+      "distinctPaths": 16
+    },
+    {
+      "id": "acupuncture",
+      "name": "Acupuncture",
+      "distinctPaths": 8
+    },
+    {
+      "id": "architecture",
+      "name": "Architecture and Urban Planning ",
+      "distinctPaths": 8
+    },
+    {
+      "id": "cemetery",
+      "name": "Cemetery",
+      "distinctPaths": 8
+    },
+    {
+      "id": "certified-public-accountant",
+      "name": "Accounting, Bookkeeping, and Tax Preparation",
+      "distinctPaths": 8
+    },
+    {
+      "id": "detective",
+      "name": "Detective Agency",
+      "distinctPaths": 8
+    },
+    {
+      "id": "employment-agency",
+      "name": "Employment Agency",
+      "distinctPaths": 8
+    },
+    {
+      "id": "food-truck",
+      "name": "Food Truck",
+      "distinctPaths": 8
+    },
+    {
+      "id": "graphic-design",
+      "name": "Graphic Design",
+      "distinctPaths": 8
+    },
+    {
+      "id": "home-baker",
+      "name": "Home Baker",
+      "distinctPaths": 8
+    },
+    {
+      "id": "it-consultant",
+      "name": "IT Consulting",
+      "distinctPaths": 8
+    },
+    {
+      "id": "law-firm",
+      "name": "Legal Services",
+      "distinctPaths": 8
+    },
+    {
+      "id": "management-consulting",
+      "name": "Management Consulting",
+      "distinctPaths": 8
+    },
+    {
+      "id": "marketing-pr-consulting",
+      "name": "Marketing and PR Consulting",
+      "distinctPaths": 8
+    },
+    {
+      "id": "massage-therapy",
+      "name": "Massage Therapy",
+      "distinctPaths": 8
+    },
+    {
+      "id": "notary-public",
+      "name": "Notary Public",
+      "distinctPaths": 8
+    },
+    {
+      "id": "pest-control",
+      "name": "Pest Control",
+      "distinctPaths": 8
+    },
+    {
+      "id": "photography",
+      "name": "Photography",
+      "distinctPaths": 8
+    },
+    {
+      "id": "residential-landlord",
+      "name": "Residential Landlord",
+      "distinctPaths": 8
+    },
+    {
+      "id": "security",
+      "name": "Security",
+      "distinctPaths": 8
+    },
+    {
+      "id": "telemarketing",
+      "name": "Telemarketing",
+      "distinctPaths": 8
+    },
+    {
+      "id": "travel-agent",
+      "name": "Travel Agency",
+      "distinctPaths": 8
+    },
+    {
+      "id": "daycare",
+      "name": "Childcare Center",
+      "distinctPaths": 4
+    }
+  ],
+  "totalDistinctPaths": 2076
 }
