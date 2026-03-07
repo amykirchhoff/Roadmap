@@ -194,6 +194,70 @@ for f in sorted(os.listdir(addon_dir_path)):
         addon_task_reach.setdefault(t, set())
         addon_task_reach[t] |= reach
 
+# ============================================================
+# Compute distinct roadmap paths per industry
+# Each industry can produce multiple unique task sets depending on
+# legal structure, non-essential question answers, and home-based status.
+# ============================================================
+# Load add-on tasks
+addon_tasks_by_id = {}
+for f in sorted(os.listdir(addon_dir_path)):
+    if not f.endswith(".json"): continue
+    d = json.load(open(os.path.join(addon_dir_path, f)))
+    addon_tasks_by_id[d["id"]] = frozenset(
+        s.get("task") or s.get("licenseTask") or ""
+        for s in d.get("roadmapSteps", []) if s.get("task") or s.get("licenseTask")
+    )
+
+# NEQ -> add-on task mapping (heuristic: match NEQ ID to add-on ID)
+neq_addon_tasks = {}
+for nq in set(q for qs in neq_to_inds.keys() for q in [qs]):
+    for aid, atasks in addon_tasks_by_id.items():
+        if nq in aid or aid in nq or aid.replace("-add","") in nq or nq in aid.split("-")[0]:
+            if atasks:
+                neq_addon_tasks[nq] = atasks
+                break
+
+legal_addon_map = {
+    "llc": [addon_tasks_by_id.get("llc", frozenset())],
+    "scorp": [addon_tasks_by_id.get("scorp", frozenset())],
+    "nonprofit": [addon_tasks_by_id.get("nonprofit", frozenset())],
+    "other": [addon_tasks_by_id.get("public-record-filing", frozenset())],
+}
+
+sector_neqs_map = {}
+for s in sector_json["arrayOfSectors"]:
+    sector_neqs_map[s["id"]] = s.get("nonEssentialQuestionsIds", [])
+
+distinct_paths = []
+total_distinct = 0
+for iid, ind in sorted(industries.items()):
+    if not ind.get("isEnabled"): continue
+    base_tasks = frozenset(ind.get("roadmapTaskNames", []))
+    ind_neqs = ind.get("nonEssentialQuestionsIds", [])
+    sec_neqs = sector_neqs_map.get(ind["defaultSectorId"], [])
+    all_neqs = list(set(ind_neqs + sec_neqs))
+
+    perm_tasks = frozenset()
+    for aid in ["permanent-location-business", "permanent-location-business-landlord"]:
+        if aid in addon_tasks_by_id:
+            perm_tasks |= addon_tasks_by_id[aid]
+    home_options = [frozenset(), perm_tasks] if ind.get("canHavePermanentLocation") else [frozenset()]
+
+    seen = set()
+    for legal_key, legal_task_list in legal_addon_map.items():
+        legal_tasks = frozenset().union(*legal_task_list)
+        for neq_bits in range(2 ** len(all_neqs)):
+            neq_tasks = frozenset()
+            for j, nq in enumerate(all_neqs):
+                if neq_bits & (1 << j) and nq in neq_addon_tasks:
+                    neq_tasks |= neq_addon_tasks[nq]
+            for home_tasks in home_options:
+                seen.add(base_tasks | legal_tasks | neq_tasks | home_tasks)
+
+    distinct_paths.append({"id": iid, "distinctPaths": len(seen)})
+    total_distinct += len(seen)
+
 output = {
     "industries": industries, "sectors": sectors, "addons": addons,
     "anytimeActions": anytime_actions, "fundings": fundings,
@@ -203,6 +267,8 @@ output = {
     "taskNameToSlug": task_name_to_slug,
     "addonTaskSlugs": sorted(addon_task_slugs),
     "addonTaskReach": {slug: len(ids) for slug, ids in addon_task_reach.items()},
+    "distinctPaths": distinct_paths,
+    "totalDistinctPaths": total_distinct,
 }
 
 os.makedirs(os.path.dirname(OUT), exist_ok=True)

@@ -244,6 +244,12 @@ print(f"  Task categories: {cat_counts}")
 # ============================================================
 # Build combined industry data
 # ============================================================
+# Distinct paths per industry (from navigator analysis)
+distinct_paths_map = {}
+for dp in nav.get("distinctPaths", []):
+    distinct_paths_map[dp["id"]] = dp["distinctPaths"]
+total_distinct_paths = nav.get("totalDistinctPaths", 0)
+
 combined_industries = []
 for ind_id, ind in sorted(nav_industries.items(), key=lambda x: x[1]["name"]):
     if not ind.get("isEnabled"): continue
@@ -286,6 +292,7 @@ for ind_id, ind in sorted(nav_industries.items(), key=lambda x: x[1]["name"]):
         "sectorMismatchName": suggested_sector_name or None,
         "roadmapTasks": ind["roadmapStepCount"],
         "nonEssentialQs": len(ind.get("nonEssentialQuestionsIds", [])),
+        "distinctPaths": distinct_paths_map.get(ind_id, 0),
         "totalDiffTasks": ta.get("totalTasks", 0),
         "uniqueTasks": ta.get("uniqueTasks", 0),
         "sharedTasks": ta.get("sharedTasks", 0),
@@ -413,6 +420,7 @@ output = {
     "taskFrequency": task_frequency,
     "universalTasks": universal_tasks,
     "totalDiffTasks": len(task_to_industries),
+    "totalDistinctPaths": total_distinct_paths,
     "unknowns": {
         "industry": unknown_industry,
         "sector": unknown_sector,
