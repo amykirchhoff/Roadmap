@@ -333,7 +333,7 @@ output = {
     "sectors": sector_summary,
     "anytimeActions": aa_reach,
     "phases": phase_summary,
-    "taskProgress": task_progress[:80],
+    "taskProgress": task_progress,
     "nonEssentialQuestions": neq_data,
     "legalStructures": legal_data,
     "orphanedSectors": sorted(orphaned_sectors),
