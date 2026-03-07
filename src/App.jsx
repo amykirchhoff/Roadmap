@@ -447,12 +447,12 @@ export default function App() {
           <button onClick={()=>setTaskSort("time")} style={{padding:"4px 10px",background:taskSort==="time"?C.accentDim:"transparent",color:taskSort==="time"?C.text:C.muted,border:`1px solid ${C.border}`,borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:C.sans}}>Longest Avg Time</button>
         </div>
         <div style={{display:"flex",gap:16,marginBottom:8,fontSize:10,color:C.muted,fontFamily:C.sans,alignItems:"center",flexWrap:"wrap"}}>
-          <span>Task type:</span>
+          <span>Task color (by roadmap count):</span>
           <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.accent,marginRight:4,verticalAlign:"middle"}}/>Universal (all roadmaps)</span>
-          <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.cyan,marginRight:4,verticalAlign:"middle"}}/>Shared (multiple industries)</span>
-          <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.red,marginRight:4,verticalAlign:"middle"}}/>Unique (one industry)</span>
-          <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.purple,marginRight:4,verticalAlign:"middle"}}/>Add-on (triggered by profile)</span>
+          <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.cyan,marginRight:4,verticalAlign:"middle"}}/>Shared (2+ industries)</span>
+          <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.red,marginRight:4,verticalAlign:"middle"}}/>Unique (1 industry)</span>
           <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.muted,marginRight:4,verticalAlign:"middle"}}/>Uncategorized</span>
+          <span style={{marginLeft:8,borderLeft:`1px solid ${C.border}`,paddingLeft:8}}><span style={{background:`${C.purple}22`,color:C.purple,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.purple}33`,fontSize:9,marginRight:4}}>ADD-ON · 58</span>Triggered by profile question or legal structure; number = how many industries could see it</span>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:8,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
           <span style={{width:22,textAlign:"right"}}>#</span>
@@ -463,11 +463,14 @@ export default function App() {
           <span style={{width:55,textAlign:"right"}}>Done</span>
           <span style={{width:40,textAlign:"right"}}>Avg Time</span>
         </div>
-        {sorted2.map((t,i)=>{const cc={universal:C.accent,shared:C.cyan,unique:C.red,addon:C.purple,uncategorized:C.muted}[t.category]||C.muted;return(
+        {sorted2.map((t,i)=>{const cc={universal:C.accent,shared:C.cyan,unique:C.red,uncategorized:C.muted}[t.category]||C.muted;return(
         <div key={t.task+i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",display:"flex",alignItems:"center",gap:8}}>
           <span style={{width:22,fontSize:10,color:C.muted,fontFamily:C.mono,textAlign:"right"}}>{i+1}</span>
-          <span style={{width:10,height:10,borderRadius:"50%",background:cc,flexShrink:0,opacity:.9}} title={t.category}></span>
-          <div style={{flex:1,minWidth:0}}><div style={{fontSize:12,color:cc,fontFamily:C.sans,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{t.task}</div></div>
+          <span style={{width:10,height:10,borderRadius:"50%",background:cc,flexShrink:0,opacity:.9}} title={t.category+(t.isAddon?" (add-on)":"")}></span>
+          <div style={{flex:1,minWidth:0,display:"flex",alignItems:"center",gap:6}}>
+            <div style={{fontSize:12,color:cc,fontFamily:C.sans,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{t.task}</div>
+            {t.isAddon&&<span style={{background:`${C.purple}22`,color:C.purple,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.purple}33`,fontSize:8,flexShrink:0}}>ADD-ON{t.reachCount?` · ${t.reachCount}`:""}</span>}
+          </div>
           <div style={{width:120,height:8,background:C.bg,borderRadius:4,overflow:"hidden"}}><div style={{width:`${t.total/topTotal*100}%`,height:"100%",background:cc,borderRadius:4,opacity:.6}}/></div>
           <span style={{width:65,textAlign:"right",fontFamily:C.mono,fontSize:12,color:C.accent}}>{fmt(t.total)}</span>
           <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:10,color:C.green}}>{fmt(t.completed)}</span>
