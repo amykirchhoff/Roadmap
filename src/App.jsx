@@ -46,6 +46,7 @@ export default function App() {
   const [selTask,setSelTask] = useState(null);
   const [sortBy,setSortBy] = useState("users");
   const [search,setSearch] = useState("");
+  const [taskSort,setTaskSort] = useState("total");
 
   const inds = DATA.industries;
   const sectors = DATA.sectors;
@@ -128,6 +129,19 @@ export default function App() {
           </div>
         ))}</div>
       </Sec>
+
+      {DATA.unknowns && <Sec title="Unknown Populations" sub="These users exist in the analytics data but are excluded from the analysis above because they have missing or unresolvable profile attributes.">
+        <Insight>
+          <strong>{fmt(DATA.unknowns.industry)} businesses</strong> ({pct(DATA.unknowns.industry, totalBiz + DATA.unknowns.phase)}) have no industry set — they likely abandoned onboarding before selecting one. <strong>{fmt(DATA.unknowns.legalStructure)}</strong> ({pct(DATA.unknowns.legalStructure, totalBiz + DATA.unknowns.phase)}) have no legal structure — primarily guest mode users who never completed that step. <strong>{fmt(DATA.unknowns.sector)}</strong> have no sector assignment, which largely overlaps the unknown-industry population.
+          {DATA.unknowns.unmatchedIndustries.length > 0 && <span> Additionally, <strong>{DATA.unknowns.unmatchedIndustries.reduce((s,i)=>s+i.users,0)} users</strong> selected industries that exist in the analytics but not in the current navigator codebase ({DATA.unknowns.unmatchedIndustries.map(i => i.name + " (" + i.users + ")").join(", ")}) — these are likely disabled or renamed industries whose users remain in the system.</span>}
+        </Insight>
+        <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+          <Stat label="Unknown Industry" value={fmt(DATA.unknowns.industry)} sub="No industry selected — not included in any industry-level analysis" color={C.orange} small />
+          <Stat label="Unknown Legal Structure" value={fmt(DATA.unknowns.legalStructure)} sub="No business structure chosen — mostly guest mode users" color={C.orange} small />
+          <Stat label="Unknown Sector" value={fmt(DATA.unknowns.sector)} sub="No sector assigned — largely overlaps the unknown-industry population" color={C.orange} small />
+          <Stat label="Unmatched Industries" value={DATA.unknowns.unmatchedIndustries.reduce((s,i)=>s+i.users,0)} sub={"Users in "+DATA.unknowns.unmatchedIndustries.length+" disabled/renamed industries not in current codebase"} color={C.muted} small />
+        </div>
+      </Sec>}
     </div>);
   };
 
@@ -250,6 +264,9 @@ export default function App() {
           <Stat label="Operate content not displayed" value="64 AAs + 64 fundings" sub={pct(totalBiz-phases.seesAAFunding,totalBiz)+" of businesses are in phases where this content is hidden"} color={C.red} />
         </div>
       </Sec>
+      {DATA.unknowns && <div style={{fontSize:11,color:C.muted,fontFamily:C.sans,background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 14px"}}>
+        <strong style={{color:C.orange}}>Note:</strong> The phase distribution above accounts for {fmt(totalBiz)} businesses. An additional {fmt(DATA.unknowns.industry)} businesses have no industry set (abandoned onboarding) and {fmt(DATA.unknowns.legalStructure)} have no legal structure selected. These populations overlap significantly and are detailed on the Content Gap tab.
+      </div>}
     </div>);
   };
 
@@ -402,8 +419,20 @@ export default function App() {
   };
 
   /* ═══ TAB: TASK ENGAGEMENT ═══ */
+  const parseTime = (s) => {
+    if(!s) return 0;
+    let mins=0;
+    const d=s.match(/(\d+)d/); if(d) mins+=parseInt(d[1])*1440;
+    const h=s.match(/(\d+)h/); if(h) mins+=parseInt(h[1])*60;
+    const m=s.match(/(\d+)m/); if(m) mins+=parseInt(m[1]);
+    return mins;
+  };
   const TaskEngagement = () => {
-    const top=tp;const topTotal=tp[0]?.total||1;
+    const sorted2 = useMemo(()=>{
+      if(taskSort==="time") return [...tp].sort((a,b)=>parseTime(b.avgTime)-parseTime(a.avgTime));
+      return tp;
+    },[taskSort,tp]);
+    const topTotal=tp[0]?.total||1;
     const top5Total=tp.slice(0,5).reduce((s,t)=>s+t.total,0);const allTotal=tp.reduce((s,t)=>s+t.total,0);const under10=tp.filter(t=>t.total<10);const under100=tp.filter(t=>t.total<100);
     return (<div>
       <Alert color={C.orange}>The top 5 tasks account for <strong>{pct(top5Total,allTotal)}</strong> of all engagement. {under10.length} tasks have fewer than 10 interactions ever, and {under100.length} of {tp.length} have fewer than 100.</Alert>
@@ -412,7 +441,11 @@ export default function App() {
         <Stat label="Total Interactions" value={fmt(allTotal)} small /><Stat label="Top 5 Tasks =" value={pct(top5Total,allTotal)} sub="of all interactions" color={C.green} small /><Stat label="Tasks With <10 Interactions" value={under10.length} sub={"of "+tp.length+" tracked tasks"} color={C.red} small /><Stat label="Tasks With <100 Interactions" value={under100.length} sub={"of "+tp.length+" tracked tasks"} color={C.orange} small />
       </div>
       <div style={{display:"grid",gap:3}}>
-        <div style={{fontSize:10,color:C.muted,fontFamily:C.sans,marginBottom:4}}>Sorted by total interactions (completed + to-do). Roadmap position sort isn't possible because tasks appear at different steps across different industries — there's no single canonical order.</div>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+          <span style={{fontSize:10,color:C.muted,fontFamily:C.sans}}>Sort by:</span>
+          <button onClick={()=>setTaskSort("total")} style={{padding:"4px 10px",background:taskSort==="total"?C.accentDim:"transparent",color:taskSort==="total"?C.text:C.muted,border:`1px solid ${C.border}`,borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:C.sans}}>Most Interactions</button>
+          <button onClick={()=>setTaskSort("time")} style={{padding:"4px 10px",background:taskSort==="time"?C.accentDim:"transparent",color:taskSort==="time"?C.text:C.muted,border:`1px solid ${C.border}`,borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:C.sans}}>Longest Avg Time</button>
+        </div>
         <div style={{display:"flex",alignItems:"center",gap:8,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
           <span style={{width:22,textAlign:"right"}}>#</span>
           <span style={{flex:1}}>Task</span>
@@ -421,14 +454,14 @@ export default function App() {
           <span style={{width:55,textAlign:"right"}}>Done</span>
           <span style={{width:40,textAlign:"right"}}>Avg Time</span>
         </div>
-        {top.map((t,i)=>(
-        <div key={i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",display:"flex",alignItems:"center",gap:8}}>
+        {sorted2.map((t,i)=>(
+        <div key={t.task} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",display:"flex",alignItems:"center",gap:8}}>
           <span style={{width:22,fontSize:10,color:C.muted,fontFamily:C.mono,textAlign:"right"}}>{i+1}</span>
           <div style={{flex:1,minWidth:0}}><div style={{fontSize:12,color:C.text,fontFamily:C.sans,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{t.task}</div></div>
           <div style={{width:120,height:8,background:C.bg,borderRadius:4,overflow:"hidden"}}><div style={{width:`${t.total/topTotal*100}%`,height:"100%",background:C.accent,borderRadius:4,opacity:.6}}/></div>
           <span style={{width:65,textAlign:"right",fontFamily:C.mono,fontSize:12,color:C.accent}}>{fmt(t.total)}</span>
           <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:10,color:C.green}}>{fmt(t.completed)}</span>
-          <span style={{width:40,textAlign:"right",fontSize:9,color:C.muted}}>{t.avgTime}</span>
+          <span style={{width:40,textAlign:"right",fontSize:9,color:taskSort==="time"?C.orange:C.muted,fontWeight:taskSort==="time"?700:400}}>{t.avgTime}</span>
         </div>
       ))}</div>
     </div>);
