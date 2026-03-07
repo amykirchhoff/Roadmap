@@ -379,17 +379,17 @@ export default function App() {
 
   /* ═══ TAB: TASK REUSE (from original Tasks view) ═══ */
   const TaskReuse = () => {
-    const top20=tasksByFreq.slice(0,20);
+    const sharedTasks=tasksByFreq.filter(t=>t.count>=2);
     return (<div>
-      <Alert color={C.muted}>Differentiating tasks ranked by how many industries include them. Tasks in 1 industry are unique; tasks in many are shared building blocks.</Alert>
+      <Alert color={C.muted}>Differentiating tasks ranked by how many industries include them. Only tasks appearing in 2 or more industries are shown here — single-industry tasks are listed separately below.</Alert>
       <Insight><strong>"get-insurance"</strong> appears in {tf["get-insurance"]?.count||0} industries — essentially universal content. The next most-shared ({tasksByFreq.slice(1,4).map(t=>`"${taskFmt(t.name)}" (${t.count})`).join(", ")}) show real reuse clusters: environmental requirements, resale tax, and vehicle tasks spanning the transportation family.</Insight>
-      <Sec title="Most Shared Tasks">
+      <Sec title="Shared Tasks" sub={"Tasks that appear in 2 or more industry roadmaps ("+sharedTasks.length+" tasks)."}>
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:14}}>
-          <ResponsiveContainer width="100%" height={350}>
-            <BarChart data={top20} layout="vertical" margin={{left:160,right:20,top:5,bottom:5}}>
-              <XAxis type="number" stroke={C.muted} tick={{fontSize:10,fontFamily:C.mono}} />
-              <YAxis dataKey="name" type="category" width={150} tick={{fontSize:10,fontFamily:C.sans}} tickFormatter={taskFmt} stroke={C.muted} />
-              <Tooltip content={({payload})=>{if(!payload?.[0])return null;const d=payload[0].payload;return <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:10,fontSize:11,color:C.text,fontFamily:C.sans}}><div style={{fontWeight:700}}>{taskFmt(d.name)}</div><div>{d.count} industries</div></div>;}} />
+          <ResponsiveContainer width="100%" height={Math.max(300,sharedTasks.length*28+40)}>
+            <BarChart data={sharedTasks} layout="vertical" margin={{left:200,right:20,top:5,bottom:5}}>
+              <XAxis type="number" stroke={C.muted} tick={{fontSize:10,fontFamily:C.mono}} label={{value:"Number of industries",position:"bottom",offset:0,fill:C.muted,fontSize:10}} />
+              <YAxis dataKey="name" type="category" width={190} tick={{fontSize:11,fontFamily:C.sans}} tickFormatter={taskFmt} stroke={C.muted} interval={0} />
+              <Tooltip content={({payload})=>{if(!payload?.[0])return null;const d=payload[0].payload;return <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:10,fontSize:11,color:C.text,fontFamily:C.sans}}><div style={{fontWeight:700}}>{taskFmt(d.name)}</div><div>Appears in {d.count} industry roadmaps</div></div>;}} />
               <Bar dataKey="count" fill={C.cyan} radius={[0,4,4,0]} />
             </BarChart>
           </ResponsiveContainer>
