@@ -143,14 +143,56 @@ for task_subdir in ["content/src/roadmaps/tasks", "content/src/roadmaps/license-
             name = m.group(1).strip().strip('"').strip("'")
             task_name_to_slug[name] = slug
 
-# Add-on task slugs
+# Add-on task slugs and reach (how many industries could trigger each)
+addon_dir_path = os.path.join(NAV_ROOT, "content/src/roadmaps/add-ons")
 addon_task_slugs = set()
-for f in os.listdir(os.path.join(NAV_ROOT, "content/src/roadmaps/add-ons")):
+all_enabled_ids = set(k for k, v in industries.items() if v.get("isEnabled"))
+perm_loc_ids = set(k for k, v in industries.items() if v.get("isEnabled") and v.get("canHavePermanentLocation"))
+
+# Build NEQ -> industries mapping (including sector-level)
+neq_to_inds = {}
+for iid, ind in industries.items():
+    if not ind.get("isEnabled"): continue
+    for q in ind.get("nonEssentialQuestionsIds", []):
+        neq_to_inds.setdefault(q, set()).add(iid)
+sector_json = json.load(open(os.path.join(NAV_ROOT, "content/src/mappings/sectors.json")))
+for s in sector_json["arrayOfSectors"]:
+    for q in s.get("nonEssentialQuestionsIds", []):
+        for iid, ind in industries.items():
+            if ind.get("isEnabled") and ind.get("defaultSectorId") == s["id"]:
+                neq_to_inds.setdefault(q, set()).add(iid)
+
+legal_addons = {"llc","scorp","nonprofit","nonprofit-and-corp-foreign","public-record-filing","public-record-filing-foreign"}
+broad_addons = {"trade-name","foreign-nexus","foreign-remote-seller","foreign-remote-worker","resale-certificate","nj-seller-streamlined-sales-tax"}
+perm_addons = {"permanent-location-business","permanent-location-business-landlord"}
+
+addon_task_reach = {}
+for f in sorted(os.listdir(addon_dir_path)):
     if not f.endswith(".json"): continue
-    d = json.load(open(os.path.join(NAV_ROOT, "content/src/roadmaps/add-ons", f)))
-    for step in d.get("roadmapSteps", []):
-        t = step.get("task") or step.get("licenseTask")
-        if t: addon_task_slugs.add(t)
+    d = json.load(open(os.path.join(addon_dir_path, f)))
+    aid = d["id"]
+    tasks = [s.get("task") or s.get("licenseTask") for s in d.get("roadmapSteps",[]) if s.get("task") or s.get("licenseTask")]
+    for t in tasks: addon_task_slugs.add(t)
+    if aid in legal_addons or aid in broad_addons:
+        reach = all_enabled_ids
+    elif aid in perm_addons or "home-based" in aid or "produce-insurance" in aid:
+        reach = perm_loc_ids
+    else:
+        reach = set()
+        for neq_id, inds_set in neq_to_inds.items():
+            if neq_id in aid or aid in neq_id or aid.replace("-add","") in neq_id or aid.split("-")[0] in neq_id:
+                reach |= inds_set
+        if not reach:
+            for iid, ind in industries.items():
+                if not ind.get("isEnabled"): continue
+                ioq = ind.get("industryOnboardingQuestions", {})
+                if isinstance(ioq, dict) and aid in str(ioq):
+                    reach.add(iid)
+        if not reach:
+            reach = {list(all_enabled_ids)[0]}
+    for t in tasks:
+        addon_task_reach.setdefault(t, set())
+        addon_task_reach[t] |= reach
 
 output = {
     "industries": industries, "sectors": sectors, "addons": addons,
@@ -160,6 +202,7 @@ output = {
                        "manage-business-vehicles","register-for-ein","register-for-taxes"],
     "taskNameToSlug": task_name_to_slug,
     "addonTaskSlugs": sorted(addon_task_slugs),
+    "addonTaskReach": {slug: len(ids) for slug, ids in addon_task_reach.items()},
 }
 
 os.makedirs(os.path.dirname(OUT), exist_ok=True)

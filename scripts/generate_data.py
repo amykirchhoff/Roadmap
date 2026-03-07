@@ -200,20 +200,40 @@ for task, inds_list in sorted(task_to_industries.items()):
     task_frequency[task] = {"count": len(inds_list), "industries": inds_list}
 
 # Categorize each task in task_progress: universal, shared, unique, addon, or uncategorized
+# Add-on tasks get colored by their potential reach (how many industries could trigger them)
 addon_slugs = set(nav.get("addonTaskSlugs", []))
+addon_reach = nav.get("addonTaskReach", {})
+total_enabled = len([i for i in nav_industries.values() if i.get("isEnabled")])
 for tp_entry in task_progress:
     name = tp_entry["task"]
     slug = task_name_to_slug.get(name, name)
+    is_addon = slug in addon_slugs
+    reach = addon_reach.get(slug, 0) if is_addon else 0
     if slug in universal_tasks or name in universal_tasks:
         tp_entry["category"] = "universal"
+        tp_entry["isAddon"] = False
+        tp_entry["reachCount"] = total_enabled
     elif slug in task_frequency:
         tp_entry["category"] = "shared" if task_frequency[slug]["count"] > 1 else "unique"
+        tp_entry["isAddon"] = False
+        tp_entry["reachCount"] = task_frequency[slug]["count"]
     elif name in task_frequency:
         tp_entry["category"] = "shared" if task_frequency[name]["count"] > 1 else "unique"
-    elif slug in addon_slugs:
-        tp_entry["category"] = "addon"
+        tp_entry["isAddon"] = False
+        tp_entry["reachCount"] = task_frequency[name]["count"]
+    elif is_addon:
+        if reach >= total_enabled:
+            tp_entry["category"] = "universal"
+        elif reach > 1:
+            tp_entry["category"] = "shared"
+        else:
+            tp_entry["category"] = "unique"
+        tp_entry["isAddon"] = True
+        tp_entry["reachCount"] = reach
     else:
         tp_entry["category"] = "uncategorized"
+        tp_entry["isAddon"] = False
+        tp_entry["reachCount"] = 0
 
 cat_counts = {}
 for tp_entry in task_progress:
