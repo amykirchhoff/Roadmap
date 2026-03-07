@@ -101,6 +101,9 @@ for row in xlsx_tasks:
     })
 task_progress.sort(key=lambda x: -x["total"])
 
+# Build task name -> slug mapping from navigator analysis
+task_name_to_slug = nav.get("taskNameToSlug", {})
+
 # Non-essential questions
 neq_data = []
 for row in xlsx_neq:
@@ -195,6 +198,28 @@ for ind_id, ind in enabled_industries.items():
 task_frequency = {}
 for task, inds_list in sorted(task_to_industries.items()):
     task_frequency[task] = {"count": len(inds_list), "industries": inds_list}
+
+# Categorize each task in task_progress: universal, shared, unique, addon, or uncategorized
+addon_slugs = set(nav.get("addonTaskSlugs", []))
+for tp_entry in task_progress:
+    name = tp_entry["task"]
+    slug = task_name_to_slug.get(name, name)
+    if slug in universal_tasks or name in universal_tasks:
+        tp_entry["category"] = "universal"
+    elif slug in task_frequency:
+        tp_entry["category"] = "shared" if task_frequency[slug]["count"] > 1 else "unique"
+    elif name in task_frequency:
+        tp_entry["category"] = "shared" if task_frequency[name]["count"] > 1 else "unique"
+    elif slug in addon_slugs:
+        tp_entry["category"] = "addon"
+    else:
+        tp_entry["category"] = "uncategorized"
+
+cat_counts = {}
+for tp_entry in task_progress:
+    c = tp_entry["category"]
+    cat_counts[c] = cat_counts.get(c, 0) + 1
+print(f"  Task categories: {cat_counts}")
 
 # ============================================================
 # Build combined industry data

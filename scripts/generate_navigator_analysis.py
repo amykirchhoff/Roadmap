@@ -128,12 +128,38 @@ sector_mismatches = {
     "residential-landlord": "real-estate",
 }
 
+# Task name -> slug mapping (from task markdown files)
+task_name_to_slug = {}
+for task_subdir in ["content/src/roadmaps/tasks", "content/src/roadmaps/license-tasks"]:
+    task_path = os.path.join(NAV_ROOT, task_subdir)
+    if not os.path.isdir(task_path): continue
+    for f in os.listdir(task_path):
+        if not f.endswith(".md"): continue
+        slug = f.replace(".md", "")
+        with open(os.path.join(task_path, f)) as fh:
+            content = fh.read()
+        m = re.search(r'^name:\s*"?(.+?)"?\s*$', content, re.MULTILINE)
+        if m:
+            name = m.group(1).strip().strip('"').strip("'")
+            task_name_to_slug[name] = slug
+
+# Add-on task slugs
+addon_task_slugs = set()
+for f in os.listdir(os.path.join(NAV_ROOT, "content/src/roadmaps/add-ons")):
+    if not f.endswith(".json"): continue
+    d = json.load(open(os.path.join(NAV_ROOT, "content/src/roadmaps/add-ons", f)))
+    for step in d.get("roadmapSteps", []):
+        t = step.get("task") or step.get("licenseTask")
+        if t: addon_task_slugs.add(t)
+
 output = {
     "industries": industries, "sectors": sectors, "addons": addons,
     "anytimeActions": anytime_actions, "fundings": fundings,
     "certifications": certifications, "sectorMismatches": sector_mismatches,
     "universalTasks": ["bank-account","business-plan","business-structure","determine-naics-code",
                        "manage-business-vehicles","register-for-ein","register-for-taxes"],
+    "taskNameToSlug": task_name_to_slug,
+    "addonTaskSlugs": sorted(addon_task_slugs),
 }
 
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
