@@ -48,27 +48,42 @@ xlsx_legal = read_sheet(wb, "Legal Structures")
 # Build user counts by industry name -> count
 # XLSX names are multi-line: "Industry Name\nDescription". Take first line only.
 industry_users = {}
+unknown_industry = 0
+unmatched_industries = []
 for row in xlsx_industries:
     raw = (row.get("Industry") or "").strip()
-    if not raw or raw == "Unknown": continue
+    if not raw: continue
     name = raw.split("\n")[0].strip()
-    industry_users[name] = int(row.get("Count") or 0)
+    cnt = int(row.get("Count") or 0)
+    if name == "Unknown":
+        unknown_industry = cnt
+        continue
+    industry_users[name] = cnt
 
 # Build sector user counts
 sector_users = {}
+unknown_sector = 0
 for row in xlsx_sectors:
     raw = (row.get("Sector") or "").strip()
-    if not raw or raw == "Unknown": continue
+    if not raw: continue
     name = raw.split("\n")[0].strip()
-    sector_users[name] = int(row.get("Count") or 0)
+    cnt = int(row.get("Count") or 0)
+    if name == "Unknown":
+        unknown_sector = cnt
+        continue
+    sector_users[name] = cnt
 
 # Operating phases
 phases = {}
 total_businesses = 0
+unknown_phase = 0
 for row in xlsx_phases:
     phase = (row.get("Phase") or "").strip()
-    if not phase or phase == "Unknown": continue
+    if not phase: continue
     cnt = int(row.get("Count") or 0)
+    if phase == "Unknown":
+        unknown_phase = cnt
+        continue
     phases[phase] = cnt
     total_businesses += cnt
 
@@ -100,10 +115,15 @@ for row in xlsx_neq:
 
 # Legal structures
 legal_data = []
+unknown_legal = 0
 for row in xlsx_legal:
     cat = (row.get("Category") or "").strip()
-    if not cat or cat == "Unknown": continue
-    legal_data.append({"structure": cat, "count": int(row.get("Count") or 0)})
+    if not cat: continue
+    cnt = int(row.get("Count") or 0)
+    if cat == "Unknown":
+        unknown_legal = cnt
+        continue
+    legal_data.append({"structure": cat, "count": cnt})
 
 # ============================================================
 # Compute content reachability from navigator analysis
@@ -320,6 +340,13 @@ phase_summary = {
     } for p, c in sorted(phases.items(), key=lambda x: -x[1])],
 }
 
+# Track XLSX industries that didn't match any navigator industry
+matched_names = set(ind["name"].strip() for ind in nav_industries.values() if ind.get("isEnabled"))
+unmatched_xlsx = []
+for name, cnt in industry_users.items():
+    if name not in matched_names:
+        unmatched_xlsx.append({"name": name, "users": cnt})
+
 # ============================================================
 # Output
 # ============================================================
@@ -341,6 +368,15 @@ output = {
     "taskFrequency": task_frequency,
     "universalTasks": universal_tasks,
     "totalDiffTasks": len(task_to_industries),
+    "unknowns": {
+        "industry": unknown_industry,
+        "sector": unknown_sector,
+        "phase": unknown_phase,
+        "legalStructure": unknown_legal,
+        "unmatchedIndustries": unmatched_xlsx,
+        "totalAccountedFor": total_businesses,
+        "totalWithUnknowns": total_businesses + unknown_phase,
+    },
 }
 
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
