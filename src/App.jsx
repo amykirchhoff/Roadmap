@@ -96,11 +96,11 @@ export default function App() {
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
         <Stat label="Businesses on Platform" value={fmt(totalBiz)} sub="All business accounts in the system" />
         <Stat label="Businesses That See Operate Content" value={fmt(phases.seesAAFunding)} sub={"Only "+pct(phases.seesAAFunding,totalBiz)+" of businesses are in a phase where anytime actions and fundings are displayed"} color={C.green} />
-        <Stat label="Businesses Assigned to 'Other Services'" value={fmt(otherServicesUsers)} sub={pct(otherServicesUsers,totalBiz)+" of all businesses land in this catch-all sector, including "+fmt(genericUsers)+" who picked 'All Other Businesses' as their industry"} color={C.orange} />
+        <Stat label="Businesses in the 'Other Services' Sector" value={fmt(otherServicesUsers)} sub={pct(otherServicesUsers,totalBiz)+" of all businesses are assigned to this catch-all sector, including "+fmt(genericUsers)+" who picked 'All Other Businesses' as their industry"} color={C.orange} />
         <Stat label="Industries With Wrong Sector" value={mismatchInds.length} sub={fmt(mismatchUsers)+" businesses in these industries are matched against the wrong sector for content filtering"} color={C.red} />
         <Stat label="Orphaned Sectors" value={DATA.orphanedSectors.length+" / 25"} sub="These sectors exist in the taxonomy but no industry's defaultSectorId points to them — only OWNING users can reach them" color={C.red} />
       </div>
-      <Sec title="Industries by Anytime Actions Visible (Starting Path)" sub="Each dot is an industry. Vertical = user count. Red = sector mismatch. Orange = Other Services. Green = correct sector. Click any dot.">
+      <Sec title="Industries by Anytime Actions Visible (Starting Path)" sub="Each dot is an industry. Horizontal = number of anytime actions a STARTING user in that industry would see. Vertical = user count. Red = sector mismatch. Orange = Other Services. Green = correct sector. Click any dot.">
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:14}}>
           <ResponsiveContainer width="100%" height={340}>
             <ScatterChart margin={{top:10,right:20,bottom:40,left:10}}>
