@@ -404,12 +404,12 @@ export default function App() {
   /* ═══ TAB: TASK ENGAGEMENT ═══ */
   const TaskEngagement = () => {
     const top=tp.slice(0,40);const topTotal=tp[0]?.total||1;
-    const top5Total=tp.slice(0,5).reduce((s,t)=>s+t.total,0);const allTotal=tp.reduce((s,t)=>s+t.total,0);const under10=tp.filter(t=>t.total<10);
+    const top5Total=tp.slice(0,5).reduce((s,t)=>s+t.total,0);const allTotal=tp.reduce((s,t)=>s+t.total,0);const under100=tp.filter(t=>t.total<100);const under500=tp.filter(t=>t.total<500);
     return (<div>
-      <Alert color={C.orange}>The top 5 tasks account for <strong>{pct(top5Total,allTotal)}</strong> of all engagement. {under10.length} tasks have fewer than 10 interactions ever.</Alert>
-      <Insight><strong>The long tail:</strong> Engagement concentrates on formation: structure → NAICS → entity auth → EIN → taxes. After that it falls off a cliff. "Business Plan" ({fmt((tp.find(t=>t.task.includes("Business Plan")&&!t.task.includes("Cannabis"))||{}).total||0)}) is the last above 10K. Industry-specific tasks that took significant research effort get single-digit to low-hundred traffic — not a bug (users haven't reached those steps yet), but a sign the operate content is underserved.</Insight>
+      <Alert color={C.orange}>The top 5 tasks account for <strong>{pct(top5Total,allTotal)}</strong> of all engagement. {under100.length} tasks have fewer than 100 interactions, and {under500.length} of {tp.length} tasks have fewer than 500. The lowest-engagement task still has {fmt(tp[tp.length-1]?.total)} interactions.</Alert>
+      <Insight><strong>The long tail:</strong> Engagement concentrates on formation: structure → NAICS → entity auth → EIN → taxes. After that it falls off a cliff. "Business Plan" ({fmt((tp.find(t=>t.task.includes("Business Plan")&&!t.task.includes("Cannabis"))||{}).total||0)}) is the last above 10K. Industry-specific tasks that took significant research effort get double- and triple-digit traffic — not a bug (users haven't reached those steps yet), but a sign the operate content is underserved.</Insight>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
-        <Stat label="Total Interactions" value={fmt(allTotal)} small /><Stat label="Top 5 = " value={pct(top5Total,allTotal)} sub="of all" color={C.green} small /><Stat label="Tasks <10 interactions" value={under10.length} sub={"of "+tp.length} color={C.red} small />
+        <Stat label="Total Interactions" value={fmt(allTotal)} small /><Stat label="Top 5 Tasks =" value={pct(top5Total,allTotal)} sub="of all interactions" color={C.green} small /><Stat label="Tasks With <100 Interactions" value={under100.length} sub={"of "+tp.length+" tracked tasks"} color={C.orange} small /><Stat label="Tasks With <500 Interactions" value={under500.length} sub={"of "+tp.length+" tracked tasks"} color={C.red} small />
       </div>
       <div style={{display:"grid",gap:3}}>{top.map((t,i)=>(
         <div key={i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",display:"flex",alignItems:"center",gap:8}}>
