@@ -1,1 +1,3775 @@
-
+{
+  "industries": {
+    "engineering": {
+      "name": "Engineering and Land Surveying",
+      "defaultSectorId": "construction",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541330, 541370 ",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "planning-services"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 10,
+      "webflowId": "656a13621861f431fc9765d2"
+    },
+    "electrical-contractor": {
+      "name": "Electrical Contractor",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "238210",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "cdl-neq",
+        "selfgenerator-transporter-registration"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 9,
+      "webflowId": "656a1363297de0dd0051e8df"
+    },
+    "retail": {
+      "name": "Retail",
+      "defaultSectorId": "retail-trade-and-ecommerce",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "459920, 441330, 445320, 459210, 458110, 445131, 456120, 455110, 449210, 445250, 449121, 459310, 456191, 449110, 459420, 444140, 459120, 458310, 458320, 445240, 441227, 459140, 444240, 459410, 456130, 444180, 444230, 459910, 459130, 458210, 459110, 441340, 459991, 459510, 455211, 449122, 455219, 456199, 449129, 459999, 445298",
+      "nonEssentialQuestionsIds": [
+        "ticket-broker-resell",
+        "weights-measures",
+        "cigarette-manufacture-sell",
+        "other-businesses-CRTK-survey",
+        "retail-pesticide-dealer-licensing",
+        "inspect-boiler",
+        "business-vehicle-irp",
+        "inspect-pv",
+        "inspect-fridge",
+        "sell-milk-question",
+        "cdl-neq",
+        "streamlined-sales-tax-registration"
+      ],
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 11,
+      "webflowId": "656a13629d57077e647ddf9f"
+    },
+    "food-truck": {
+      "name": "Food Truck",
+      "defaultSectorId": "accommodation-and-food-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": false,
+      "naicsCodes": "722330",
+      "nonEssentialQuestionsIds": [
+        "weights-measures"
+      ],
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 19,
+      "webflowId": "656a136253b505573055370f"
+    },
+    "home-baker": {
+      "name": "Home Baker",
+      "defaultSectorId": "accommodation-and-food-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": false,
+      "naicsCodes": "311811, 311821 ",
+      "nonEssentialQuestionsIds": [
+        "weights-measures"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 10,
+      "webflowId": "656a1363059ec5def0e98fd9"
+    },
+    "restaurant": {
+      "name": "Restaurant",
+      "defaultSectorId": "accommodation-and-food-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "722511, 722310, 722320, 722410, 722513, 722514, 722515",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "inspect-boiler",
+        "inspect-pv",
+        "inspect-fridge",
+        "sell-milk-question"
+      ],
+      "industryOnboardingQuestions": {
+        "isLiquorLicenseApplicable": true
+      },
+      "roadmapStepCount": 12,
+      "webflowId": "656a1362e1f1359c3c90e9eb"
+    },
+    "remediation-waste": {
+      "name": "Remediation and Waste Services",
+      "defaultSectorId": "waste-management-and-Remediation",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "562910, 562111, 562112, 562119, 562211, 562212, 562213, 562219, 562920, 562991, 562998",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "asbestos-abatement-question",
+        "waste-transporter-license-a-901",
+        "flashing-light-permit"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isCannabisLicenseTypeApplicable": false,
+        "isCpaRequiredApplicable": false,
+        "isCarServiceApplicable": false,
+        "isInterstateMovingApplicable": false,
+        "petCareHousing": false,
+        "isLiquorLicenseApplicable": false,
+        "isInterstateLogisticsApplicable": false,
+        "isRealEstateAppraisalManagementApplicable": false,
+        "isChildcareForSixOrMore": false,
+        "willSellPetCareItems": false,
+        "isTransportation": true,
+        "isCertifiedInteriorDesignerApplicable": false,
+        "isProvidesStaffingServicesApplicable": false
+      },
+      "roadmapStepCount": 7,
+      "webflowId": "68a7501fbf7e85d7b58fcc9f"
+    },
+    "printing-business": {
+      "name": "Printing Business",
+      "defaultSectorId": "digital-and-print-media",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "323111, 323117, 323113",
+      "nonEssentialQuestionsIds": [
+        "weights-measures"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 10,
+      "webflowId": "656a13628899de7accc4fd89"
+    },
+    "moving-company": {
+      "name": "Moving Company",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "484210",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "resale-tax-cert",
+        "vehicle-dealership-q"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isTransportation": true,
+        "isInterstateMovingApplicable": true
+      },
+      "roadmapStepCount": 12,
+      "webflowId": "656a136257239e597fcb93da"
+    },
+    "school-bus": {
+      "name": "School Bus",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "485999, 485210, 485310, 485320, 485410, 485510",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "business-vehicle-irp",
+        "vehicle-dealership-q"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isTransportation": true
+      },
+      "roadmapStepCount": 13,
+      "webflowId": "656a1362295cb540cf06fe19"
+    },
+    "freight-forwarding": {
+      "name": "Freight Forwarding",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "493110, 493190, 493120, 493130",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "vehicle-dealership-q"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isCpaRequiredApplicable": false,
+        "isCarServiceApplicable": false,
+        "isInterstateMovingApplicable": false,
+        "isLiquorLicenseApplicable": false,
+        "isInterstateLogisticsApplicable": false,
+        "isRealEstateAppraisalManagementApplicable": false,
+        "isTransportation": false,
+        "isCertifiedInteriorDesignerApplicable": false,
+        "isProvidesStaffingServicesApplicable": false
+      },
+      "roadmapStepCount": 13,
+      "webflowId": "656a13623df6c55c9cca76d4"
+    },
+    "photography": {
+      "name": "Photography",
+      "defaultSectorId": "digital-and-print-media",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541921",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 9,
+      "webflowId": "656a1362d699210e3fd468e8"
+    },
+    "hvac-contractor": {
+      "name": "HVAC Contractor",
+      "defaultSectorId": "professional-scientific-and-technical-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "238220",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "cdl-neq",
+        "selfgenerator-transporter-registration"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 8,
+      "webflowId": "656a1362ec40f516ab69a690"
+    },
+    "commercial-construction": {
+      "name": "Construction",
+      "defaultSectorId": "construction",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "236220, 238160, 238130, 238210, 238220, 238320, 236118, 236115, 236116, 236117",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "business-vehicle-irp",
+        "well-driller",
+        "vehicle-dealership-q",
+        "cdl-neq",
+        "selfgenerator-transporter-registration",
+        "waste-transporter-license-a-901",
+        "flashing-light-permit"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isConstructionTypeApplicable": true
+      },
+      "roadmapStepCount": 8,
+      "webflowId": "65b41d2d3d0fa463cd97855a"
+    },
+    "cosmetology": {
+      "name": "Cosmetology",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "812112, 812199, 812113, 611511, 812111",
+      "nonEssentialQuestionsIds": [
+        "electrologist"
+      ],
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 12,
+      "webflowId": "656a13627f0131f68c389665"
+    },
+    "demo-only": {
+      "name": "Demo Only",
+      "defaultSectorId": "other-services",
+      "isEnabled": false,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "demo-only"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": false,
+        "isCannabisLicenseTypeApplicable": false,
+        "isCpaRequiredApplicable": false,
+        "isCarServiceApplicable": false,
+        "isInterstateMovingApplicable": false,
+        "petCareHousing": false,
+        "isLiquorLicenseApplicable": false,
+        "isInterstateLogisticsApplicable": false,
+        "isRealEstateAppraisalManagementApplicable": false,
+        "isChildcareForSixOrMore": false,
+        "willSellPetCareItems": false,
+        "isTransportation": false,
+        "isCertifiedInteriorDesignerApplicable": false,
+        "isProvidesStaffingServicesApplicable": false
+      },
+      "roadmapStepCount": 3,
+      "webflowId": ""
+    },
+    "acupuncture": {
+      "name": "Acupuncture",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "621399",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 9,
+      "webflowId": "656a136266a0b2c046a17462"
+    },
+    "telemarketing": {
+      "name": "Telemarketing",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "561422 ",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 10,
+      "webflowId": "668d747f9da2941b65705860"
+    },
+    "lawn-care": {
+      "name": "Lawn Care",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "561730",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "lawn-businesses-CRTK-survey",
+        "pesticides-applicator-licensing",
+        "cdl-neq"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 8,
+      "webflowId": "656a13620578cfd34294c82f"
+    },
+    "architecture": {
+      "name": "Architecture and Urban Planning ",
+      "defaultSectorId": "construction",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541310, 925120",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 12,
+      "webflowId": "656a13629e1c371e9fc59cbd"
+    },
+    "pest-control": {
+      "name": "Pest Control",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "561710",
+      "nonEssentialQuestionsIds": [
+        "pest-pesticide-dealer-licensing"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 11,
+      "webflowId": "656a13628934eb2330f44bcb"
+    },
+    "cannabis": {
+      "name": "Cannabis",
+      "defaultSectorId": "cannabis",
+      "isEnabled": true,
+      "canHavePermanentLocation": false,
+      "naicsCodes": "111419, 111998, 424590, 459991",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "inspect-boiler",
+        "business-vehicle-irp",
+        "inspect-pv",
+        "inspect-fridge",
+        "bus-initial-inspection",
+        "cdl-neq"
+      ],
+      "industryOnboardingQuestions": {
+        "isCannabisLicenseTypeApplicable": true
+      },
+      "roadmapStepCount": 15,
+      "webflowId": "656a1362657b7f011c19dc79"
+    },
+    "notary-public": {
+      "name": "Notary Public",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541120",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 9,
+      "webflowId": "656a1362d0d78023552ba48c"
+    },
+    "security": {
+      "name": "Security",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "561622, 561621",
+      "nonEssentialQuestionsIds": [
+        "bus-initial-inspection",
+        "vehicle-dealership-q",
+        "cdl-neq",
+        "flashing-light-permit"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isCannabisLicenseTypeApplicable": false,
+        "isCpaRequiredApplicable": false,
+        "isCarServiceApplicable": false,
+        "isInterstateMovingApplicable": false,
+        "petCareHousing": false,
+        "isLiquorLicenseApplicable": false,
+        "isInterstateLogisticsApplicable": false,
+        "isRealEstateAppraisalManagementApplicable": false,
+        "isChildcareForSixOrMore": false,
+        "willSellPetCareItems": false,
+        "isTransportation": false,
+        "isCertifiedInteriorDesignerApplicable": false,
+        "isProvidesStaffingServicesApplicable": false
+      },
+      "roadmapStepCount": 11,
+      "webflowId": "68a7501fcc861e3cfeea14af"
+    },
+    "non-medical-transport": {
+      "name": "Non-Medical Transport",
+      "defaultSectorId": "health-care-and-social-assistance",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "485999",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "business-vehicle-irp",
+        "vehicle-dealership-q"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 15,
+      "webflowId": "656a1363d721d75bf1eae1f4"
+    },
+    "courier": {
+      "name": "Courier Service",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "492110, 491110, 492210",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "courier-CRTK-survey",
+        "business-vehicle-irp",
+        "bus-initial-inspection",
+        "vehicle-dealership-q",
+        "cdl-neq"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 7,
+      "webflowId": "656a136211d2436d60683a37"
+    },
+    "health-club": {
+      "name": "Health Club",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "711211, 713910, 713940, 721110, 812199",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "electrologist",
+        "inspect-boiler",
+        "inspect-pv",
+        "inspect-fridge",
+        "bus-initial-inspection",
+        "resale-tax-cert"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": false
+      },
+      "roadmapStepCount": 10,
+      "webflowId": "660d922207f6969e35490f1a"
+    },
+    "e-commerce": {
+      "name": "Online Business",
+      "defaultSectorId": "retail-trade-and-ecommerce",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "459920,441330,445320,459210,458110,445131,456120,455110,449210,445250,449121,459310,456191,449110,459420,444140,459120,458310,458320,445240,441227,459140,444240,459410,456130,444180,444230,459910,459130,458210,459110,441340,459991,459510,455211,449122,455219,456199,449129,459999,445298",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "cigarette-manufacture-sell",
+        "other-businesses-CRTK-survey",
+        "streamlined-sales-tax-registration"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 9,
+      "webflowId": "656a13625bf066c2e6d815e9"
+    },
+    "lodging": {
+      "name": "Lodging",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "721110, 721191, 721199, 721310",
+      "nonEssentialQuestionsIds": [
+        "hotel-register",
+        "rooming-boarding-house-owner",
+        "hotel-food",
+        "hotel-liquor",
+        "inspect-boiler",
+        "business-vehicle-irp",
+        "inspect-pv",
+        "inspect-fridge",
+        "bus-initial-inspection",
+        "mvc-cpcn",
+        "cdl-neq"
+      ],
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 9,
+      "webflowId": "662a86cad07b4acada82449d"
+    },
+    "travel-agent": {
+      "name": "Travel Agency",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "561510",
+      "nonEssentialQuestionsIds": [
+        "bus-initial-inspection",
+        "mvc-cpcn",
+        "cdl-neq"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 8,
+      "webflowId": "656a13621bdc1e1600ec8734"
+    },
+    "logistics": {
+      "name": "Logistics",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "493110, 493190, 493120, 493130",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "logistics-CRTK-survey",
+        "regulated-medical-waste-question",
+        "vehicle-dealership-q",
+        "flashing-light-permit"
+      ],
+      "industryOnboardingQuestions": {
+        "isInterstateLogisticsApplicable": true
+      },
+      "roadmapStepCount": 11,
+      "webflowId": "656a1363f32acabce37d60c9"
+    },
+    "massage-therapy": {
+      "name": "Massage Therapy",
+      "defaultSectorId": "health-care-and-social-assistance",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "621399",
+      "nonEssentialQuestionsIds": [
+        "resale-tax-cert"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 10,
+      "webflowId": "656a1362f58a7269b112bdc8"
+    },
+    "cemetery": {
+      "name": "Cemetery",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "812220",
+      "nonEssentialQuestionsIds": [
+        "mvc-cpcn"
+      ],
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 11,
+      "webflowId": "68a7501ebf7e85d7b58fcc50"
+    },
+    "car-rental": {
+      "name": "Car Rental and Dealerships ",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "532111, 441110, 441120",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "bus-initial-inspection"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": false
+      },
+      "roadmapStepCount": 12,
+      "webflowId": "656a136212e59f3e1bcf4cc5"
+    },
+    "real-estate-broker": {
+      "name": "Real Estate Brokerage",
+      "defaultSectorId": "real-estate",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "531210",
+      "nonEssentialQuestionsIds": [
+        "weights-measures"
+      ],
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 9,
+      "webflowId": "656a136289170f00e544e8f8"
+    },
+    "management-consulting": {
+      "name": "Management Consulting",
+      "defaultSectorId": "organizational-or-financial-management",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541611,541618",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isProvidesStaffingServicesApplicable": true
+      },
+      "roadmapStepCount": 8,
+      "webflowId": "656a1362d7ab8badbc8736ed"
+    },
+    "residential-landlord": {
+      "name": "Residential Landlord",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": false,
+      "naicsCodes": "531110",
+      "nonEssentialQuestionsIds": [
+        "multiple-dwelling-register",
+        "inspect-boiler",
+        "inspect-fridge",
+        "inspect-pv"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": false,
+        "whatIsPropertyLeaseType": true,
+        "canHaveThreeOrMoreRentalUnits": true
+      },
+      "roadmapStepCount": 9,
+      "webflowId": "656a13628934eb2330f44bcb"
+    },
+    "pharmacy": {
+      "name": "Pharmacy",
+      "defaultSectorId": "health-care-and-social-assistance",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "456110",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "business-vehicle-irp",
+        "sell-milk-question",
+        "cdl-neq"
+      ],
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 15,
+      "webflowId": "656a1363a68882853497486e"
+    },
+    "home-health-aide": {
+      "name": "Home Health Aide Placement",
+      "defaultSectorId": "health-care-and-social-assistance",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "621610",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "bus-initial-inspection",
+        "mvc-cpcn",
+        "cdl-neq"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 10,
+      "webflowId": "656a13624020a38de9cbd8eb"
+    },
+    "finance-insurance": {
+      "name": "Finance and Insurance",
+      "defaultSectorId": "finance-and-insurance",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "524210, 524126, 524128, 524298, 524127, 524114, 524113, 525190, 524291, 522220, 524298",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "insurance-producer"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 9,
+      "webflowId": "656a13628934eb2330f44bcb"
+    },
+    "marketing-pr-consulting": {
+      "name": "Marketing and PR Consulting",
+      "defaultSectorId": "digital-and-print-media",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541613,541820",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isProvidesStaffingServicesApplicable": true
+      },
+      "roadmapStepCount": 8,
+      "webflowId": "656a1362d61cbaa67af3ac81"
+    },
+    "real-estate-appraisals": {
+      "name": "Real Estate Appraisals",
+      "defaultSectorId": "real-estate",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "",
+      "nonEssentialQuestionsIds": [
+        "weights-measures"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isRealEstateAppraisalManagementApplicable": true
+      },
+      "roadmapStepCount": 10,
+      "webflowId": "656a1362227f321008b482f5"
+    },
+    "interior-designer": {
+      "name": "Interior Design",
+      "defaultSectorId": "construction",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541410",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "selfgenerator-transporter-registration"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isCertifiedInteriorDesignerApplicable": true
+      },
+      "roadmapStepCount": 9,
+      "webflowId": "656a1363ce71bd6be5205c65"
+    },
+    "healthcare": {
+      "name": "Healthcare",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "621330, 621112, 621420, 812990, 622210, 621111, 621112, 621330, 621391, 621310, 621210, 621399, 621320, 812199, 621330, 621111, 621112,  621340, 623110, 623312, 541940",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "dentist",
+        "dental-amalgam-waste",
+        "freestanding-residential-health-care-license",
+        "electrologist",
+        "healthcare-xray-regis",
+        "healthcare-optometrist ",
+        "dental-hygienist",
+        "special-permit-dentistry",
+        "inspect-boiler",
+        "inspect-pv",
+        "inspect-fridge",
+        "bus-initial-inspection",
+        "mvc-cpcn",
+        "cdl-neq"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 13,
+      "webflowId": "656a13622828697d87e05e99"
+    },
+    "car-service": {
+      "name": "Transportation and Car Service",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "485999, 485210, 485310, 485320, 485410, 485510",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "business-vehicle-irp",
+        "bus-initial-inspection",
+        "vehicle-dealership-q",
+        "cdl-neq"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isCarServiceApplicable": true,
+        "isTransportation": true
+      },
+      "roadmapStepCount": 14,
+      "webflowId": "656a1362f637cd08076d3599"
+    },
+    "domestic-employer": {
+      "name": "Domestic Employer",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "814110",
+      "nonEssentialQuestionsIds": [
+        "business-vehicle-title-reg"
+      ],
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 3,
+      "webflowId": "668d747e8623c6105ee139cf"
+    },
+    "it-consultant": {
+      "name": "IT Consulting",
+      "defaultSectorId": "technology",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541690",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isProvidesStaffingServicesApplicable": true
+      },
+      "roadmapStepCount": 9,
+      "webflowId": "656a13629927b9c3c306ff69"
+    },
+    "real-estate-investor": {
+      "name": "Real Estate Investing",
+      "defaultSectorId": "real-estate",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "531390, 523999",
+      "nonEssentialQuestionsIds": [
+        "multiple-dwelling-register",
+        "inspect-boiler",
+        "inspect-fridge",
+        "inspect-pv"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 8,
+      "webflowId": "656a1362a0fc64e8e4c8e30d"
+    },
+    "certified-public-accountant": {
+      "name": "Accounting, Bookkeeping, and Tax Preparation",
+      "defaultSectorId": "finance-and-insurance",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541211",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isCpaRequiredApplicable": true
+      },
+      "roadmapStepCount": 9,
+      "webflowId": "656a1362227f321008b482eb"
+    },
+    "graphic-design": {
+      "name": "Graphic Design",
+      "defaultSectorId": "digital-and-print-media",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541430",
+      "nonEssentialQuestionsIds": [
+        "resale-tax-cert"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 8,
+      "webflowId": "656a1362d7cc059b165c4385"
+    },
+    "detective": {
+      "name": "Detective Agency",
+      "defaultSectorId": "professional-scientific-and-technical-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "561611",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 10,
+      "webflowId": "656a136282b07990fab8d438"
+    },
+    "landscape-architecture": {
+      "name": "Landscape Architecture",
+      "defaultSectorId": "construction",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541320",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "planning-services",
+        "pesticides-applicator-licensing"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 10,
+      "webflowId": "656a13628934eb2330f44bcb"
+    },
+    "independent-artist": {
+      "name": "Entertainment",
+      "defaultSectorId": "arts-entertainment-and-recreation",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "",
+      "nonEssentialQuestionsIds": [
+        "carnival-fire-licenses",
+        "carnival-ride-permitting",
+        "ticket-broker-resell",
+        "entertainment-agency-register",
+        "business-vehicle-irp",
+        "bus-initial-inspection",
+        "resale-tax-cert",
+        "mvc-cpcn"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isCannabisLicenseTypeApplicable": false,
+        "isCpaRequiredApplicable": false,
+        "isCarServiceApplicable": false,
+        "isInterstateMovingApplicable": false,
+        "petCareHousing": false,
+        "isLiquorLicenseApplicable": false,
+        "isInterstateLogisticsApplicable": false,
+        "isRealEstateAppraisalManagementApplicable": false,
+        "isChildcareForSixOrMore": false,
+        "willSellPetCareItems": false,
+        "isTransportation": false,
+        "isCertifiedInteriorDesignerApplicable": false,
+        "isProvidesStaffingServicesApplicable": false
+      },
+      "roadmapStepCount": 8,
+      "webflowId": "656a1363b58e709cb5828632"
+    },
+    "petcare": {
+      "name": "Pet Care",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "812910",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "petcare-cds-shelter",
+        "petcare-cds-trainer",
+        "pesticides-applicator-licensing"
+      ],
+      "industryOnboardingQuestions": {
+        "isPetCareHousingApplicable": true,
+        "canBeHomeBased": true,
+        "willSellPetCareItems": true
+      },
+      "roadmapStepCount": 10,
+      "webflowId": "656a1362f58a7269b112bdc6"
+    },
+    "home-contractor": {
+      "name": "Home Improvement Contractor",
+      "defaultSectorId": "construction",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "238990,238390,238910,238350,238340,238330,238320,238310,238290,238220,238210,238190,238170,238160,238150,238140,238130,238120,238110,236118",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "cdl-neq",
+        "selfgenerator-transporter-registration"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 9,
+      "webflowId": "656a13623bf23c3979606d9d"
+    },
+    "daycare": {
+      "name": "Childcare Center",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": false,
+      "naicsCodes": "624410",
+      "nonEssentialQuestionsIds": [
+        "mvc-cpcn",
+        "cdl-neq"
+      ],
+      "industryOnboardingQuestions": {
+        "isChildcareForSixOrMore": true
+      },
+      "roadmapStepCount": 9,
+      "webflowId": "656a1362065390a761c33567"
+    },
+    "employment-agency": {
+      "name": "Employment Agency",
+      "defaultSectorId": "administrative-and-employment-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "561311",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isEmploymentAndPersonnelTypeApplicable": true
+      },
+      "roadmapStepCount": 9,
+      "webflowId": "656a13625bf066c2e6d815e7"
+    },
+    "funeral": {
+      "name": "Funeral Services",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "812210",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "crematory",
+        "bus-initial-inspection",
+        "mvc-cpcn",
+        "cdl-neq"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isCannabisLicenseTypeApplicable": false,
+        "isCpaRequiredApplicable": false,
+        "isCarServiceApplicable": false,
+        "isInterstateMovingApplicable": false,
+        "petCareHousing": false,
+        "isLiquorLicenseApplicable": false,
+        "isInterstateLogisticsApplicable": false,
+        "isRealEstateAppraisalManagementApplicable": false,
+        "isChildcareForSixOrMore": false,
+        "willSellPetCareItems": false,
+        "isTransportation": false,
+        "isCertifiedInteriorDesignerApplicable": false,
+        "isProvidesStaffingServicesApplicable": false
+      },
+      "roadmapStepCount": 11,
+      "webflowId": "6761e57d7cf913c3dc28724d"
+    },
+    "cleaning-janitorial-services": {
+      "name": "Cleaning and Janitorial Services",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "561720",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "pesticides-applicator-licensing"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 8,
+      "webflowId": "656a136212e59f3e1bcf4cc3"
+    },
+    "law-firm": {
+      "name": "Legal Services",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "541110, 541199",
+      "nonEssentialQuestionsIds": [],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 9,
+      "webflowId": "656a13621af61e584bd4e074"
+    },
+    "event-planning": {
+      "name": "Event Planning",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "561920, 561990, 711320, 532289",
+      "nonEssentialQuestionsIds": [
+        "business-vehicle-irp",
+        "bus-initial-inspection",
+        "mvc-cpcn",
+        "cdl-neq"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 8,
+      "webflowId": "656a13620578cfd34294c820"
+    },
+    "vending-machine": {
+      "name": "Vending Machine",
+      "defaultSectorId": "accommodation-and-food-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": false,
+      "naicsCodes": "445132, 454210",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "sell-milk-question"
+      ],
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 10,
+      "webflowId": "656a1362b4c9c3096676539c"
+    },
+    "auto-body-repair": {
+      "name": "Auto-Body Repair",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "811121, 811111, 811198, 811114",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "vehicle-dealership-q",
+        "ust-reg",
+        "flashing-light-permit"
+      ],
+      "industryOnboardingQuestions": {},
+      "roadmapStepCount": 12,
+      "webflowId": "656a13624544e5127379fdf2"
+    },
+    "generic": {
+      "name": "All Other Businesses",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "cds-lab-research ",
+        "cds-supply",
+        "other-businesses-CRTK-survey",
+        "inspect-boiler",
+        "regulated-medical-waste-question",
+        "business-vehicle-irp",
+        "inspect-fridge",
+        "inspect-pv",
+        "bus-initial-inspection",
+        "resale-tax-cert",
+        "ust-reg",
+        "streamlined-sales-tax-registration",
+        "flashing-light-permit",
+        "crtk-applicable-naics-codes"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true
+      },
+      "roadmapStepCount": 9,
+      "webflowId": "656a13628934eb2330f44bcb"
+    },
+    "trucking": {
+      "name": "Trucking",
+      "defaultSectorId": "other-services",
+      "isEnabled": true,
+      "canHavePermanentLocation": true,
+      "naicsCodes": "484110, 484121, 484122, 484220, 484230",
+      "nonEssentialQuestionsIds": [
+        "weights-measures",
+        "vehicle-dealership-q",
+        "flashing-light-permit"
+      ],
+      "industryOnboardingQuestions": {
+        "canBeHomeBased": true,
+        "isTransportation": true
+      },
+      "roadmapStepCount": 16,
+      "webflowId": "656a13624bda6c773dde8d2f"
+    }
+  },
+  "sectors": {
+    "accommodation-and-food-services": {
+      "name": "Accommodation and Food Services",
+      "nonEssentialQuestionsIds": []
+    },
+    "administrative-and-employment-services": {
+      "name": "Administrative and Employment Services",
+      "nonEssentialQuestionsIds": []
+    },
+    "agriculture-forestry-fishing-and-hunting": {
+      "name": "Agriculture, Forestry, Fishing and Hunting",
+      "nonEssentialQuestionsIds": []
+    },
+    "arts-entertainment-and-recreation": {
+      "name": "Arts, Entertainment, and Recreation",
+      "nonEssentialQuestionsIds": [
+        "resale-tax-cert"
+      ]
+    },
+    "cannabis": {
+      "name": "Cannabis",
+      "nonEssentialQuestionsIds": []
+    },
+    "clean-energy": {
+      "name": "Clean Energy",
+      "nonEssentialQuestionsIds": []
+    },
+    "construction": {
+      "name": "Construction",
+      "nonEssentialQuestionsIds": []
+    },
+    "digital-and-print-media": {
+      "name": "Digital and Print Media",
+      "nonEssentialQuestionsIds": []
+    },
+    "educational-services": {
+      "name": "Educational Services",
+      "nonEssentialQuestionsIds": []
+    },
+    "finance-and-insurance": {
+      "name": "Finance and Insurance",
+      "nonEssentialQuestionsIds": []
+    },
+    "health-care-and-social-assistance": {
+      "name": "Health Care and Social Assistance",
+      "nonEssentialQuestionsIds": []
+    },
+    "life-sciences": {
+      "name": "Life Sciences",
+      "nonEssentialQuestionsIds": []
+    },
+    "manufacturing": {
+      "name": "Manufacturing",
+      "nonEssentialQuestionsIds": []
+    },
+    "mining-quarrying-and-oil-and-gas-extraction": {
+      "name": "Mining, Quarrying, and Oil and Gas Extraction",
+      "nonEssentialQuestionsIds": []
+    },
+    "offshore-wind": {
+      "name": "Offshore Wind",
+      "nonEssentialQuestionsIds": []
+    },
+    "organizational-or-financial-management": {
+      "name": "Organizational or Financial Management Companies",
+      "nonEssentialQuestionsIds": []
+    },
+    "other-services": {
+      "name": "Other Services",
+      "nonEssentialQuestionsIds": [
+        "resale-tax-cert",
+        "streamlined-sales-tax-registration"
+      ]
+    },
+    "professional-scientific-and-technical-services": {
+      "name": "Professional, Scientific, and Technical Services",
+      "nonEssentialQuestionsIds": [
+        "streamlined-sales-tax-registration"
+      ]
+    },
+    "real-estate": {
+      "name": "Real Estate and Leasing",
+      "nonEssentialQuestionsIds": []
+    },
+    "retail-trade-and-ecommerce": {
+      "name": "Retail Trade and E-Commerce",
+      "nonEssentialQuestionsIds": [
+        "streamlined-sales-tax-registration"
+      ]
+    },
+    "technology": {
+      "name": "Technology",
+      "nonEssentialQuestionsIds": [
+        "streamlined-sales-tax-registration"
+      ]
+    },
+    "transportation-and-warehousing": {
+      "name": "Transportation and Warehousing",
+      "nonEssentialQuestionsIds": []
+    },
+    "utilities": {
+      "name": "Utilities",
+      "nonEssentialQuestionsIds": []
+    },
+    "waste-management-and-Remediation": {
+      "name": "Waste Management and Remediation",
+      "nonEssentialQuestionsIds": []
+    },
+    "wholesale-trade": {
+      "name": "Wholesale Trade",
+      "nonEssentialQuestionsIds": [
+        "streamlined-sales-tax-registration"
+      ]
+    }
+  },
+  "addons": {
+    "short-term-rental-registration": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "healthcare-tpa": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "lodging-liquor": {
+      "taskCount": 1,
+      "modifications": [
+        {
+          "taskToReplaceFilename": "town-mercantile-license",
+          "replaceWithFilename": "town-mercantile-license-liquor"
+        }
+      ]
+    },
+    "construction-home-renovation": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "employment-agency-temporary": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "cosmetology-electrologist-license": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "cdl-addOnWhenYes": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "vehicle-cpcn": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "planner": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "home-based-transportation": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "planned-renovation": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "foreign-remote-worker": {
+      "taskCount": 4,
+      "modifications": []
+    },
+    "raffle-bingo-games": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "entertainment-carnival-fire-licenses": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "petcare-license": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "regulated-medical-waste-generator-registration": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "healthcare-freestanding-facility-license": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "residential-landlord-long-term-few-units": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "cpa": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "cigarettes-add": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "nonprofit-and-corp-foreign": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "foreign-remote-seller": {
+      "taskCount": 3,
+      "modifications": []
+    },
+    "entertainment-agency-registration": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "llc": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "healthcare-xray-reg": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "other-cds-supply": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "produce-insurance": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "nj-seller-streamlined-sales-tax": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "car-service-high-capacity": {
+      "taskCount": 4,
+      "modifications": []
+    },
+    "waste-transporter-license": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "construction-well-driller-license": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "retail-pesticide-dealer-license": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "refrigeration-certificate": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "petcare-trainer": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "permanent-location-business-landlord": {
+      "taskCount": 5,
+      "modifications": []
+    },
+    "pv-certificate": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "crematory-application-funeral": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "construction-new-home-construction": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "lodging-hotel-registration": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "healthcare-dentist": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "community-rtk-survey": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "liquor-license": {
+      "taskCount": 1,
+      "modifications": [
+        {
+          "taskToReplaceFilename": "town-mercantile-license",
+          "replaceWithFilename": "town-mercantile-license-liquor"
+        }
+      ]
+    },
+    "car-service-standard": {
+      "taskCount": 3,
+      "modifications": []
+    },
+    "registration-selfgenerator-waste-transp": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "amber-light": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "public-works-contractor": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "entertainment-carnival-ride-permit": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "weights-measures-add": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "oos-pharmacy": {
+      "taskCount": 0,
+      "modifications": [
+        {
+          "step": 4,
+          "taskToReplaceFilename": "pharmacy-license",
+          "replaceWithFilename": "oos-pharmacy-registration"
+        }
+      ]
+    },
+    "family-daycare": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "scorp": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "notify-asbestos": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "cannabis-annual": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "interstate-moving": {
+      "taskCount": 4,
+      "modifications": []
+    },
+    "vehicle-irp": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "business-vehicle": {
+      "taskCount": 3,
+      "modifications": []
+    },
+    "healthcare-dental-specialty": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "will-sell-pet-care-items": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "multi-pest-applicator-license": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "boiler": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "lodging-food": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "employment-agency-permanent": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "foreign-nexus": {
+      "taskCount": 0,
+      "modifications": [
+        {
+          "taskToReplaceFilename": "register-for-taxes",
+          "replaceWithFilename": "register-for-taxes-foreign"
+        },
+        {
+          "taskToReplaceFilename": "get-insurance",
+          "replaceWithFilename": "research-insurance-needs-foreign"
+        }
+      ]
+    },
+    "lodging-rooming-boarding-house": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "env-requirements": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "dental-waste-registration": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "real-estate-appraiser": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "sell-milk": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "healthcare-dental-hygienist": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "other-lab-research": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "transportation-initial-inspection": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "real-estate-appraisal-management": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "public-record-filing": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "logistics-modification": {
+      "taskCount": 0,
+      "modifications": [
+        {
+          "taskToReplaceFilename": "evaluate-your-location",
+          "replaceWithFilename": "logistics-site-evaluation"
+        }
+      ]
+    },
+    "resale-certificate": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "multiple-dwelling-registration": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "pest-pesticide-dealer-license": {
+      "taskCount": 2,
+      "modifications": []
+    },
+    "ticket-broker-reseller": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "employment-agency-job-seekers": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "employment-agency-employers-both": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "dental-waste-exemption": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "vehicle-dealership-neq": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "daycare": {
+      "taskCount": 3,
+      "modifications": []
+    },
+    "interstate-logistics": {
+      "taskCount": 4,
+      "modifications": []
+    },
+    "nonprofit": {
+      "taskCount": 5,
+      "modifications": [
+        {
+          "taskToReplaceFilename": "business-plan",
+          "replaceWithFilename": "nonprofit-business-plan"
+        }
+      ]
+    },
+    "public-record-filing-foreign": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "petcare-shelter": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "residential-landlord-long-term-many-units": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "trade-name": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "elevator-owning-business": {
+      "taskCount": 1,
+      "modifications": []
+    },
+    "permanent-location-business": {
+      "taskCount": 6,
+      "modifications": []
+    },
+    "cannabis-conditional": {
+      "taskCount": 2,
+      "modifications": []
+    }
+  },
+  "anytimeActions": [
+    {
+      "id": "add-update-waste-generator-decals",
+      "name": "Add, Replace and Update Your Waste Transporter Decals",
+      "filename": "add-update-waste-generator-decals",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "construction",
+        "waste-management-and-Remediation"
+      ],
+      "categories": [
+        "purchase-new-products-or-equipment",
+        "manage-my-business-vehicles"
+      ]
+    },
+    {
+      "id": "adjust-rental-rates",
+      "name": "Learn How to Adjust Your Rental Rates",
+      "filename": "adjust-rental-rates",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "residential-landlord"
+      ],
+      "sectorIds": [
+        "real-estate"
+      ],
+      "categories": [
+        "manage-my-properties"
+      ]
+    },
+    {
+      "id": "amber-light-permit",
+      "name": "Apply for a Flashing Amber Light Permit",
+      "filename": "amber-light-permit",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "construction",
+        "other-services",
+        "transportation-and-warehousing",
+        "utilities",
+        "waste-management-and-Remediation"
+      ],
+      "categories": [
+        "manage-my-business-vehicles"
+      ]
+    },
+    {
+      "id": "anytime-selfgenerator-waste-transporters-reg",
+      "name": "Apply for Your Self-Generator Waste Transporter Registration",
+      "filename": "anytime-selfgenerator-waste-transporters-reg",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "commercial-construction",
+        "hvac-contractor",
+        "electrical-contractor",
+        "home-contractor",
+        "interior-designer"
+      ],
+      "sectorIds": [
+        "construction"
+      ],
+      "categories": [
+        "purchase-new-products-or-equipment"
+      ]
+    },
+    {
+      "id": "boiler",
+      "name": "Get Your Boiler Inspected",
+      "filename": "boiler",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "cannabis",
+        "generic",
+        "health-club",
+        "healthcare",
+        "real-estate-investor",
+        "residential-landlord",
+        "retail",
+        "restaurant",
+        "lodging"
+      ],
+      "sectorIds": [
+        "cannabis",
+        "accommodation-and-food-services",
+        "clean-energy",
+        "health-care-and-social-assistance",
+        "manufacturing",
+        "retail-trade-and-ecommerce",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "other-services",
+        "offshore-wind",
+        "real-estate",
+        "transportation-and-warehousing",
+        "utilities"
+      ],
+      "categories": [
+        "manage-my-properties"
+      ]
+    },
+    {
+      "id": "carnival-ride-supplemental-modification",
+      "name": "Modify Your Carnival or Amusement Ride",
+      "filename": "carnival-ride-supplemental-modification",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [],
+      "categories": [
+        "offer-new-products-or-services"
+      ]
+    },
+    {
+      "id": "cemetery-reinstatement",
+      "name": "Reinstate Your Cemetery Salesperson License",
+      "filename": "cemetery-reinstatement",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "cemetery"
+      ],
+      "sectorIds": [],
+      "categories": [
+        "reactivate-my-expired-permit-license-or-registration"
+      ]
+    },
+    {
+      "id": "close-your-business",
+      "name": "Close Your Business",
+      "filename": "close-your-business",
+      "applyToAllUsers": true,
+      "industryIds": [],
+      "sectorIds": [],
+      "categories": [
+        "sell-or-close-my-business"
+      ]
+    },
+    {
+      "id": "code23-osow-30day-permit",
+      "name": "Apply for Your Code 23 OS/OW (30-day) Permit, if Applicable",
+      "filename": "code23-osow-30day-permit",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "commercial-construction",
+        "freight-forwarding",
+        "trucking",
+        "moving-company",
+        "home-contractor",
+        "hvac-contractor"
+      ],
+      "sectorIds": [
+        "agriculture-forestry-fishing-and-hunting",
+        "construction",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "transportation-and-warehousing",
+        "manufacturing"
+      ],
+      "categories": [
+        "transport-my-products-or-equipment"
+      ]
+    },
+    {
+      "id": "code23-trailer-permit",
+      "name": "Apply for Your Code 23 Special Oversize Trailer Permit",
+      "filename": "code23-trailer-permit",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "commercial-construction",
+        "freight-forwarding",
+        "trucking",
+        "moving-company",
+        "home-contractor",
+        "hvac-contractor"
+      ],
+      "sectorIds": [
+        "construction",
+        "agriculture-forestry-fishing-and-hunting",
+        "manufacturing",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "transportation-and-warehousing"
+      ],
+      "categories": [
+        "transport-my-products-or-equipment"
+      ]
+    },
+    {
+      "id": "commercial-pest-applicator-license-recert",
+      "name": "Recertify Your Commercial Pesticide Applicator License",
+      "filename": "commercial-pest-applicator-license-recert",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "pest-control"
+      ],
+      "sectorIds": [],
+      "categories": [
+        "reactivate-my-expired-permit-license-or-registration"
+      ]
+    },
+    {
+      "id": "commercial-pest-applicator-license-renewal",
+      "name": "Renew Your Commercial Pesticide Applicator License",
+      "filename": "commercial-pest-applicator-license-renewal",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "pest-control"
+      ],
+      "sectorIds": [],
+      "categories": [
+        "purchase-new-products-or-equipment"
+      ]
+    },
+    {
+      "id": "demo-only",
+      "name": "Demo Anytime Action",
+      "filename": "demo-only",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [],
+      "categories": [
+        "apply-for-state-funding"
+      ]
+    },
+    {
+      "id": "electrical-contracting-business-permit-reactivation",
+      "name": "Reactivate Your Electrical Contracting Business Permit",
+      "filename": "electrical-contracting-business-permit-reactivation",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [],
+      "categories": [
+        "reactivate-my-expired-permit-license-or-registration"
+      ]
+    },
+    {
+      "id": "electrical-contracting-business-permit-update",
+      "name": "Update Your Electrical Contracting Business Permit",
+      "filename": "electrical-contracting-business-permit-update",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "electrical-contractor"
+      ],
+      "sectorIds": [],
+      "categories": [
+        "change-my-business-information"
+      ]
+    },
+    {
+      "id": "emergency-trip-permit",
+      "name": "Apply for Your Emergency Trip Permit for Last-Minute Alcohol Pickups or",
+      "filename": "emergency-trip-permit",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "trucking"
+      ],
+      "sectorIds": [
+        "transportation-and-warehousing"
+      ],
+      "categories": [
+        "transport-my-products-or-equipment"
+      ]
+    },
+    {
+      "id": "food-truck-fire-permit",
+      "name": "Get a Fire Permit for Your Food Truck",
+      "filename": "food-truck-fire-permit",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "accommodation-and-food-services"
+      ],
+      "categories": [
+        "set-up-at-a-temporary-location"
+      ]
+    },
+    {
+      "id": "fumigation-fire-permit",
+      "name": "Get a Fire Permit for Fumigation or Thermal Insecticide Fogging",
+      "filename": "fumigation-fire-permit",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "pest-control"
+      ],
+      "sectorIds": [],
+      "categories": [
+        "set-up-at-a-temporary-location"
+      ]
+    },
+    {
+      "id": "healthcare-cds-reinstate",
+      "name": "Reinstate Your Controlled Dangerous Substances Registration",
+      "filename": "healthcare-cds-reinstate",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "healthcare"
+      ],
+      "sectorIds": [],
+      "categories": [
+        "reactivate-my-expired-permit-license-or-registration"
+      ]
+    },
+    {
+      "id": "hot-work-fire-permit",
+      "name": "Get a Fire Permit to Perform Hot Work",
+      "filename": "hot-work-fire-permit",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "commercial-construction",
+        "auto-body-repair",
+        "home-contractor",
+        "hvac-contractor"
+      ],
+      "sectorIds": [
+        "construction",
+        "professional-scientific-and-technical-services"
+      ],
+      "categories": [
+        "set-up-at-a-temporary-location"
+      ]
+    },
+    {
+      "id": "landlord-registration-update",
+      "name": "Register or Update Your Landlord Registration",
+      "filename": "landlord-registration-update",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "real-estate"
+      ],
+      "categories": [
+        "manage-my-properties",
+        "change-my-business-information"
+      ]
+    },
+    {
+      "id": "license-a-901",
+      "name": "Apply for Your A-901 License to Transport Waste",
+      "filename": "license-a-901",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "construction",
+        "waste-management-and-Remediation"
+      ],
+      "categories": [
+        "offer-new-products-or-services"
+      ]
+    },
+    {
+      "id": "mvc-ein",
+      "name": "Get Your Motor Vehicle Commission EIN",
+      "filename": "mvc-ein",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "transportation-and-warehousing",
+        "utilities",
+        "waste-management-and-Remediation",
+        "accommodation-and-food-services",
+        "agriculture-forestry-fishing-and-hunting",
+        "construction",
+        "manufacturing",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "administrative-and-employment-services",
+        "arts-entertainment-and-recreation",
+        "clean-energy",
+        "cannabis",
+        "educational-services",
+        "digital-and-print-media",
+        "health-care-and-social-assistance",
+        "finance-and-insurance",
+        "life-sciences",
+        "organizational-or-financial-management",
+        "offshore-wind",
+        "other-services",
+        "professional-scientific-and-technical-services",
+        "real-estate",
+        "retail-trade-and-ecommerce",
+        "technology",
+        "wholesale-trade"
+      ],
+      "categories": [
+        "manage-my-business-vehicles"
+      ]
+    },
+    {
+      "id": "mvc-register",
+      "name": "Register Your Business-Owned Vehicle(s) with the NJ MVC",
+      "filename": "mvc-register",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "agriculture-forestry-fishing-and-hunting",
+        "accommodation-and-food-services",
+        "utilities",
+        "transportation-and-warehousing",
+        "waste-management-and-Remediation",
+        "construction",
+        "manufacturing",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "administrative-and-employment-services",
+        "arts-entertainment-and-recreation",
+        "cannabis",
+        "clean-energy",
+        "digital-and-print-media",
+        "educational-services",
+        "finance-and-insurance",
+        "life-sciences",
+        "health-care-and-social-assistance",
+        "organizational-or-financial-management",
+        "offshore-wind",
+        "professional-scientific-and-technical-services",
+        "other-services",
+        "real-estate",
+        "technology",
+        "retail-trade-and-ecommerce",
+        "wholesale-trade"
+      ],
+      "categories": [
+        "manage-my-business-vehicles"
+      ]
+    },
+    {
+      "id": "mvc-title",
+      "name": "Get a Title for Your Business Vehicle(s)",
+      "filename": "mvc-title",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "transportation-and-warehousing",
+        "utilities",
+        "waste-management-and-Remediation",
+        "accommodation-and-food-services",
+        "agriculture-forestry-fishing-and-hunting",
+        "construction",
+        "manufacturing",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "administrative-and-employment-services",
+        "cannabis",
+        "digital-and-print-media",
+        "educational-services",
+        "arts-entertainment-and-recreation",
+        "clean-energy",
+        "finance-and-insurance",
+        "health-care-and-social-assistance",
+        "life-sciences",
+        "offshore-wind",
+        "organizational-or-financial-management",
+        "other-services",
+        "professional-scientific-and-technical-services",
+        "real-estate",
+        "retail-trade-and-ecommerce",
+        "technology",
+        "wholesale-trade"
+      ],
+      "categories": [
+        "manage-my-business-vehicles"
+      ]
+    },
+    {
+      "id": "new-home-warranty-enrollment",
+      "name": "Enroll New Homes You Build and Sell in a Warranty Plan",
+      "filename": "new-home-warranty-enrollment",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "commercial-construction"
+      ],
+      "sectorIds": [
+        "construction"
+      ],
+      "categories": [
+        "manage-my-properties"
+      ]
+    },
+    {
+      "id": "ocean-borne-container-permit",
+      "name": "Apply for Your Ocean Borne Container Permit",
+      "filename": "ocean-borne-container-permit",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "freight-forwarding",
+        "moving-company"
+      ],
+      "sectorIds": [
+        "transportation-and-warehousing"
+      ],
+      "categories": [
+        "transport-my-products-or-equipment"
+      ]
+    },
+    {
+      "id": "operating-carnival-fire-permit",
+      "name": "Get a Fire Permit for Your Carnival or Circus",
+      "filename": "operating-carnival-fire-permit",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [],
+      "categories": [
+        "set-up-at-a-temporary-location"
+      ]
+    },
+    {
+      "id": "pesticide-applicator-business-license-renewal",
+      "name": "Renew Your Pesticide Applicator Business License",
+      "filename": "pesticide-applicator-business-license-renewal",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "pest-control"
+      ],
+      "sectorIds": [],
+      "categories": [
+        "purchase-new-products-or-equipment"
+      ]
+    },
+    {
+      "id": "pesticide-dealer-business-license",
+      "name": "Renew Your Pesticide Dealer Business License",
+      "filename": "pesticide-dealer-business-license",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [],
+      "categories": [
+        "purchase-new-products-or-equipment"
+      ]
+    },
+    {
+      "id": "pesticide-dealer-license-renewal",
+      "name": "Renew Your Certified Pesticide Dealer License",
+      "filename": "pesticide-dealer-license-renewal",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [],
+      "categories": [
+        "purchase-new-products-or-equipment"
+      ]
+    },
+    {
+      "id": "pred-registration",
+      "name": "Register Your Condominium or Other Planned Real Estate Development",
+      "filename": "pred-registration",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "commercial-construction"
+      ],
+      "sectorIds": [
+        "construction"
+      ],
+      "categories": [
+        "manage-my-properties"
+      ]
+    },
+    {
+      "id": "pressure-vessel",
+      "name": "Get Your Pressure Vessel Inspected",
+      "filename": "pressure-vessel",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "cannabis",
+        "generic",
+        "health-club",
+        "healthcare",
+        "lodging",
+        "residential-landlord",
+        "real-estate-investor",
+        "restaurant",
+        "retail"
+      ],
+      "sectorIds": [
+        "cannabis",
+        "accommodation-and-food-services",
+        "clean-energy",
+        "health-care-and-social-assistance",
+        "manufacturing",
+        "retail-trade-and-ecommerce",
+        "real-estate",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "other-services",
+        "offshore-wind",
+        "utilities",
+        "transportation-and-warehousing"
+      ],
+      "categories": [
+        "manage-my-properties"
+      ]
+    },
+    {
+      "id": "refrigeration",
+      "name": "Get Your Refrigeration System Inspected",
+      "filename": "refrigeration",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "cannabis",
+        "health-club",
+        "healthcare",
+        "lodging",
+        "retail",
+        "residential-landlord",
+        "real-estate-investor",
+        "generic",
+        "restaurant"
+      ],
+      "sectorIds": [
+        "cannabis",
+        "accommodation-and-food-services",
+        "clean-energy",
+        "health-care-and-social-assistance",
+        "manufacturing",
+        "retail-trade-and-ecommerce",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "other-services",
+        "offshore-wind",
+        "utilities",
+        "transportation-and-warehousing",
+        "real-estate"
+      ],
+      "categories": [
+        "manage-my-properties"
+      ]
+    },
+    {
+      "id": "register-short-term-rental",
+      "name": "Register as a Short-term Rental, if Your Town Requires It",
+      "filename": "register-short-term-rental",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "real-estate"
+      ],
+      "categories": [
+        "manage-my-properties"
+      ]
+    },
+    {
+      "id": "registry-update-brc-amendment",
+      "name": "Update Your Business Registration Certificate and/or Registry Account",
+      "filename": "registry-update-brc-amendment",
+      "applyToAllUsers": true,
+      "industryIds": [],
+      "sectorIds": [],
+      "categories": [
+        "change-my-business-information",
+        "hire-new-employees"
+      ]
+    },
+    {
+      "id": "renew-waste-transporter-decals",
+      "name": "Renew Your Waste Transporter Decals",
+      "filename": "renew-waste-transporter-decals",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "construction",
+        "waste-management-and-Remediation"
+      ],
+      "categories": [
+        "manage-my-business-vehicles"
+      ]
+    },
+    {
+      "id": "report-asbestos",
+      "name": "Report Your Asbestos Work",
+      "filename": "report-asbestos",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "remediation-waste"
+      ],
+      "sectorIds": [
+        "waste-management-and-Remediation"
+      ],
+      "categories": [
+        "offer-new-products-or-services"
+      ]
+    },
+    {
+      "id": "resale-tax-certificate",
+      "name": "Get a Sales Tax Resale Certificate",
+      "filename": "resale-tax-certificate",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "accommodation-and-food-services",
+        "digital-and-print-media",
+        "retail-trade-and-ecommerce"
+      ],
+      "categories": [
+        "purchase-new-products-or-equipment"
+      ]
+    },
+    {
+      "id": "rmw-generator-registration-operating",
+      "name": "Complete Your Regulated Medical Waste Generator Registration",
+      "filename": "rmw-generator-registration-operating",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "acupuncture",
+        "healthcare",
+        "funeral",
+        "pharmacy",
+        "petcare",
+        "home-health-aide"
+      ],
+      "sectorIds": [
+        "health-care-and-social-assistance",
+        "professional-scientific-and-technical-services",
+        "life-sciences",
+        "educational-services"
+      ],
+      "categories": [
+        "change-my-business-information"
+      ]
+    },
+    {
+      "id": "shelter-cds-reinstatement",
+      "name": "Reinstate Your Animal Shelter\u2019s Controlled Dangerous Substances Registration",
+      "filename": "shelter-cds-reinstatement",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "petcare"
+      ],
+      "sectorIds": [],
+      "categories": [
+        "reactivate-my-expired-permit-license-or-registration"
+      ]
+    },
+    {
+      "id": "single-trip-osow-permit",
+      "name": "Apply for Your Single Trip OS/OW Permit (5-day)",
+      "filename": "single-trip-osow-permit",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "commercial-construction",
+        "freight-forwarding",
+        "trucking",
+        "moving-company",
+        "home-contractor",
+        "hvac-contractor"
+      ],
+      "sectorIds": [
+        "agriculture-forestry-fishing-and-hunting",
+        "construction",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "transportation-and-warehousing",
+        "manufacturing"
+      ],
+      "categories": [
+        "transport-my-products-or-equipment"
+      ]
+    },
+    {
+      "id": "smoke-detector-certificate",
+      "name": "Get a New Smoke Detector, Carbon Monoxide Detector, and Fire Extinguisher",
+      "filename": "smoke-detector-certificate",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "real-estate"
+      ],
+      "categories": [
+        "manage-my-properties",
+        "purchase-new-products-or-equipment"
+      ]
+    },
+    {
+      "id": "social-affair-nonprofit",
+      "name": " Apply for a Social Affair Permit to Serve Alcohol",
+      "filename": "social-affair-nonprofit",
+      "applyToAllUsers": true,
+      "industryIds": [],
+      "sectorIds": [],
+      "categories": [
+        "set-up-at-a-temporary-location"
+      ]
+    },
+    {
+      "id": "state-contracting",
+      "name": "Learn How to Contract with the NJ State Government",
+      "filename": "state-contracting",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "accommodation-and-food-services",
+        "administrative-and-employment-services",
+        "agriculture-forestry-fishing-and-hunting",
+        "arts-entertainment-and-recreation",
+        "cannabis",
+        "clean-energy",
+        "digital-and-print-media",
+        "educational-services",
+        "finance-and-insurance",
+        "health-care-and-social-assistance",
+        "life-sciences",
+        "manufacturing",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "organizational-or-financial-management",
+        "other-services",
+        "professional-scientific-and-technical-services",
+        "real-estate",
+        "retail-trade-and-ecommerce",
+        "technology",
+        "utilities",
+        "transportation-and-warehousing",
+        "waste-management-and-Remediation",
+        "wholesale-trade"
+      ],
+      "categories": [
+        "contract-with-nj-gov"
+      ]
+    },
+    {
+      "id": "streamlined-sales-tax-nj",
+      "name": "Register for Streamlined Sales Tax",
+      "filename": "streamlined-sales-tax-nj",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "digital-and-print-media",
+        "wholesale-trade",
+        "other-services",
+        "retail-trade-and-ecommerce"
+      ],
+      "categories": [
+        "apply-for-state-funding"
+      ]
+    },
+    {
+      "id": "tax-clearance-certificate",
+      "name": "Get a Tax Clearance Certificate",
+      "filename": "tax-clearance-certificate",
+      "applyToAllUsers": true,
+      "industryIds": [],
+      "sectorIds": [],
+      "categories": [
+        "apply-for-state-funding"
+      ]
+    },
+    {
+      "id": "temp-xray-registration",
+      "name": "Register Your Temporary X-Ray Machine",
+      "filename": "temp-xray-registration",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [],
+      "categories": [
+        "purchase-new-products-or-equipment"
+      ]
+    },
+    {
+      "id": "temporary-space-online-biz-fire-permit",
+      "name": "Get a Fire Permit to Set Up Your Temporary Retail Space",
+      "filename": "temporary-space-online-biz-fire-permit",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "e-commerce"
+      ],
+      "sectorIds": [],
+      "categories": [
+        "set-up-at-a-temporary-location"
+      ]
+    },
+    {
+      "id": "tenant-eviction",
+      "name": "Learn About the Tenant Eviction Process",
+      "filename": "tenant-eviction",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "residential-landlord"
+      ],
+      "sectorIds": [
+        "real-estate"
+      ],
+      "categories": [
+        "manage-my-properties"
+      ]
+    },
+    {
+      "id": "trainer-cds-reinstatement",
+      "name": "Reinstate Your Dog Trainer Controlled Dangerous Substances Registration",
+      "filename": "trainer-cds-reinstatement",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "petcare"
+      ],
+      "sectorIds": [],
+      "categories": [
+        "reactivate-my-expired-permit-license-or-registration"
+      ]
+    },
+    {
+      "id": "transportation-cpcn-aa",
+      "name": "Get Your Certificate of Public Convenience and Necessity (CPCN)",
+      "filename": "transportation-cpcn-aa",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "transportation-and-warehousing",
+        "educational-services",
+        "accommodation-and-food-services",
+        "utilities",
+        "arts-entertainment-and-recreation",
+        "health-care-and-social-assistance"
+      ],
+      "categories": [
+        "manage-my-business-vehicles"
+      ]
+    },
+    {
+      "id": "transportation-inspection-aa",
+      "name": "Schedule Your Initial Bus Inspection",
+      "filename": "transportation-inspection-aa",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "transportation-and-warehousing",
+        "educational-services",
+        "arts-entertainment-and-recreation",
+        "accommodation-and-food-services",
+        "utilities",
+        "construction",
+        "health-care-and-social-assistance",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "offshore-wind",
+        "other-services"
+      ],
+      "categories": [
+        "manage-my-business-vehicles"
+      ]
+    },
+    {
+      "id": "trucking-cdl-aa",
+      "name": "Make Sure You or Your Drivers have a Commercial Driver's License (CDL)",
+      "filename": "trucking-cdl-aa",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "utilities",
+        "transportation-and-warehousing",
+        "arts-entertainment-and-recreation",
+        "manufacturing",
+        "retail-trade-and-ecommerce",
+        "offshore-wind",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "waste-management-and-Remediation",
+        "life-sciences",
+        "wholesale-trade",
+        "construction",
+        "clean-energy",
+        "cannabis",
+        "agriculture-forestry-fishing-and-hunting",
+        "health-care-and-social-assistance",
+        "educational-services",
+        "accommodation-and-food-services"
+      ],
+      "categories": [
+        "manage-my-business-vehicles"
+      ]
+    },
+    {
+      "id": "trucking-ifta-aa",
+      "name": "Get Your International Fuel Tax Agreement (IFTA) License and Decals",
+      "filename": "trucking-ifta-aa",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "transportation-and-warehousing",
+        "manufacturing",
+        "utilities",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "waste-management-and-Remediation",
+        "construction",
+        "wholesale-trade",
+        "agriculture-forestry-fishing-and-hunting",
+        "life-sciences",
+        "cannabis",
+        "arts-entertainment-and-recreation",
+        "offshore-wind",
+        "clean-energy",
+        "retail-trade-and-ecommerce"
+      ],
+      "categories": [
+        "manage-my-business-vehicles"
+      ]
+    },
+    {
+      "id": "trucking-irp-aa",
+      "name": "Register Your Vehicle(s) Under the International Registration Plan (IRP)",
+      "filename": "trucking-irp-aa",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "transportation-and-warehousing",
+        "manufacturing",
+        "utilities",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "waste-management-and-Remediation",
+        "construction",
+        "wholesale-trade",
+        "agriculture-forestry-fishing-and-hunting",
+        "life-sciences",
+        "cannabis",
+        "arts-entertainment-and-recreation",
+        "offshore-wind",
+        "clean-energy",
+        "retail-trade-and-ecommerce"
+      ],
+      "categories": [
+        "manage-my-business-vehicles"
+      ]
+    },
+    {
+      "id": "ust-modification",
+      "name": "Modify Your Underground Storage Tank (UST) Registration",
+      "filename": "ust-modification",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [],
+      "categories": [
+        "purchase-new-products-or-equipment"
+      ]
+    },
+    {
+      "id": "ust-registration-renewal",
+      "name": "Renew Your Underground Storage Tank (UST) Registration",
+      "filename": "ust-registration-renewal",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [],
+      "categories": [
+        "purchase-new-products-or-equipment"
+      ]
+    },
+    {
+      "id": "vacant-building-fire-permit",
+      "name": "Get a Fire Permit for Your Vacant or Unoccupied Property",
+      "filename": "vacant-building-fire-permit",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [],
+      "categories": [
+        "manage-my-properties"
+      ]
+    },
+    {
+      "id": "vehicle-dealership-aa",
+      "name": "Get Your Motor Vehicle or Boat Dealership License",
+      "filename": "vehicle-dealership-aa",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [
+        "transportation-and-warehousing",
+        "waste-management-and-Remediation",
+        "manufacturing",
+        "utilities",
+        "clean-energy",
+        "offshore-wind",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "wholesale-trade",
+        "construction",
+        "agriculture-forestry-fishing-and-hunting"
+      ],
+      "categories": [
+        "manage-my-business-vehicles"
+      ]
+    },
+    {
+      "id": "well-decommissioning-report",
+      "name": "Decommission Your Customer\u2019s Well",
+      "filename": "well-decommissioning-report",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "commercial-construction"
+      ],
+      "sectorIds": [
+        "construction"
+      ],
+      "categories": [
+        "offer-new-products-or-services"
+      ]
+    },
+    {
+      "id": "well-permit",
+      "name": " Apply for a Permit for Your Customer\u2019s Well",
+      "filename": "well-permit",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "commercial-construction"
+      ],
+      "sectorIds": [
+        "construction"
+      ],
+      "categories": [
+        "offer-new-products-or-services"
+      ]
+    },
+    {
+      "id": "well-record",
+      "name": "File a Record for Your Customer\u2019s Well",
+      "filename": "well-record",
+      "applyToAllUsers": false,
+      "industryIds": [
+        "commercial-construction"
+      ],
+      "sectorIds": [
+        "construction"
+      ],
+      "categories": [
+        "offer-new-products-or-services"
+      ]
+    },
+    {
+      "id": "xray-disposition-form",
+      "name": "Submit Your X-Ray Machine Disposition Form",
+      "filename": "xray-disposition-form",
+      "applyToAllUsers": false,
+      "industryIds": [],
+      "sectorIds": [],
+      "categories": [
+        "sell-or-close-my-business"
+      ]
+    }
+  ],
+  "fundings": [
+    {
+      "id": "angel-investor-tax",
+      "name": "Angel Investor Tax Credit Program",
+      "filename": "angel-investor-tax",
+      "sector": [
+        "technology",
+        "life-sciences",
+        "clean-energy",
+        "manufacturing"
+      ],
+      "fundingType": "tax credit",
+      "status": "rolling application"
+    },
+    {
+      "id": "angel-match-program",
+      "name": "Angel Match Program",
+      "filename": "angel-match-program",
+      "sector": [
+        "clean-energy",
+        "life-sciences",
+        "technology",
+        "manufacturing",
+        "finance-and-insurance",
+        "professional-scientific-and-technical-services"
+      ],
+      "fundingType": "loan",
+      "status": "rolling application"
+    },
+    {
+      "id": "apprenticeship-tax-credit",
+      "name": "Apprenticeship Tax Credit Program",
+      "filename": "apprenticeship-tax-credit",
+      "sector": [],
+      "fundingType": "tax credit",
+      "status": "rolling application"
+    },
+    {
+      "id": "bond-financing",
+      "name": "Bond Financing",
+      "filename": "bond-financing",
+      "sector": [
+        "manufacturing",
+        "waste-management-and-Remediation",
+        "utilities",
+        "other-services"
+      ],
+      "fundingType": "loan",
+      "status": "rolling application"
+    },
+    {
+      "id": "clean-energy-loans",
+      "name": "New Jersey Clean Energy Loans",
+      "filename": "clean-energy-loans",
+      "sector": [
+        "clean-energy",
+        "technology",
+        "utilities"
+      ],
+      "fundingType": "loan",
+      "status": "rolling application"
+    },
+    {
+      "id": "clean-energy-program-combined-heat-and-power-fuel-cells",
+      "name": "New Jersey\u2019s Clean Energy Program - Combined Heat & Power - Fuel Cells",
+      "filename": "clean-energy-program-combined-heat-and-power-fuel-cells",
+      "sector": [
+        "clean-energy",
+        "construction",
+        "real-estate",
+        "other-services"
+      ],
+      "fundingType": "grant",
+      "status": "rolling application"
+    },
+    {
+      "id": "clean-energy-program-commercial-and-industrial-new-construction",
+      "name": "New Jersey\u2019s Clean Energy Program - Commercial & Industrial New Construction",
+      "filename": "clean-energy-program-commercial-and-industrial-new-construction",
+      "sector": [
+        "construction",
+        "clean-energy",
+        "other-services",
+        "manufacturing"
+      ],
+      "fundingType": "grant",
+      "status": "rolling application"
+    },
+    {
+      "id": "clean-energy-program-large-energy-users",
+      "name": "New Jersey\u2019s Clean Energy Program - Large Energy Users",
+      "filename": "clean-energy-program-large-energy-users",
+      "sector": [
+        "clean-energy",
+        "construction",
+        "other-services",
+        "real-estate",
+        "manufacturing"
+      ],
+      "fundingType": "grant",
+      "status": "rolling application"
+    },
+    {
+      "id": "clean-energy-program-residential-new-construction",
+      "name": "New Jersey\u2019s Clean Energy Program - Residential New Construction",
+      "filename": "clean-energy-program-residential-new-construction",
+      "sector": [
+        "construction",
+        "other-services",
+        "real-estate",
+        "clean-energy"
+      ],
+      "fundingType": "grant",
+      "status": "rolling application"
+    },
+    {
+      "id": "clean-tech-research",
+      "name": "Clean Tech Research & Development (R&D) Voucher Program",
+      "filename": "clean-tech-research",
+      "sector": [
+        "technology",
+        "clean-energy",
+        "professional-scientific-and-technical-services",
+        "manufacturing",
+        "other-services"
+      ],
+      "fundingType": "grant",
+      "status": "first come, first serve"
+    },
+    {
+      "id": "dep-child-care-facility-grant",
+      "name": "Child Care Facility Grant",
+      "filename": "dep-child-care-facility-grant",
+      "sector": [
+        "other-services"
+      ],
+      "fundingType": "grant",
+      "status": "rolling application"
+    },
+    {
+      "id": "dep-drinking-water",
+      "name": "Drinking Water State Revolving Fund Program",
+      "filename": "dep-drinking-water",
+      "sector": [
+        "construction",
+        "utilities"
+      ],
+      "fundingType": "loan",
+      "status": "rolling application"
+    },
+    {
+      "id": "dep-electric-school-bus",
+      "name": "Electric School Bus Program",
+      "filename": "dep-electric-school-bus",
+      "sector": [
+        "clean-energy",
+        "other-services",
+        "transportation-and-warehousing"
+      ],
+      "fundingType": "grant",
+      "status": "deadline"
+    },
+    {
+      "id": "dep-emobility-grant",
+      "name": "eMobility Rolling Grant Program",
+      "filename": "dep-emobility-grant",
+      "sector": [],
+      "fundingType": "grant",
+      "status": "rolling application"
+    },
+    {
+      "id": "dep-petroleum-storage",
+      "name": "Petroleum Underground Storage Tank Remediation, Upgrade and Closure Fund",
+      "filename": "dep-petroleum-storage",
+      "sector": [
+        "construction",
+        "real-estate",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "utilities"
+      ],
+      "fundingType": "grant",
+      "status": "rolling application"
+    },
+    {
+      "id": "dep-technical-grant",
+      "name": "Technical Assistance Grants",
+      "filename": "dep-technical-grant",
+      "sector": [],
+      "fundingType": "grant",
+      "status": "rolling application"
+    },
+    {
+      "id": "dep-vehicle-charging",
+      "name": "It Pays to Plug In: Electric Vehicle Workplace Charging Grant Program",
+      "filename": "dep-vehicle-charging",
+      "sector": [],
+      "fundingType": "grant",
+      "status": "first come, first serve"
+    },
+    {
+      "id": "dep-water-bank",
+      "name": "New Jersey Water Bank Program",
+      "filename": "dep-water-bank",
+      "sector": [],
+      "fundingType": "loan",
+      "status": "rolling application"
+    },
+    {
+      "id": "dep-work-clean",
+      "name": "WorkClean: Diesel Modernization Program",
+      "filename": "dep-work-clean",
+      "sector": [],
+      "fundingType": "grant",
+      "status": "rolling application"
+    },
+    {
+      "id": "digital-media-tax",
+      "name": "Digital Media Tax Credit",
+      "filename": "digital-media-tax",
+      "sector": [
+        "arts-entertainment-and-recreation",
+        "digital-and-print-media"
+      ],
+      "fundingType": "tax credit",
+      "status": "first come, first serve"
+    },
+    {
+      "id": "direct-loans",
+      "name": "Direct Loans",
+      "filename": "direct-loans",
+      "sector": [
+        "accommodation-and-food-services",
+        "agriculture-forestry-fishing-and-hunting",
+        "clean-energy",
+        "administrative-and-employment-services",
+        "arts-entertainment-and-recreation",
+        "construction",
+        "digital-and-print-media",
+        "educational-services",
+        "finance-and-insurance",
+        "health-care-and-social-assistance",
+        "life-sciences",
+        "manufacturing",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "offshore-wind",
+        "other-services",
+        "organizational-or-financial-management",
+        "professional-scientific-and-technical-services",
+        "real-estate",
+        "retail-trade-and-ecommerce"
+      ],
+      "fundingType": "loan",
+      "status": "rolling application"
+    },
+    {
+      "id": "disadvantaged-business-enterprise-supportive-services-program-dbe-ssp",
+      "name": "Disadvantaged Business Enterprise Supportive Services Program (DBE/SSP)",
+      "filename": "disadvantaged-business-enterprise-supportive-services-program-dbe-ssp",
+      "sector": [
+        "agriculture-forestry-fishing-and-hunting",
+        "construction",
+        "finance-and-insurance",
+        "manufacturing",
+        "professional-scientific-and-technical-services",
+        "technology",
+        "transportation-and-warehousing",
+        "utilities",
+        "other-services"
+      ],
+      "fundingType": "hiring and employee training support",
+      "status": "first come, first serve"
+    },
+    {
+      "id": "electric-vehicle-tourism-program",
+      "name": "Electric Vehicle Tourism Program",
+      "filename": "electric-vehicle-tourism-program",
+      "sector": [
+        "accommodation-and-food-services",
+        "agriculture-forestry-fishing-and-hunting",
+        "arts-entertainment-and-recreation",
+        "other-services"
+      ],
+      "fundingType": "grant",
+      "status": "deadline"
+    },
+    {
+      "id": "entrepreneur-support-program",
+      "name": "Entrepreneur Support Program",
+      "filename": "entrepreneur-support-program",
+      "sector": [
+        "life-sciences",
+        "technology",
+        "transportation-and-warehousing",
+        "manufacturing",
+        "finance-and-insurance",
+        "professional-scientific-and-technical-services",
+        "digital-and-print-media",
+        "arts-entertainment-and-recreation",
+        "retail-trade-and-ecommerce"
+      ],
+      "fundingType": "loan",
+      "status": "first come, first serve"
+    },
+    {
+      "id": "film-tax-credit",
+      "name": "Film Tax Credit Program",
+      "filename": "film-tax-credit",
+      "sector": [
+        "arts-entertainment-and-recreation"
+      ],
+      "fundingType": "tax credit",
+      "status": "first come, first serve"
+    },
+    {
+      "id": "food-desert-relief",
+      "name": "Food Desert Relief Supermarket Tax Credit Program",
+      "filename": "food-desert-relief",
+      "sector": [
+        "retail-trade-and-ecommerce",
+        "real-estate"
+      ],
+      "fundingType": "tax credit",
+      "status": "rolling application"
+    },
+    {
+      "id": "gnec-business-builder-loan",
+      "name": "Greater Newark Enterprises Corporation (GNEC) Business Builder Loan Program",
+      "filename": "gnec-business-builder-loan",
+      "sector": [],
+      "fundingType": "loan",
+      "status": "rolling application"
+    },
+    {
+      "id": "gnec-dreammaker-loan",
+      "name": "Greater Newark Enterprises Corporation (GNEC) DreamMaker Loan Program",
+      "filename": "gnec-dreammaker-loan",
+      "sector": [],
+      "fundingType": "loan",
+      "status": "rolling application"
+    },
+    {
+      "id": "growing-apprenticeship-in-nontraditional-sectors",
+      "name": "Growing Apprenticeship in Nontraditional Sectors (GAINS)",
+      "filename": "growing-apprenticeship-in-nontraditional-sectors",
+      "sector": [],
+      "fundingType": "hiring and employee training support",
+      "status": "deadline"
+    },
+    {
+      "id": "hazardous-discharge-site",
+      "name": "Hazardous Discharge Site Remediation Fund",
+      "filename": "hazardous-discharge-site",
+      "sector": [
+        "real-estate",
+        "construction",
+        "agriculture-forestry-fishing-and-hunting",
+        "waste-management-and-Remediation"
+      ],
+      "fundingType": "loan",
+      "status": "rolling application"
+    },
+    {
+      "id": "investments-in-womenled",
+      "name": "Investments in Women-Led Start-ups",
+      "filename": "investments-in-womenled",
+      "sector": [
+        "technology",
+        "life-sciences"
+      ],
+      "fundingType": "technical assistance",
+      "status": "rolling application"
+    },
+    {
+      "id": "new-jersey-state-trade-expansion-program",
+      "name": "New Jersey State Trade Expansion Program (NJSTEP)",
+      "filename": "new-jersey-state-trade-expansion-program",
+      "sector": [],
+      "fundingType": "grant",
+      "status": "deadline"
+    },
+    {
+      "id": "next-nj-manufacturing-program",
+      "name": "Next New Jersey Manufacturing Program",
+      "filename": "next-nj-manufacturing-program",
+      "sector": [
+        "clean-energy",
+        "life-sciences",
+        "manufacturing",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "offshore-wind",
+        "technology"
+      ],
+      "fundingType": "tax credit",
+      "status": "deadline"
+    },
+    {
+      "id": "nj-accelerate",
+      "name": "NJ Accelerate",
+      "filename": "nj-accelerate",
+      "sector": [
+        "technology",
+        "life-sciences",
+        "clean-energy",
+        "educational-services"
+      ],
+      "fundingType": "loan",
+      "status": "rolling application"
+    },
+    {
+      "id": "nj-brownfields-assistance",
+      "name": "NJ Brownfields Assistance Center @ NJIT",
+      "filename": "nj-brownfields-assistance",
+      "sector": [
+        "waste-management-and-Remediation",
+        "construction",
+        "real-estate"
+      ],
+      "fundingType": "technical assistance",
+      "status": "rolling application"
+    },
+    {
+      "id": "nj-cool",
+      "name": "NJ Cool",
+      "filename": "nj-cool",
+      "sector": [
+        "construction",
+        "other-services",
+        "real-estate"
+      ],
+      "fundingType": "grant",
+      "status": "rolling application"
+    },
+    {
+      "id": "nj-ignite",
+      "name": "NJ Ignite",
+      "filename": "nj-ignite",
+      "sector": [
+        "technology",
+        "life-sciences"
+      ],
+      "fundingType": "grant",
+      "status": "rolling application"
+    },
+    {
+      "id": "nj-industry-partnerships",
+      "name": "NJ Industry Partnerships",
+      "filename": "nj-industry-partnerships",
+      "sector": [],
+      "fundingType": "hiring and employee training support",
+      "status": "rolling application"
+    },
+    {
+      "id": "nj-zero-emission",
+      "name": "NJ Zero Emission Incentive Program (NJZIP)",
+      "filename": "nj-zero-emission",
+      "sector": [
+        "accommodation-and-food-services",
+        "administrative-and-employment-services",
+        "agriculture-forestry-fishing-and-hunting",
+        "arts-entertainment-and-recreation",
+        "clean-energy",
+        "construction",
+        "digital-and-print-media",
+        "educational-services",
+        "health-care-and-social-assistance",
+        "finance-and-insurance",
+        "manufacturing",
+        "life-sciences",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "offshore-wind",
+        "organizational-or-financial-management",
+        "other-services",
+        "professional-scientific-and-technical-services",
+        "real-estate",
+        "retail-trade-and-ecommerce"
+      ],
+      "fundingType": "grant",
+      "status": "first come, first serve"
+    },
+    {
+      "id": "njbac-cannabis-training-academy",
+      "name": "New Jersey Business Action Center Cannabis Training Academy",
+      "filename": "njbac-cannabis-training-academy",
+      "sector": [],
+      "fundingType": "technical assistance",
+      "status": "rolling application"
+    },
+    {
+      "id": "njeda-aspire",
+      "name": "Aspire",
+      "filename": "njeda-aspire",
+      "sector": [
+        "construction",
+        "real-estate"
+      ],
+      "fundingType": "tax credit",
+      "status": "deadline"
+    },
+    {
+      "id": "njeda-capital-access",
+      "name": "New Jersey Capital Access Fund",
+      "filename": "njeda-capital-access",
+      "sector": [
+        "accommodation-and-food-services",
+        "administrative-and-employment-services",
+        "arts-entertainment-and-recreation",
+        "agriculture-forestry-fishing-and-hunting",
+        "clean-energy",
+        "construction",
+        "digital-and-print-media",
+        "educational-services",
+        "finance-and-insurance",
+        "health-care-and-social-assistance",
+        "life-sciences",
+        "manufacturing",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "offshore-wind",
+        "organizational-or-financial-management",
+        "other-services",
+        "professional-scientific-and-technical-services",
+        "real-estate",
+        "retail-trade-and-ecommerce",
+        "technology",
+        "transportation-and-warehousing",
+        "utilities",
+        "waste-management-and-Remediation",
+        "wholesale-trade"
+      ],
+      "fundingType": "loan",
+      "status": "rolling application"
+    },
+    {
+      "id": "njeda-rd-voucher",
+      "name": "Catalyst R&D Voucher Program",
+      "filename": "njeda-rd-voucher",
+      "sector": [
+        "accommodation-and-food-services",
+        "arts-entertainment-and-recreation",
+        "clean-energy",
+        "construction",
+        "digital-and-print-media",
+        "educational-services",
+        "finance-and-insurance",
+        "health-care-and-social-assistance",
+        "life-sciences",
+        "manufacturing",
+        "other-services",
+        "professional-scientific-and-technical-services",
+        "technology"
+      ],
+      "fundingType": "grant",
+      "status": "rolling application"
+    },
+    {
+      "id": "njeda-take-charge-program",
+      "name": "NJEDA Take Charge Program",
+      "filename": "njeda-take-charge-program",
+      "sector": [
+        "clean-energy",
+        "transportation-and-warehousing",
+        "construction",
+        "other-services"
+      ],
+      "fundingType": "grant",
+      "status": "opening soon"
+    },
+    {
+      "id": "on-the-job-training-program",
+      "name": "On-the-Job Training Program",
+      "filename": "on-the-job-training-program",
+      "sector": [],
+      "fundingType": "hiring and employee training support",
+      "status": "first come, first serve"
+    },
+    {
+      "id": "pace-apprenticeship-in-career-education",
+      "name": "Pace Apprenticeship in Career Education",
+      "filename": "pace-apprenticeship-in-career-education",
+      "sector": [],
+      "fundingType": "grant",
+      "status": "deadline"
+    },
+    {
+      "id": "perjob-tax-credits",
+      "name": "Per-Job Tax Credits with the Emerge Program",
+      "filename": "perjob-tax-credits",
+      "sector": [
+        "technology",
+        "professional-scientific-and-technical-services",
+        "life-sciences",
+        "clean-energy",
+        "transportation-and-warehousing",
+        "accommodation-and-food-services",
+        "manufacturing",
+        "finance-and-insurance",
+        "digital-and-print-media",
+        "other-services"
+      ],
+      "fundingType": "tax credit",
+      "status": "rolling application"
+    },
+    {
+      "id": "premier-lender-program",
+      "name": "Premier Lender Program",
+      "filename": "premier-lender-program",
+      "sector": [
+        "accommodation-and-food-services",
+        "administrative-and-employment-services",
+        "agriculture-forestry-fishing-and-hunting",
+        "arts-entertainment-and-recreation",
+        "clean-energy",
+        "construction",
+        "digital-and-print-media",
+        "educational-services",
+        "finance-and-insurance",
+        "health-care-and-social-assistance",
+        "manufacturing",
+        "life-sciences",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "offshore-wind",
+        "organizational-or-financial-management",
+        "other-services",
+        "professional-scientific-and-technical-services",
+        "real-estate",
+        "retail-trade-and-ecommerce"
+      ],
+      "fundingType": "loan",
+      "status": "rolling application"
+    },
+    {
+      "id": "retrofit-nj-program",
+      "name": "RETROFIT NJ Program",
+      "filename": "retrofit-nj-program",
+      "sector": [],
+      "fundingType": "grant",
+      "status": "rolling application"
+    },
+    {
+      "id": "return-and-earn",
+      "name": "Return and Earn: Employer Grants for Hiring Unemployed",
+      "filename": "return-and-earn",
+      "sector": [],
+      "fundingType": "grant",
+      "status": "rolling application"
+    },
+    {
+      "id": "sbir-sttr",
+      "name": "SBIR/STTR Direct Financial Assistance Program",
+      "filename": "sbir-sttr",
+      "sector": [
+        "accommodation-and-food-services",
+        "agriculture-forestry-fishing-and-hunting",
+        "administrative-and-employment-services",
+        "arts-entertainment-and-recreation",
+        "clean-energy",
+        "construction",
+        "digital-and-print-media",
+        "educational-services",
+        "finance-and-insurance",
+        "health-care-and-social-assistance",
+        "life-sciences",
+        "manufacturing",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "offshore-wind",
+        "organizational-or-financial-management",
+        "other-services",
+        "professional-scientific-and-technical-services",
+        "real-estate",
+        "retail-trade-and-ecommerce",
+        "technology",
+        "transportation-and-warehousing",
+        "utilities",
+        "waste-management-and-Remediation",
+        "wholesale-trade"
+      ],
+      "fundingType": "technical assistance",
+      "status": "rolling application"
+    },
+    {
+      "id": "small-business-fund",
+      "name": "Small Business Fund",
+      "filename": "small-business-fund",
+      "sector": [
+        "accommodation-and-food-services",
+        "administrative-and-employment-services",
+        "agriculture-forestry-fishing-and-hunting",
+        "arts-entertainment-and-recreation",
+        "clean-energy",
+        "construction",
+        "digital-and-print-media",
+        "educational-services",
+        "finance-and-insurance",
+        "health-care-and-social-assistance",
+        "life-sciences",
+        "manufacturing",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "offshore-wind",
+        "organizational-or-financial-management",
+        "other-services",
+        "professional-scientific-and-technical-services",
+        "real-estate",
+        "retail-trade-and-ecommerce"
+      ],
+      "fundingType": "loan",
+      "status": "rolling application"
+    },
+    {
+      "id": "small-business-improvement",
+      "name": "Small Business Improvement Grant",
+      "filename": "small-business-improvement",
+      "sector": [
+        "accommodation-and-food-services",
+        "administrative-and-employment-services",
+        "agriculture-forestry-fishing-and-hunting",
+        "arts-entertainment-and-recreation",
+        "clean-energy",
+        "construction",
+        "digital-and-print-media",
+        "educational-services",
+        "finance-and-insurance",
+        "health-care-and-social-assistance",
+        "life-sciences",
+        "manufacturing",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "offshore-wind",
+        "organizational-or-financial-management",
+        "other-services",
+        "professional-scientific-and-technical-services",
+        "real-estate",
+        "retail-trade-and-ecommerce"
+      ],
+      "fundingType": "grant",
+      "status": "first come, first serve"
+    },
+    {
+      "id": "small-business-lease",
+      "name": "Small Business Lease Grant",
+      "filename": "small-business-lease",
+      "sector": [
+        "accommodation-and-food-services",
+        "administrative-and-employment-services",
+        "agriculture-forestry-fishing-and-hunting",
+        "arts-entertainment-and-recreation",
+        "clean-energy",
+        "construction",
+        "digital-and-print-media",
+        "finance-and-insurance",
+        "educational-services",
+        "health-care-and-social-assistance",
+        "manufacturing",
+        "life-sciences",
+        "mining-quarrying-and-oil-and-gas-extraction",
+        "offshore-wind",
+        "organizational-or-financial-management",
+        "other-services",
+        "professional-scientific-and-technical-services",
+        "real-estate",
+        "retail-trade-and-ecommerce"
+      ],
+      "fundingType": "grant",
+      "status": "first come, first serve"
+    },
+    {
+      "id": "ssb-stimulus",
+      "name": "School and Small Business Energy Efficiency Stimulus Program",
+      "filename": "ssb-stimulus",
+      "sector": [
+        "educational-services",
+        "other-services",
+        "real-estate",
+        "clean-energy",
+        "construction"
+      ],
+      "fundingType": "grant",
+      "status": "first come, first serve"
+    },
+    {
+      "id": "tax-credit-veterans",
+      "name": "Tax Credit for Hiring Veterans and Other Target Groups",
+      "filename": "tax-credit-veterans",
+      "sector": [],
+      "fundingType": "tax credit",
+      "status": "rolling application"
+    },
+    {
+      "id": "technology-business-tax",
+      "name": "Technology Business Tax Certificate Transfer (NOL) Program [formerly Net",
+      "filename": "technology-business-tax",
+      "sector": [
+        "technology",
+        "life-sciences",
+        "clean-energy",
+        "health-care-and-social-assistance",
+        "professional-scientific-and-technical-services",
+        "other-services"
+      ],
+      "fundingType": "tax credit",
+      "status": "deadline"
+    },
+    {
+      "id": "the-federal-bonding",
+      "name": "The Federal Bonding Program: Assurance for Hiring Risk Workers",
+      "filename": "the-federal-bonding",
+      "sector": [],
+      "fundingType": "hiring and employee training support",
+      "status": "rolling application"
+    },
+    {
+      "id": "the-small-business",
+      "name": "The Small Business Bonding Readiness Assistance Program",
+      "filename": "the-small-business",
+      "sector": [],
+      "fundingType": "",
+      "status": ""
+    },
+    {
+      "id": "upskill-free-incumbent",
+      "name": "Upskill: Free Incumbent Worker Training Programs",
+      "filename": "upskill-free-incumbent",
+      "sector": [
+        "life-sciences",
+        "technology",
+        "clean-energy",
+        "educational-services",
+        "manufacturing",
+        "clean-energy",
+        "accommodation-and-food-services",
+        "digital-and-print-media",
+        "finance-and-insurance",
+        "other-services"
+      ],
+      "fundingType": "grant",
+      "status": "rolling application"
+    },
+    {
+      "id": "urban-enterprise-zone",
+      "name": "Urban Enterprise Zone Manufacturers Energy Sales Tax Exemption",
+      "filename": "urban-enterprise-zone",
+      "sector": [
+        "manufacturing"
+      ],
+      "fundingType": "tax exemption",
+      "status": "first come, first serve"
+    },
+    {
+      "id": "venture-fund-investments",
+      "name": "Venture Fund Investments",
+      "filename": "venture-fund-investments",
+      "sector": [
+        "technology",
+        "life-sciences"
+      ],
+      "fundingType": "loan",
+      "status": "rolling application"
+    },
+    {
+      "id": "work-first-nj",
+      "name": "Work First NJ (TANF + SNAP) Employment and Training",
+      "filename": "work-first-nj",
+      "sector": [],
+      "fundingType": "hiring and employee training support",
+      "status": "rolling application"
+    },
+    {
+      "id": "youth-transitions-to-work",
+      "name": "Youth Transitions to Work",
+      "filename": "youth-transitions-to-work",
+      "sector": [],
+      "fundingType": "grant",
+      "status": "deadline"
+    }
+  ],
+  "certifications": [
+    {
+      "id": "dbe",
+      "name": "Obtain a Disadvantaged Business Enterprise Certification",
+      "applicableOwnershipTypes": [
+        "minority-owned",
+        "woman-owned"
+      ]
+    },
+    {
+      "id": "dvob",
+      "name": "Get Certified as a Disabled Veteran-Owned Business",
+      "applicableOwnershipTypes": [
+        "disabled-veteran"
+      ]
+    },
+    {
+      "id": "esbe",
+      "name": "Get an Emerging Small Business Enterprise (ESBE) Certification",
+      "applicableOwnershipTypes": []
+    },
+    {
+      "id": "lgbtq",
+      "name": "Obtain a LGBTQ+-Owned Business Certification",
+      "applicableOwnershipTypes": [
+        "lgbtq-owned"
+      ]
+    },
+    {
+      "id": "mwbe",
+      "name": "Obtain a Minority/Women-Owned Business Certification",
+      "applicableOwnershipTypes": [
+        "woman-owned",
+        "minority-owned"
+      ]
+    },
+    {
+      "id": "sbe",
+      "name": "Get A Small Business Enterprise Certification",
+      "applicableOwnershipTypes": []
+    },
+    {
+      "id": "sedb",
+      "name": "Get a Socially and Economically Disadvantaged Business Certificate",
+      "applicableOwnershipTypes": [
+        "woman-owned",
+        "veteran-owned",
+        "minority-owned",
+        "disabled-veteran",
+        "lgbtq-owned"
+      ]
+    },
+    {
+      "id": "uez",
+      "name": "Get an Urban Enterprise Zone (UEZ) Certification",
+      "applicableOwnershipTypes": []
+    },
+    {
+      "id": "veteran-owned-business",
+      "name": "Get Certified as a Veteran-Owned Business",
+      "applicableOwnershipTypes": [
+        "veteran-owned",
+        "disabled-veteran"
+      ]
+    }
+  ],
+  "sectorMismatches": {
+    "trucking": "transportation-and-warehousing",
+    "freight-forwarding": "transportation-and-warehousing",
+    "moving-company": "transportation-and-warehousing",
+    "courier": "transportation-and-warehousing",
+    "logistics": "transportation-and-warehousing",
+    "car-service": "transportation-and-warehousing",
+    "car-rental": "transportation-and-warehousing",
+    "school-bus": "transportation-and-warehousing",
+    "electrical-contractor": "construction",
+    "acupuncture": "health-care-and-social-assistance",
+    "healthcare": "health-care-and-social-assistance",
+    "funeral": "health-care-and-social-assistance",
+    "petcare": "health-care-and-social-assistance",
+    "residential-landlord": "real-estate"
+  }
+}
