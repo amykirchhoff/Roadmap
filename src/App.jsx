@@ -255,11 +255,18 @@ export default function App() {
 
   /* ═══ TAB: INDUSTRIES LIST ═══ */
   const Industries = () => (<div>
-    <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap",alignItems:"center"}}>
+    <div style={{display:"flex",gap:6,marginBottom:8,flexWrap:"wrap",alignItems:"center"}}>
       <input placeholder="Search..." value={search} onChange={e=>setSearch(e.target.value)} style={{padding:"6px 12px",background:C.card,border:`1px solid ${C.border}`,borderRadius:6,color:C.text,fontSize:12,flex:1,minWidth:160,outline:"none",fontFamily:C.sans}} />
+      <span style={{fontSize:10,color:C.muted,fontFamily:C.sans}}>Sort by:</span>
       {[["users","Users"],["diff","Diff Tasks"],["unique","Unique"],["aa","AAs"],["fundings","Fundings"]].map(([k,l])=>(
         <button key={k} onClick={()=>setSortBy(k)} style={{padding:"4px 10px",background:sortBy===k?C.accentDim:"transparent",color:sortBy===k?C.text:C.muted,border:`1px solid ${C.border}`,borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:C.sans}}>{l}</button>
       ))}
+    </div>
+    <div style={{display:"flex",gap:16,marginBottom:12,fontSize:10,color:C.muted,fontFamily:C.sans,alignItems:"center",flexWrap:"wrap"}}>
+      <span>Task Bar:</span>
+      <span><span style={{display:"inline-block",width:12,height:8,borderRadius:2,background:C.cyan,opacity:.4,marginRight:4,verticalAlign:"middle"}}/>Shared tasks (appear in multiple industries)</span>
+      <span><span style={{display:"inline-block",width:12,height:8,borderRadius:2,background:C.red,marginRight:4,verticalAlign:"middle"}}/>Unique tasks (only this industry)</span>
+      <span><span style={{color:C.red,marginRight:4}}>⚠</span>Sector mismatch — this industry is assigned to the wrong sector, causing content filtering issues</span>
     </div>
     <div style={{display:"grid",gap:3}}>
       <div style={{display:"grid",gridTemplateColumns:"1fr 70px 45px 35px 45px 45px 100px",gap:6,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
