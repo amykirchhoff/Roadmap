@@ -156,14 +156,35 @@ export default function App() {
         <strong>No middle layer.</strong> Of {DATA.totalDiffTasks} differentiating tasks, {uniqueOnly.length} appear in only one roadmap. Tasks are either universal (shared by all) or bespoke (built for a single industry). Only {DATA.totalDiffTasks - uniqueOnly.length} tasks sit in between.<br/>
         <strong>23 industries have zero unique content.</strong> Their roadmaps are assembled entirely from tasks shared with other industries — there is nothing a user sees that they wouldn't also see in a different industry.<br/>
         <strong>The top 10 tasks account for {pct(tp.slice(0,10).reduce((s,t)=>s+t.total,0), tp.reduce((s,t)=>s+t.total,0))} of all engagement.</strong> The bottom half of tasks ({Math.floor(tp.length/2)}+) account for {pct(tp.slice(Math.floor(tp.length/2)).reduce((s,t)=>s+t.total,0), tp.reduce((s,t)=>s+t.total,0))}. {tp.filter(t=>t.total<10).length} tasks have fewer than 10 interactions ever, and {tp.filter(t=>t.total<100).length} have fewer than 100.<br/>
-        <strong>97% drop-off by task #10.</strong> "Select Your Business Structure" has {fmt(tp[0]?.total)} interactions; by the 10th-ranked task, engagement has dropped to {fmt(tp[9]?.total)} — before most users ever reach the differentiating content.
+        <strong>97% drop-off by task #10.</strong> "Select Your Business Structure" has {fmt(tp[0]?.total)} interactions; by the 10th-ranked task, engagement has dropped to {fmt(tp[9]?.total)} — before most users ever reach the differentiating content.<br/>
+        <strong>{fmt(DATA.totalDistinctPaths||0)} distinct roadmaps.</strong> Factoring in industry × legal structure × non-essential questions × home-based status, the system can produce {fmt(DATA.totalDistinctPaths||0)} unique task-set combinations. Healthcare alone accounts for 512 variants. The simplest industries still produce 4-8 variants each.
       </Insight>
       <Insight><strong>The differentiation problem:</strong> {diffStats.zeroDiff.length} industries have <strong>zero differentiating tasks</strong> (Courier Service and Remediation &amp; Waste) — their {fmt(diffStats.zeroDiffUsers)} users get an identical-to-generic roadmap. Another {diffStats.noUnique.length} industries have tasks but <strong>none unique to them</strong> — including some of the largest: Online Business (21K users), Real Estate Investing (13K), Management Consulting (7K), and Cleaning &amp; Janitorial (6K). Only {diffStats.hasUnique.length} industries have truly unique content, led by Retail, Home Improvement Contractor, Healthcare, and Trucking. Meanwhile, {uniqueOnly.length} of {DATA.totalDiffTasks} differentiating tasks appear in just one industry — purpose-built content like the Food Truck License, Cosmetology Shop License, and Trucking USDOT registration that serves a single audience.</Insight>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
         <Stat label="Industry Roadmaps" value={inds.length} sub="Total enabled industries with a roadmap definition" />
         <Stat label="Differentiating Tasks" value={DATA.totalDiffTasks} sub="Industry-specific tasks remaining after removing 7 universal tasks every industry shares" />
         <Stat label="Single-Industry Tasks" value={uniqueOnly.length} sub={pct(uniqueOnly.length,DATA.totalDiffTasks)+" of differentiating tasks appear in only one industry's roadmap"} color={C.red} />
+        <Stat label="Distinct Roadmaps" value={fmt(DATA.totalDistinctPaths||0)} sub="Unique task-set combinations the system can produce across all industries, legal structures, and profile questions" color={C.purple} />
       </div>
+
+      <Sec title="Distinct Roadmap Paths by Industry" sub="Each industry produces multiple roadmap variants depending on legal structure, non-essential questions, and home-based status. The number shown is how many unique task sets that industry can produce.">
+        {(()=>{const byPaths=[...inds].filter(i=>i.distinctPaths>0).sort((a,b)=>b.distinctPaths-a.distinctPaths);const maxPaths=byPaths[0]?.distinctPaths||1;return(
+          <div style={{display:"grid",gap:3}}>
+            {byPaths.slice(0,20).map((ind,i)=>(
+              <div key={ind.id} onClick={()=>goDetail(ind)} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:10,fontSize:12}} onMouseEnter={e=>e.currentTarget.style.background=C.cardHover} onMouseLeave={e=>e.currentTarget.style.background=C.card}>
+                <span style={{width:22,fontSize:10,color:C.muted,fontFamily:C.mono,textAlign:"right"}}>{i+1}</span>
+                <span style={{flex:1,color:C.text,fontWeight:500}}>{ind.name}</span>
+                <span style={{color:C.purple,fontFamily:C.mono,fontWeight:700}}>{fmt(ind.distinctPaths)}</span>
+                <span style={{fontSize:10,color:C.muted}}>paths</span>
+                <div style={{width:100,height:8,background:C.bg,borderRadius:4,overflow:"hidden"}}><div style={{width:`${Math.log2(ind.distinctPaths)/Math.log2(maxPaths)*100}%`,height:"100%",background:C.purple,borderRadius:4,opacity:.6}}/></div>
+                <span style={{fontSize:10,color:C.muted}}>{ind.nonEssentialQs} NEQs</span>
+              </div>
+            ))}
+            {byPaths.length>20&&<div style={{fontSize:10,color:C.muted,padding:"4px 14px"}}>+ {byPaths.length-20} more industries (minimum {byPaths[byPaths.length-1]?.distinctPaths} paths each)</div>}
+          </div>
+        );})()}
+      </Sec>
+
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:20}}>
         <Stat label="Industries w/ Zero Diff. Tasks" value={diffStats.zeroDiff.length} sub={fmt(diffStats.zeroDiffUsers)+" businesses see a roadmap identical to the generic baseline"} color={C.red} />
         <Stat label="Industries w/ Shared Tasks Only" value={diffStats.noUnique.length} sub={fmt(diffStats.noUniqueUsers)+" businesses — every task in their roadmap also appears in other industries"} color={C.orange} />
@@ -326,6 +347,7 @@ export default function App() {
         <Stat label="Anytime Actions (Starting)" value={s.aaTotal} sub={s.aaByIndustry+" by industryId, "+s.aaBySector+" by sectorId, "+s.aaUniversal+" universal"} color={C.cyan} />
         <Stat label="Fundings Visible (Starting)" value={s.fundings} sub={"Matched via the '"+ind.sectorName+"' sector"} color={C.green} />
         <Stat label="Non-Essential Questions" value={ind.nonEssentialQs} sub="Profile questions asked of this industry that trigger add-on tasks" color={C.muted} />
+        {ind.distinctPaths>0&&<Stat label="Distinct Roadmap Paths" value={fmt(ind.distinctPaths)} sub="Unique task-set combinations from legal structure, NEQs, and home-based choices" color={C.purple} />}
       </div>
       {ind.sectorMismatch&&<Alert color={C.red}><strong>Sector mismatch:</strong> Assigned "{ind.sectorName}" but content implies "{ind.sectorMismatchName}."{fix.missedAA>0&&<span> These users are missing <strong>{fix.missedAA} anytime actions</strong> tagged to the correct sector.</span>}{fix.missedFund!==0&&<span> Funding count difference: <strong>{fix.missedFund>0?"+":""}{fix.missedFund}</strong>.</span>}</Alert>}
       {ind.sectorMismatch&&(()=>{
