@@ -392,6 +392,174 @@ phase_summary = {
     } for p, c in sorted(phases.items(), key=lambda x: -x[1])],
 }
 
+# ============================================================
+# Plurmit inventory analysis
+# ============================================================
+PLURMIT_FILE = os.path.join(ROOT, "data", "plurmits.xlsx")
+plurmit_data = None
+
+if os.path.exists(PLURMIT_FILE):
+    print(f"Reading plurmits: {PLURMIT_FILE}")
+    pwb = openpyxl.load_workbook(PLURMIT_FILE, data_only=True)
+    pws = pwb["Plurmits-All Plurmits"]
+    pheaders = [c.value for c in next(pws.iter_rows(min_row=1, max_row=1))]
+    prows = []
+    for prow in pws.iter_rows(min_row=2, values_only=True):
+        if prow[0]: prows.append(dict(zip(pheaders, prow)))
+
+    # Agency DB integrations (from codebase analysis)
+    api_integrations = [
+        {"agency":"NJ Treasury (NJFAST)","agencyShort":"Treasury","type":"Submit+Pay","tasks":["form-business-entity"],"aas":[],"desc":"Business entity formation filing and payment"},
+        {"agency":"NICUSA / NJ Treasury","agencyShort":"NICUSA","type":"Query","tasks":["search-business-name","search-business-name-nexus"],"aas":[],"desc":"Business name availability search"},
+        {"agency":"DCA — License Status (Dynamics 365)","agencyShort":"DCA","type":"Query","tasks":["apply-for-shop-license","appraiser-company-register","authorization-architect-firm","authorization-landscape-architect-firm","cemetery-certificate","consulting-firm-headhunter-reg","electrologist-office-license","entertainment-agency-reg","funeral-registration","health-club-registration","home-health-aide-license","license-massage-therapy","moving-company-license","oos-pharmacy-registration","pharmacy-license","register-accounting-firm","register-home-contractor","search-licenses-employment-agency","telemarketing-license","ticket-broker-reseller-registration","temp-help-consulting-firm-combined-reg","temporary-help-service-firm-reg"],"aas":[],"desc":"22 DCA license status lookups via Dynamics 365"},
+        {"agency":"DCA — Elevator Safety (Dynamics 365)","agencyShort":"DCA","type":"Query+Register","tasks":["elevator-registration"],"aas":[],"desc":"Elevator registration, inspection, violations"},
+        {"agency":"DCA — Housing (Dynamics 365)","agencyShort":"DCA","type":"Query","tasks":["hotel-motel-registration","multiple-dwelling-registration"],"aas":[],"desc":"Hotel/motel and multiple dwelling registration status"},
+        {"agency":"DEP — CRTK","agencyShort":"DEP","type":"Query","tasks":["community-right-to-know-survey"],"aas":[],"desc":"Community Right to Know facility lookup"},
+        {"agency":"DEP — X-ray Registration","agencyShort":"DEP","type":"Query","tasks":["xray-reg"],"aas":[],"desc":"X-ray equipment registration status"},
+        {"agency":"NJ Treasury — Cigarette License","agencyShort":"Treasury","type":"Submit+Pay","tasks":["cigarette-license"],"aas":[],"desc":"Cigarette license application and payment"},
+        {"agency":"ABC (Alcoholic Beverage Control)","agencyShort":"ABC","type":"Submit","tasks":[],"aas":["emergency-trip-permit"],"desc":"Emergency trip permit application"},
+        {"agency":"NJ Treasury — Tax Clearance","agencyShort":"Treasury","type":"Submit","tasks":[],"aas":["tax-clearance-certificate"],"desc":"Tax clearance certificate request"},
+        {"agency":"NJ Treasury — Tax Filing","agencyShort":"Treasury","type":"Query","tasks":[],"aas":[],"desc":"Tax filing calendar and deadlines","dashboard":"Filings Calendar"},
+        {"agency":"DOL (Dept. of Labor)","agencyShort":"DOL","type":"Query","tasks":[],"aas":[],"desc":"Employer contribution rates","dashboard":"Employer Rates"},
+        {"agency":"MyNJ","agencyShort":"MyNJ","type":"Submit","tasks":[],"aas":[],"desc":"MyNJ account self-registration","dashboard":"Account Creation"},
+        {"agency":"Power Automate (Email Relay)","agencyShort":"MSFT","type":"Send","tasks":["env-requirements","community-right-to-know-survey"],"aas":[],"desc":"Sends personalized email for env/CRTK results"},
+    ]
+
+    api_task_slugs = set()
+    api_aa_slugs = set()
+    for ai in api_integrations:
+        api_task_slugs.update(ai["tasks"])
+        api_aa_slugs.update(ai["aas"])
+
+    def ps(val): return str(val or "").strip()
+
+    biz_keywords = ["yes this is","yes businesses often","yes the shop owner","yes businesses use","yes, but primarily"]
+    all_ind_ids = set(k for k,v in nav_industries.items() if v.get("isEnabled"))
+
+    plurmits_out = []
+    for pr in prows:
+        pname = ps(pr.get("Plurmit"))
+        dept = ps(pr.get("Department"))
+        biz_app = any(kw in ps(pr.get("Does this plurmit apply to businesses?")).lower() for kw in biz_keywords)
+        online = ps(pr.get("Online Status [Normalized]"))
+        if online == "None": online = ""
+        worth = ps(pr.get("Worth Integrating or Mentioning?"))
+        integ = ps(pr.get("Is it Integrated or mentioned yet?"))
+        cms = ps(pr.get("Consumer Affairs Licenses in CMS"))
+        if cms == "None": cms = ""
+        bnj_ind = ps(pr.get("Relates to B.NJ Industry"))
+        if bnj_ind == "None": bnj_ind = ""
+        ind_muni = ps(pr.get("Industry [MUNI]"))
+        if ind_muni == "None": ind_muni = ""
+        mlo = ps(pr.get("MLO Profession (using Boomi)"))
+        if mlo == "None": mlo = ""
+        notes = ps(pr.get("Notes on integration/mention analysis"))
+        if notes == "None": notes = ""
+        vol_raw = ps(pr.get("Annual volume of submissions"))
+        vol = 0
+        try: vol = int(float(str(vol_raw).replace(",","")))
+        except: pass
+
+        # Integration level
+        if integ in ["Read and/or Write","Yes"]:
+            int_level = "api"
+        elif integ == "Read":
+            int_level = "read"
+        elif integ == "Mentioned":
+            int_level = "mentioned"
+        else:
+            int_level = "none"
+
+        # Match to navigator tasks
+        matched_tasks = []
+        if cms:
+            for tn, sl in task_name_to_slug.items():
+                if sl in cms.lower() or tn.lower() in cms.lower():
+                    if sl not in matched_tasks: matched_tasks.append(sl)
+            for sl in set(task_name_to_slug.values()):
+                if sl in cms.lower() and sl not in matched_tasks:
+                    matched_tasks.append(sl)
+
+        # Match to industries
+        matched_inds = []
+        for fv in [bnj_ind, ind_muni]:
+            if not fv: continue
+            for iid in all_ind_ids:
+                if iid in fv.lower() or iid.replace("-"," ") in fv.lower():
+                    if iid not in matched_inds: matched_inds.append(iid)
+
+        # Check API integration
+        has_api = any(t in api_task_slugs for t in matched_tasks)
+
+        # Priority
+        if "High Priority" in worth: pri = "high"
+        elif "Low Priority" in worth: pri = "low"
+        elif "Mention" in worth: pri = "mention"
+        elif worth == "No": pri = "no"
+        else: pri = "unassessed"
+
+        plurmits_out.append({
+            "name": pname, "department": dept, "bizApplicable": biz_app,
+            "onlineStatus": online, "integrationLevel": int_level, "priority": pri,
+            "volume": vol, "matchedTasks": matched_tasks, "matchedIndustries": matched_inds,
+            "hasApi": has_api, "cmsLink": cms[:120], "notes": notes[:200],
+        })
+
+    # Department summary
+    dept_sum = {}
+    for p in plurmits_out:
+        d = p["department"]
+        if d not in dept_sum:
+            dept_sum[d] = {"name":d,"total":0,"bizApplicable":0,"mentioned":0,"read":0,"api":0,"none":0,"highPri":0,"lowPri":0,"online":0,"volume":0}
+        ds = dept_sum[d]
+        ds["total"] += 1; ds["volume"] += p["volume"]
+        if p["bizApplicable"]: ds["bizApplicable"] += 1
+        if p["onlineStatus"] in ["Available","Submitted"]: ds["online"] += 1
+        ds[p["integrationLevel"]] += 1
+        if p["priority"] == "high": ds["highPri"] += 1
+        if p["priority"] == "low": ds["lowPri"] += 1
+
+    # Industry -> plurmit count
+    ind_plurmit_map = {}
+    for p in plurmits_out:
+        for iid in p["matchedIndustries"]:
+            if iid not in ind_plurmit_map:
+                ind_plurmit_map[iid] = {"total":0,"integrated":0,"api":0,"names":[]}
+            ind_plurmit_map[iid]["total"] += 1
+            if p["integrationLevel"] in ["mentioned","read","api"]: ind_plurmit_map[iid]["integrated"] += 1
+            if p["hasApi"]: ind_plurmit_map[iid]["api"] += 1
+            ind_plurmit_map[iid]["names"].append(p["name"])
+
+    biz_only = [p for p in plurmits_out if p["bizApplicable"]]
+    hi_gaps = [{"name":p["name"],"department":p["department"],"volume":p["volume"],"notes":p["notes"]}
+               for p in sorted(biz_only, key=lambda x:-x["volume"]) if p["priority"]=="high" and p["integrationLevel"]=="none"]
+
+    plurmit_data = {
+        "coverage": {
+            "total": len(plurmits_out),
+            "bizApplicable": sum(1 for p in plurmits_out if p["bizApplicable"]),
+            "bizMentioned": sum(1 for p in biz_only if p["integrationLevel"]=="mentioned"),
+            "bizRead": sum(1 for p in biz_only if p["integrationLevel"]=="read"),
+            "bizApi": sum(1 for p in biz_only if p["integrationLevel"]=="api"),
+            "bizNone": sum(1 for p in biz_only if p["integrationLevel"]=="none"),
+            "bizHighPri": sum(1 for p in biz_only if p["priority"]=="high"),
+            "bizLowPri": sum(1 for p in biz_only if p["priority"]=="low"),
+            "highPriGaps": hi_gaps,
+        },
+        "departments": sorted(dept_sum.values(), key=lambda x:-x["total"]),
+        "apiIntegrations": api_integrations,
+        "apiTaskSlugs": sorted(api_task_slugs),
+        "apiTaskNames": sorted(set(tn for tn, sl in task_name_to_slug.items() if sl in api_task_slugs)),
+        "apiAASlugs": sorted(api_aa_slugs),
+        "industryPlurmitMap": ind_plurmit_map,
+        "plurmits": [{"name":p["name"],"dept":p["department"],"biz":p["bizApplicable"],
+                      "online":p["onlineStatus"],"level":p["integrationLevel"],"pri":p["priority"],
+                      "vol":p["volume"],"tasks":p["matchedTasks"],"inds":p["matchedIndustries"],
+                      "api":p["hasApi"]} for p in biz_only],
+    }
+    print(f"  Plurmits: {len(plurmits_out)} total, {len(biz_only)} business-applicable")
+    print(f"  API-connected tasks: {len(api_task_slugs)}, API-connected AAs: {len(api_aa_slugs)}")
+
 # Track XLSX industries that didn't match any navigator industry
 matched_names = set(ind["name"].strip() for ind in nav_industries.values() if ind.get("isEnabled"))
 unmatched_xlsx = []
@@ -421,6 +589,7 @@ output = {
     "universalTasks": universal_tasks,
     "totalDiffTasks": len(task_to_industries),
     "totalDistinctPaths": total_distinct_paths,
+    "permitCoverage": plurmit_data,
     "unknowns": {
         "industry": unknown_industry,
         "sector": unknown_sector,
