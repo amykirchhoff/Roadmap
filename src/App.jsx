@@ -100,7 +100,7 @@ export default function App() {
         <Stat label="Mismatched Industries" value={mismatchInds.length} sub={fmt(mismatchUsers)+" users affected"} color={C.red} />
         <Stat label="Orphaned Sectors" value={DATA.orphanedSectors.length+" / 25"} sub="No STARTING industry maps here" color={C.red} />
       </div>
-      <Sec title="Industries by Anytime Actions Visible (Starting Path)" sub="Each dot is an industry. Size = user count. Red = sector mismatch. Orange = Other Services. Green = correct sector. Click any dot.">
+      <Sec title="Industries by Anytime Actions Visible (Starting Path)" sub="Each dot is an industry. Vertical = user count. Red = sector mismatch. Orange = Other Services. Green = correct sector. Click any dot.">
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:14}}>
           <ResponsiveContainer width="100%" height={340}>
             <ScatterChart margin={{top:10,right:20,bottom:40,left:10}}>
