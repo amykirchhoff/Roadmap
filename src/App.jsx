@@ -137,6 +137,13 @@ export default function App() {
     const oneTasks = inds.filter(i=>i.totalDiffTasks===1).sort((a,b)=>b.users-a.users);
     return (<div>
       <Alert color={C.orange}>7 universal tasks excluded (business plan, structure, NAICS, EIN, taxes, bank account, vehicles). Showing only the tasks that differentiate one industry's roadmap from another.</Alert>
+      <Insight>
+        <strong>Key findings:</strong><br/>
+        <strong>No middle layer.</strong> Of {DATA.totalDiffTasks} differentiating tasks, {uniqueOnly.length} appear in only one roadmap. Tasks are either universal (shared by all) or bespoke (built for a single industry). Only {DATA.totalDiffTasks - uniqueOnly.length} tasks sit in between.<br/>
+        <strong>23 industries have zero unique content.</strong> Their roadmaps are assembled entirely from tasks shared with other industries — there is nothing a user sees that they wouldn't also see in a different industry.<br/>
+        <strong>The top 10 tasks account for {pct(tp.slice(0,10).reduce((s,t)=>s+t.total,0), tp.reduce((s,t)=>s+t.total,0))} of all engagement.</strong> The bottom half of tasks ({Math.floor(tp.length/2)}+) account for {pct(tp.slice(Math.floor(tp.length/2)).reduce((s,t)=>s+t.total,0), tp.reduce((s,t)=>s+t.total,0))}. {tp.filter(t=>t.total<100).length} tasks have fewer than 100 interactions ever.<br/>
+        <strong>97% drop-off by task #10.</strong> "Select Your Business Structure" has {fmt(tp[0]?.total)} interactions; by the 10th-ranked task, engagement has dropped to {fmt(tp[9]?.total)} — before most users ever reach the differentiating content.
+      </Insight>
       <Insight><strong>The differentiation problem:</strong> {diffStats.zeroDiff.length} industries have <strong>zero differentiating tasks</strong> (Courier Service and Remediation &amp; Waste) — their {fmt(diffStats.zeroDiffUsers)} users get an identical-to-generic roadmap. Another {diffStats.noUnique.length} industries have tasks but <strong>none unique to them</strong> — including some of the largest: Online Business (21K users), Real Estate Investing (13K), Management Consulting (7K), and Cleaning &amp; Janitorial (6K). Only {diffStats.hasUnique.length} industries have truly unique content, led by Retail, Home Improvement Contractor, Healthcare, and Trucking. Meanwhile, {uniqueOnly.length} of {DATA.totalDiffTasks} differentiating tasks appear in just one industry — purpose-built content like the Food Truck License, Cosmetology Shop License, and Trucking USDOT registration that serves a single audience.</Insight>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
         <Stat label="Industry Roadmaps" value={inds.length} sub="Total enabled industries with a roadmap definition" />
