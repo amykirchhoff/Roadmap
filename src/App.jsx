@@ -411,7 +411,17 @@ export default function App() {
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
         <Stat label="Total Interactions" value={fmt(allTotal)} small /><Stat label="Top 5 Tasks =" value={pct(top5Total,allTotal)} sub="of all interactions" color={C.green} small /><Stat label="Tasks With <100 Interactions" value={under100.length} sub={"of "+tp.length+" tracked tasks"} color={C.orange} small /><Stat label="Tasks With <500 Interactions" value={under500.length} sub={"of "+tp.length+" tracked tasks"} color={C.red} small />
       </div>
-      <div style={{display:"grid",gap:3}}>{top.map((t,i)=>(
+      <div style={{display:"grid",gap:3}}>
+        <div style={{fontSize:10,color:C.muted,fontFamily:C.sans,marginBottom:4}}>Sorted by total interactions (completed + to-do). Roadmap position sort isn't possible because tasks appear at different steps across different industries — there's no single canonical order.</div>
+        <div style={{display:"flex",alignItems:"center",gap:8,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
+          <span style={{width:22,textAlign:"right"}}>#</span>
+          <span style={{flex:1}}>Task</span>
+          <span style={{width:120,textAlign:"center"}}>Relative to #1</span>
+          <span style={{width:65,textAlign:"right"}}>Total</span>
+          <span style={{width:55,textAlign:"right"}}>Done</span>
+          <span style={{width:40,textAlign:"right"}}>Avg Time</span>
+        </div>
+        {top.map((t,i)=>(
         <div key={i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",display:"flex",alignItems:"center",gap:8}}>
           <span style={{width:22,fontSize:10,color:C.muted,fontFamily:C.mono,textAlign:"right"}}>{i+1}</span>
           <div style={{flex:1,minWidth:0}}><div style={{fontSize:12,color:C.text,fontFamily:C.sans,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{t.task}</div></div>
