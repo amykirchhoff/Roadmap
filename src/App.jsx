@@ -484,13 +484,27 @@ export default function App() {
   const ProfileQuestions = () => (<div>
     <Alert color={C.muted}>Non-essential questions drive add-ons and anytime action personalization. Most go unanswered because they're industry-specific.</Alert>
     <Insight><strong>Home-Based Business</strong> is the only question with real engagement ({fmt(neq.find(q=>q.question==="Home-Based Business")?.yes||0)} yes, {fmt(neq.find(q=>q.question==="Home-Based Business")?.no||0)} no) because it's asked of nearly every industry. All others are highly targeted — Liquor License only for restaurants/food trucks, Cannabis Microbusiness only for cannabis. The 99%+ unknown rates are by design. The low absolutes (489 liquor, 233 cannabis micro) reflect industry sizes, not disengagement.</Insight>
-    <div style={{display:"grid",gap:3}}>{neq.map((q,i)=>{const total=q.yes+q.no+q.unknown;const yp=total>0?q.yes/total*100:0;const np=total>0?q.no/total*100:0;return(
+    <div style={{display:"flex",gap:16,marginBottom:8,fontSize:10,color:C.muted,fontFamily:C.sans,alignItems:"center",flexWrap:"wrap"}}>
+      <span>Response bar:</span>
+      <span><span style={{display:"inline-block",width:12,height:8,borderRadius:2,background:C.green,marginRight:4,verticalAlign:"middle"}}/>Answered Yes</span>
+      <span><span style={{display:"inline-block",width:12,height:8,borderRadius:2,background:C.red,opacity:.5,marginRight:4,verticalAlign:"middle"}}/>Answered No</span>
+      <span style={{color:C.muted}}>Remaining bar = Unknown (never asked or skipped)</span>
+    </div>
+    <div style={{display:"grid",gap:3}}>
+      <div style={{display:"flex",alignItems:"center",gap:10,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
+        <span style={{flex:1}}>Question</span>
+        <span style={{width:120,textAlign:"center"}}>Yes / No / Unknown</span>
+        <span style={{width:55,textAlign:"right"}}>Yes</span>
+        <span style={{width:55,textAlign:"right"}}>No</span>
+        <span style={{width:65,textAlign:"right"}}>Unknown</span>
+      </div>
+      {neq.map((q,i)=>{const total=q.yes+q.no+q.unknown;const yp=total>0?q.yes/total*100:0;const np=total>0?q.no/total*100:0;return(
       <div key={i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",display:"flex",alignItems:"center",gap:10}}>
         <span style={{flex:1,fontSize:12,color:C.text,fontFamily:C.sans}}>{q.question}</span>
         <div style={{width:120,height:8,background:C.bg,borderRadius:4,overflow:"hidden",display:"flex"}}><div style={{width:`${yp}%`,height:"100%",background:C.green}}/><div style={{width:`${np}%`,height:"100%",background:C.red,opacity:.5}}/></div>
         <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:11,color:C.green}}>{fmt(q.yes)}</span>
         <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:11,color:C.red}}>{fmt(q.no)}</span>
-        <span style={{width:65,textAlign:"right",fontFamily:C.mono,fontSize:9,color:C.muted}}>{fmt(q.unknown)} unk</span>
+        <span style={{width:65,textAlign:"right",fontFamily:C.mono,fontSize:9,color:C.muted}}>{fmt(q.unknown)}</span>
       </div>
     );})}</div>
   </div>);
