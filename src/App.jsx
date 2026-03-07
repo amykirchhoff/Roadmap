@@ -481,26 +481,39 @@ export default function App() {
   };
 
   /* ═══ TAB: PROFILE QUESTIONS ═══ */
-  const ProfileQuestions = () => (<div>
+  const ProfileQuestions = () => {
+    const sorted3 = useMemo(()=>[...neq].sort((a,b)=>{const ta=a.yes+a.no+a.unknown;const tb=b.yes+b.no+b.unknown;const ra=ta>0?(a.yes+a.no)/ta:0;const rb=tb>0?(b.yes+b.no)/tb:0;return rb-ra;}),[neq]);
+    return (<div>
     <Alert color={C.muted}>Non-essential questions drive add-ons and anytime action personalization. Most go unanswered because they're industry-specific.</Alert>
     <Insight><strong>Home-Based Business</strong> is the only question with real engagement ({fmt(neq.find(q=>q.question==="Home-Based Business")?.yes||0)} yes, {fmt(neq.find(q=>q.question==="Home-Based Business")?.no||0)} no) because it's asked of nearly every industry. All others are highly targeted — Liquor License only for restaurants/food trucks, Cannabis Microbusiness only for cannabis. The 99%+ unknown rates are by design. The low absolutes (489 liquor, 233 cannabis micro) reflect industry sizes, not disengagement.</Insight>
+    <div style={{display:"flex",gap:16,marginBottom:8,fontSize:10,color:C.muted,fontFamily:C.sans,alignItems:"center",flexWrap:"wrap"}}>
+      <span>Row color = response rate (yes + no as % of total):</span>
+      <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.green,marginRight:4,verticalAlign:"middle"}}/>{'>'} 10% response</span>
+      <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.cyan,marginRight:4,verticalAlign:"middle"}}/>1–10% response</span>
+      <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.orange,marginRight:4,verticalAlign:"middle"}}/>{'<'} 1% response</span>
+      <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.muted,marginRight:4,verticalAlign:"middle"}}/>0% (never answered)</span>
+    </div>
     <div style={{display:"flex",gap:16,marginBottom:8,fontSize:10,color:C.muted,fontFamily:C.sans,alignItems:"center",flexWrap:"wrap"}}>
       <span>Response bar:</span>
       <span><span style={{display:"inline-block",width:12,height:8,borderRadius:2,background:C.green,marginRight:4,verticalAlign:"middle"}}/>Answered Yes</span>
       <span><span style={{display:"inline-block",width:12,height:8,borderRadius:2,background:C.red,opacity:.5,marginRight:4,verticalAlign:"middle"}}/>Answered No</span>
-      <span style={{color:C.muted}}>Remaining bar = Unknown (never asked or skipped)</span>
+      <span style={{color:C.muted}}>Empty = Unknown (never asked or skipped)</span>
     </div>
     <div style={{display:"grid",gap:3}}>
       <div style={{display:"flex",alignItems:"center",gap:10,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
+        <span style={{width:22,textAlign:"right"}}>#</span>
         <span style={{flex:1}}>Question</span>
+        <span style={{width:55,textAlign:"right"}}>Rate</span>
         <span style={{width:120,textAlign:"center"}}>Yes / No / Unknown</span>
         <span style={{width:55,textAlign:"right"}}>Yes</span>
         <span style={{width:55,textAlign:"right"}}>No</span>
         <span style={{width:65,textAlign:"right"}}>Unknown</span>
       </div>
-      {neq.map((q,i)=>{const total=q.yes+q.no+q.unknown;const yp=total>0?q.yes/total*100:0;const np=total>0?q.no/total*100:0;return(
+      {sorted3.map((q,i)=>{const total=q.yes+q.no+q.unknown;const yp=total>0?q.yes/total*100:0;const np=total>0?q.no/total*100:0;const rate=total>0?(q.yes+q.no)/total*100:0;const rc=rate>10?C.green:rate>=1?C.cyan:rate>0?C.orange:C.muted;return(
       <div key={i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",display:"flex",alignItems:"center",gap:10}}>
-        <span style={{flex:1,fontSize:12,color:C.text,fontFamily:C.sans}}>{q.question}</span>
+        <span style={{width:22,fontSize:10,color:C.muted,fontFamily:C.mono,textAlign:"right"}}>{i+1}</span>
+        <span style={{flex:1,fontSize:12,color:rc,fontFamily:C.sans}}>{q.question}</span>
+        <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:10,color:rc}}>{rate.toFixed(1)}%</span>
         <div style={{width:120,height:8,background:C.bg,borderRadius:4,overflow:"hidden",display:"flex"}}><div style={{width:`${yp}%`,height:"100%",background:C.green}}/><div style={{width:`${np}%`,height:"100%",background:C.red,opacity:.5}}/></div>
         <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:11,color:C.green}}>{fmt(q.yes)}</span>
         <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:11,color:C.red}}>{fmt(q.no)}</span>
@@ -508,6 +521,7 @@ export default function App() {
       </div>
     );})}</div>
   </div>);
+  };
 
   /* ═══ RENDER ═══ */
   return (
