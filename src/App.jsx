@@ -47,6 +47,8 @@ export default function App() {
   const [sortBy,setSortBy] = useState("users");
   const [search,setSearch] = useState("");
   const [taskSort,setTaskSort] = useState("total");
+  const [pFilter,setPFilter] = useState("all");
+  const [pDept,setPDept] = useState("all");
 
   const inds = DATA.industries;
   const sectors = DATA.sectors;
@@ -100,6 +102,7 @@ export default function App() {
         <Stat label="Businesses in the 'Other Services' Sector" value={fmt(otherServicesUsers)} sub={pct(otherServicesUsers,totalBiz)+" of all businesses are assigned to this catch-all sector, including "+fmt(genericUsers)+" who picked 'All Other Businesses' as their industry"} color={C.orange} />
         <Stat label="Industries With Wrong Sector" value={mismatchInds.length} sub={fmt(mismatchUsers)+" businesses in these industries are matched against the wrong sector for content filtering"} color={C.red} />
         <Stat label="Orphaned Sectors" value={DATA.orphanedSectors.length+" / 25"} sub="These sectors exist in the taxonomy but no industry's defaultSectorId points to them — only OWNING users can reach them" color={C.red} />
+        {DATA.permitCoverage&&<Stat label="State Permits Covered" value={fmt(DATA.permitCoverage.coverage.bizApplicable - DATA.permitCoverage.coverage.bizNone)+" / "+fmt(DATA.permitCoverage.coverage.bizApplicable)} sub={fmt(DATA.permitCoverage.coverage.bizNone)+" business permits have no presence in the Navigator. "+DATA.permitCoverage.plurmits.filter(p=>p.api).length+" have live API connections."} color={C.purple} />}
       </div>
       <Sec title="Industries by Anytime Actions Visible (Starting Path)" sub="Each dot is an industry. Horizontal = number of anytime actions a STARTING user in that industry would see. Vertical = user count. Red = sector mismatch. Orange = Other Services. Green = correct sector. Click any dot.">
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:14}}>
@@ -407,6 +410,44 @@ export default function App() {
           <div><div style={{fontSize:10,color:C.purple,marginBottom:3}}>Only OWNING ({oOnlyAA.length}):</div>{oOnlyAA.length?<div style={{display:"flex",flexWrap:"wrap",gap:2}}>{oOnlyAA.map(n=><Tag key={n} color={C.purple}>{n}</Tag>)}</div>:<span style={{fontSize:10,color:C.muted}}>None</span>}</div>
         </div>}
       </Sec>
+      {DATA.permitCoverage && (()=>{
+        const pc = DATA.permitCoverage;
+        const apiSlugs = new Set(pc.apiTaskSlugs||[]);
+        const apiAAs = new Set(pc.apiAASlugs||[]);
+        const allTasks = [...(ind.allDiffTasks||[]), ...DATA.universalTasks];
+        const apiTasks = allTasks.filter(t=>apiSlugs.has(t));
+        const infoTasks = allTasks.filter(t=>!apiSlugs.has(t));
+        // AAs with API
+        const indAAs = DATA.anytimeActions.filter(aa=>aa.reached.some(r=>r.id===ind.id));
+        const apiAAList = indAAs.filter(aa=>apiAAs.has(aa.id));
+        const indPlurmits = pc.industryPlurmitMap[ind.id];
+        const matchedPls = pc.plurmits.filter(p=>p.inds.includes(ind.id));
+        return (<Sec title="Permit & API Integration" sub="Which of this industry's tasks have live database connections vs. informational content, and how many state permits map to this industry.">
+          <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:12}}>
+            <Stat label="Tasks w/ API Connection" value={apiTasks.length} sub={apiTasks.length>0?apiTasks.map(t=>taskFmt(t)).join(", "):"No tasks in this roadmap have live agency DB connections"} color={apiTasks.length>0?C.green:C.muted} small />
+            <Stat label="AAs w/ API Connection" value={apiAAList.length} sub={apiAAList.length>0?apiAAList.map(a=>a.name).join(", "):"No anytime actions for this industry connect to agency DBs"} color={apiAAList.length>0?C.green:C.muted} small />
+            <Stat label="State Permits Mapped" value={indPlurmits?indPlurmits.total:0} sub={indPlurmits?indPlurmits.integrated+" integrated, "+(indPlurmits.total-indPlurmits.integrated)+" not yet covered":"No permits from the Plurmits inventory map to this industry"} color={indPlurmits&&indPlurmits.total>0?C.purple:C.muted} small />
+          </div>
+          {apiTasks.length>0&&<div style={{marginBottom:10}}>
+            <div style={{fontSize:10,color:C.green,marginBottom:4,fontWeight:600}}>Tasks with live DB connections:</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:3}}>{apiTasks.map(t=>{
+              const agency = pc.apiIntegrations.find(ai=>ai.tasks.includes(t));
+              return <Tag key={t} color={C.green}>{taskFmt(t)}{agency&&<span style={{opacity:.6}}> · {agency.agencyShort}</span>}</Tag>;
+            })}</div>
+          </div>}
+          {apiAAList.length>0&&<div style={{marginBottom:10}}>
+            <div style={{fontSize:10,color:C.green,marginBottom:4,fontWeight:600}}>Anytime Actions with live DB connections:</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:3}}>{apiAAList.map(aa=>{
+              const agency = pc.apiIntegrations.find(ai=>ai.aas.includes(aa.id));
+              return <Tag key={aa.id} color={C.green}>{aa.name}{agency&&<span style={{opacity:.6}}> · {agency.agencyShort}</span>}</Tag>;
+            })}</div>
+          </div>}
+          {matchedPls.length>0&&<div>
+            <div style={{fontSize:10,color:C.purple,marginBottom:4,fontWeight:600}}>Mapped state permits ({matchedPls.length}):</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:3}}>{matchedPls.map((p,i)=><Tag key={i} color={p.api?C.green:p.tasks.length>0?C.cyan:C.muted}>{p.name}{p.api?" (API)":p.tasks.length>0?" (Info)":""}</Tag>)}</div>
+          </div>}
+        </Sec>);
+      })()}
       {myTasks.size>0&&<Sec title="Most Similar Industries (Jaccard)" sub="Based on overlap of differentiating roadmap tasks.">
         <div style={{display:"grid",gap:3}}>{similar.filter(s2=>s2.sim>0).map(s2=>(
           <div key={s2.id} onClick={()=>goDetail(s2)} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:10,fontSize:12}} onMouseEnter={e=>e.currentTarget.style.background=C.cardHover} onMouseLeave={e=>e.currentTarget.style.background=C.card}>
@@ -456,6 +497,7 @@ export default function App() {
       return tp;
     },[taskSort,tp]);
     const topTotal=tp[0]?.total||1;
+    const apiSlugs = DATA.permitCoverage ? new Set([...(DATA.permitCoverage.apiTaskSlugs||[]),...(DATA.permitCoverage.apiTaskNames||[])]) : new Set();
     const top5Total=tp.slice(0,5).reduce((s,t)=>s+t.total,0);const allTotal=tp.reduce((s,t)=>s+t.total,0);const under10=tp.filter(t=>t.total<10);const under100=tp.filter(t=>t.total<100);
     return (<div>
       <Alert color={C.orange}>The top 5 tasks account for <strong>{pct(top5Total,allTotal)}</strong> of all engagement. {under10.length} tasks have fewer than 10 interactions ever, and {under100.length} of {tp.length} have fewer than 100.</Alert>
@@ -476,6 +518,7 @@ export default function App() {
           <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.red,marginRight:4,verticalAlign:"middle"}}/>Unique (1 industry)</span>
           <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.muted,marginRight:4,verticalAlign:"middle"}}/>Uncategorized</span>
           <span style={{marginLeft:8,borderLeft:`1px solid ${C.border}`,paddingLeft:8}}><span style={{background:`${C.purple}22`,color:C.purple,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.purple}33`,fontSize:9,marginRight:4}}>ADD-ON · 58</span>Triggered by profile question or legal structure; number = how many industries could see it</span>
+          <span style={{marginLeft:8,borderLeft:`1px solid ${C.border}`,paddingLeft:8}}><span style={{background:`${C.green}22`,color:C.green,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.green}33`,fontSize:9,marginRight:4}}>API</span>Task has live DB connection to agency</span>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:8,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
           <span style={{width:22,textAlign:"right"}}>#</span>
@@ -493,6 +536,7 @@ export default function App() {
           <div style={{flex:1,minWidth:0,display:"flex",alignItems:"center",gap:6}}>
             <div style={{fontSize:12,color:cc,fontFamily:C.sans,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{t.task}</div>
             {t.isAddon&&<span style={{background:`${C.purple}22`,color:C.purple,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.purple}33`,fontSize:8,flexShrink:0}}>ADD-ON{t.reachCount?` · ${t.reachCount}`:""}</span>}
+            {(apiSlugs.has(t.task)||apiSlugs.has(t.task.toLowerCase().replace(/ /g,"-")))&&<span style={{background:`${C.green}22`,color:C.green,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.green}33`,fontSize:8,flexShrink:0}}>API</span>}
           </div>
           <div style={{width:120,height:8,background:C.bg,borderRadius:4,overflow:"hidden"}}><div style={{width:`${t.total/topTotal*100}%`,height:"100%",background:cc,borderRadius:4,opacity:.6}}/></div>
           <span style={{width:65,textAlign:"right",fontFamily:C.mono,fontSize:12,color:C.accent}}>{fmt(t.total)}</span>
@@ -500,6 +544,134 @@ export default function App() {
           <span style={{width:40,textAlign:"right",fontSize:9,color:taskSort==="time"?C.orange:C.muted,fontWeight:taskSort==="time"?700:400}}>{t.avgTime}</span>
         </div>
       );})}</div>
+    </div>);
+  };
+
+  /* ═══ TAB: PERMIT COVERAGE ═══ */
+  const PermitCoverage = () => {
+    const pc = DATA.permitCoverage;
+    if(!pc) return <div style={{color:C.muted,textAlign:"center",padding:40}}>No plurmit data available. Place plurmits.xlsx in data/ and regenerate.</div>;
+    const cov = pc.coverage;
+    const depts = pc.departments;
+    const apis = pc.apiIntegrations;
+    const pls = pc.plurmits;
+    const apiSlugs = new Set(pc.apiTaskSlugs||[]);
+    const apiAAs = new Set(pc.apiAASlugs||[]);
+    const hasApiCount = pls.filter(p=>p.api).length;
+    const hasTaskMatch = pls.filter(p=>p.tasks.length>0).length;
+    const infoOnly = hasTaskMatch - hasApiCount;
+    const bizInteg = cov.bizMentioned + cov.bizRead + cov.bizApi;
+
+    const filteredPls = useMemo(()=>{
+      let f = pls;
+      if(pFilter==="api") f = f.filter(p=>p.api);
+      else if(pFilter==="info") f = f.filter(p=>p.tasks.length>0&&!p.api);
+      else if(pFilter==="mentioned") f = f.filter(p=>p.level==="mentioned"&&p.tasks.length===0);
+      else if(pFilter==="none") f = f.filter(p=>p.level==="none");
+      else if(pFilter==="high") f = f.filter(p=>p.pri==="high");
+      if(pDept!=="all") f = f.filter(p=>p.dept===pDept);
+      return f.sort((a,b)=>b.vol-a.vol);
+    },[pFilter,pDept,pls]);
+
+    const deptBiz = depts.filter(d=>d.bizApplicable>0).sort((a,b)=>b.bizApplicable-a.bizApplicable);
+    const maxBiz = Math.max(...deptBiz.map(d=>d.bizApplicable));
+
+    return (<div>
+      <Alert color={C.accent}>Cross-referencing the <strong>Plurmits inventory</strong> ({fmt(cov.total)} permits across {depts.length} NJ agencies) with the Navigator codebase to show which state permits are integrated with live database connections, mentioned as informational content, or completely absent.</Alert>
+      <Insight>
+        <strong>The integration pyramid:</strong> Of <strong>{fmt(cov.bizApplicable)}</strong> business-applicable permits statewide, <strong>{hasApiCount}</strong> have live API/database connections to agency systems (real-time status lookups, form submissions). Another <strong>{infoOnly}</strong> are linked to Navigator tasks as informational content (guides, checklists, external links). <strong>{fmt(cov.bizNone)}</strong> business permits have no presence in the Navigator at all.
+        The API integrations concentrate heavily in DCA (22 license status lookups via Dynamics 365) and Treasury (formation, cigarette, tax clearance). DEP has CRTK and X-ray lookups. ABC has emergency trip permits. The remaining ~{cov.bizApplicable - hasApiCount - infoOnly - cov.bizNone} permits are "mentioned" in content but not linked to specific tasks.
+      </Insight>
+
+      <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:20}}>
+        <Stat label="State Permits Inventoried" value={fmt(cov.total)} sub={"Across "+depts.length+" NJ departments/agencies"} />
+        <Stat label="Business-Applicable" value={fmt(cov.bizApplicable)} sub={pct(cov.bizApplicable,cov.total)+" of all permits apply to businesses"} color={C.accent} />
+        <Stat label="Live API Integration" value={hasApiCount} sub="Permits with real-time DB connection to agency" color={C.green} />
+        <Stat label="Informational in Navigator" value={infoOnly} sub="Linked to a task but no live data connection" color={C.cyan} />
+        <Stat label="Mentioned Only" value={bizInteg - hasApiCount - infoOnly} sub="Referenced in content, not linked to tasks" color={C.orange} />
+        <Stat label="Not in Navigator" value={fmt(cov.bizNone)} sub={pct(cov.bizNone,cov.bizApplicable)+" of business permits have zero coverage"} color={C.red} />
+      </div>
+
+      <Sec title="Agency Database Integrations" sub="Live connections between the Navigator and NJ agency systems. These are the permits where users can query status, submit applications, or receive real-time data — not just read about them.">
+        <div style={{display:"grid",gap:4}}>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 100px 80px 90px",gap:8,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
+            <span>Agency / Integration</span><span>Type</span><span style={{textAlign:"right"}}>Tasks</span><span style={{textAlign:"right"}}>Feature</span>
+          </div>
+          {apis.map((ai,idx)=>{const tc=ai.type.includes("Submit")?C.green:ai.type.includes("Query")?C.cyan:C.orange; return (
+            <div key={idx} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"10px 14px",display:"grid",gridTemplateColumns:"1fr 100px 80px 90px",gap:8,alignItems:"center"}}>
+              <div>
+                <div style={{fontSize:12,color:C.text,fontWeight:600,fontFamily:C.sans}}>{ai.agency}</div>
+                <div style={{fontSize:10,color:C.muted,marginTop:2}}>{ai.desc}</div>
+              </div>
+              <Tag color={tc}>{ai.type}</Tag>
+              <span style={{textAlign:"right",fontFamily:C.mono,fontSize:12,color:C.accent}}>{ai.tasks.length + ai.aas.length}</span>
+              <span style={{textAlign:"right",fontSize:10,color:ai.dashboard?C.purple:C.muted}}>{ai.dashboard||"—"}</span>
+            </div>
+          );})}
+        </div>
+      </Sec>
+
+      <Sec title="Coverage by Department" sub="How many of each department's business permits are covered in the Navigator, and at what depth.">
+        <div style={{display:"grid",gap:3}}>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 55px 55px 55px 55px 55px 130px",gap:6,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
+            <span>Department</span><span style={{textAlign:"right"}}>Total</span><span style={{textAlign:"right"}}>Biz</span><span style={{textAlign:"right"}}>In BNJ</span><span style={{textAlign:"right"}}>Online</span><span style={{textAlign:"right"}}>Hi-Pri</span><span>Coverage</span>
+          </div>
+          {deptBiz.map(d=>{const inBnj=d.mentioned+d.read+d.api;const covPct=d.bizApplicable>0?inBnj/d.bizApplicable:0;return(
+            <div key={d.name} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",display:"grid",gridTemplateColumns:"1fr 55px 55px 55px 55px 55px 130px",gap:6,alignItems:"center"}}>
+              <div style={{fontSize:11,color:C.text,fontFamily:C.sans,fontWeight:500}}>{d.name.replace("Department of ","").replace("Division of ","")}</div>
+              <span style={{textAlign:"right",fontFamily:C.mono,fontSize:11,color:C.muted}}>{d.total}</span>
+              <span style={{textAlign:"right",fontFamily:C.mono,fontSize:11,color:C.accent}}>{d.bizApplicable}</span>
+              <span style={{textAlign:"right",fontFamily:C.mono,fontSize:11,color:inBnj>0?C.green:C.muted}}>{inBnj}</span>
+              <span style={{textAlign:"right",fontFamily:C.mono,fontSize:11,color:C.cyan}}>{d.online}</span>
+              <span style={{textAlign:"right",fontFamily:C.mono,fontSize:11,color:d.highPri>0?C.red:C.muted}}>{d.highPri||"—"}</span>
+              <div style={{display:"flex",alignItems:"center",gap:6}}>
+                <div style={{flex:1,height:8,background:C.bg,borderRadius:4,overflow:"hidden",display:"flex"}}>
+                  <div style={{width:`${d.bizApplicable>0?d.api/d.bizApplicable*100:0}%`,height:"100%",background:C.green}} title="API"/>
+                  <div style={{width:`${d.bizApplicable>0?d.read/d.bizApplicable*100:0}%`,height:"100%",background:C.cyan}} title="Read"/>
+                  <div style={{width:`${d.bizApplicable>0?d.mentioned/d.bizApplicable*100:0}%`,height:"100%",background:C.orange,opacity:.6}} title="Mentioned"/>
+                </div>
+                <span style={{fontSize:9,color:C.muted,fontFamily:C.mono,width:30,textAlign:"right"}}>{(covPct*100).toFixed(0)}%</span>
+              </div>
+            </div>
+          );})}
+        </div>
+        <div style={{display:"flex",gap:16,marginTop:8,fontSize:10,color:C.muted,fontFamily:C.sans}}>
+          <span><span style={{display:"inline-block",width:12,height:8,borderRadius:2,background:C.green,marginRight:4,verticalAlign:"middle"}}/>API integration</span>
+          <span><span style={{display:"inline-block",width:12,height:8,borderRadius:2,background:C.cyan,marginRight:4,verticalAlign:"middle"}}/>Read (data pull)</span>
+          <span><span style={{display:"inline-block",width:12,height:8,borderRadius:2,background:C.orange,opacity:.6,marginRight:4,verticalAlign:"middle"}}/>Mentioned</span>
+          <span style={{color:C.muted}}>Empty = not covered</span>
+        </div>
+      </Sec>
+
+      <Sec title="Business Permits Inventory" sub="All 521 business-applicable permits. Filter by integration depth.">
+        <div style={{display:"flex",gap:6,marginBottom:10,flexWrap:"wrap",alignItems:"center"}}>
+          <span style={{fontSize:10,color:C.muted}}>Filter:</span>
+          {[["all","All ("+cov.bizApplicable+")"],["api","API Connected ("+hasApiCount+")"],["info","Informational ("+infoOnly+")"],["mentioned","Mentioned Only"],["none","Not in Navigator ("+cov.bizNone+")"],["high","High Priority ("+cov.bizHighPri+")"]].map(([k,l])=>(
+            <button key={k} onClick={()=>setPFilter(k)} style={{padding:"4px 10px",background:pFilter===k?C.accentDim:"transparent",color:pFilter===k?C.text:C.muted,border:`1px solid ${C.border}`,borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:C.sans}}>{l}</button>
+          ))}
+          <select value={pDept} onChange={e=>setPDept(e.target.value)} style={{padding:"4px 8px",background:C.card,border:`1px solid ${C.border}`,borderRadius:4,color:C.text,fontSize:10,fontFamily:C.sans}}>
+            <option value="all">All Departments</option>
+            {deptBiz.map(d=><option key={d.name} value={d.name}>{d.name.replace("Department of ","")}</option>)}
+          </select>
+        </div>
+        <div style={{fontSize:10,color:C.muted,marginBottom:6,fontFamily:C.sans}}>Showing {filteredPls.length} permits{pDept!=="all"?" in "+pDept.replace("Department of ",""):""}</div>
+        <div style={{display:"grid",gap:2,maxHeight:500,overflowY:"auto"}}>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 120px 70px 70px",gap:6,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans,position:"sticky",top:0,background:C.bg,zIndex:1}}>
+            <span>Permit</span><span>Department</span><span style={{textAlign:"right"}}>Volume</span><span>Status</span>
+          </div>
+          {filteredPls.map((p,i)=>{
+            const sc = p.api?C.green:p.tasks.length>0?C.cyan:p.level==="mentioned"?C.orange:p.level==="read"?C.cyan:C.muted;
+            const sl = p.api?"API":p.tasks.length>0?"Info":p.level==="mentioned"?"Mention":p.level==="read"?"Read":"—";
+            return(
+            <div key={i} style={{background:C.card,border:`1px solid ${p.pri==="high"?C.red+"44":C.border}`,borderRadius:5,padding:"6px 14px",display:"grid",gridTemplateColumns:"1fr 120px 70px 70px",gap:6,alignItems:"center",fontSize:11}}>
+              <div style={{color:C.text,fontFamily:C.sans,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}} title={p.name}>{p.pri==="high"&&<span style={{color:C.red,fontSize:9,marginRight:3}}>★</span>}{p.name}</div>
+              <div style={{fontSize:9,color:C.muted,fontFamily:C.sans,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{p.dept.replace("Department of ","")}</div>
+              <span style={{textAlign:"right",fontFamily:C.mono,fontSize:10,color:p.vol>0?C.accent:C.muted}}>{p.vol>0?fmt(p.vol):"—"}</span>
+              <Tag color={sc}>{sl}</Tag>
+            </div>);
+          })}
+        </div>
+      </Sec>
     </div>);
   };
 
@@ -555,12 +727,12 @@ export default function App() {
           <span style={{fontSize:11,color:C.muted}}>Business.NJ.gov Analysis</span>
         </div>
         <div style={{fontSize:10,color:C.muted,marginBottom:14}}>
-          Source: {DATA.meta.xlsxFile} · {fmt(DATA.meta.totalBusinesses)} businesses · {inds.length} industries · {DATA.totalDiffTasks} diff. tasks · {DATA.anytimeActions.length} AAs · {sectors.length} sectors
+          Source: {DATA.meta.xlsxFile} · {fmt(DATA.meta.totalBusinesses)} businesses · {inds.length} industries · {DATA.totalDiffTasks} diff. tasks · {DATA.anytimeActions.length} AAs · {sectors.length} sectors{DATA.permitCoverage&&` · ${fmt(DATA.permitCoverage.coverage.total)} state permits`}
         </div>
         <div style={{display:"flex",gap:5,marginBottom:20,flexWrap:"wrap"}}>
-          {nav("contentgap","Content Gap")}{nav("roadmap","Roadmap Analysis")}{nav("sectorhealth","Sector Health")}{nav("journey","User Journey")}{nav("industries","Industries")}{nav("detail","Industry Detail")}{nav("tasks","Task Reuse")}{nav("engagement","Task Engagement")}{nav("profile","Profile Questions")}
+          {nav("contentgap","Content Gap")}{nav("roadmap","Roadmap Analysis")}{nav("sectorhealth","Sector Health")}{nav("journey","User Journey")}{nav("industries","Industries")}{nav("detail","Industry Detail")}{nav("tasks","Task Reuse")}{nav("engagement","Task Engagement")}{nav("permits","Permit Coverage")}{nav("profile","Profile Questions")}
         </div>
-        {view==="contentgap"&&<ContentGap/>}{view==="roadmap"&&<RoadmapAnalysis/>}{view==="sectorhealth"&&<SectorHealth/>}{view==="journey"&&<UserJourney/>}{view==="industries"&&<Industries/>}{view==="detail"&&<Detail/>}{view==="tasks"&&<TaskReuse/>}{view==="engagement"&&<TaskEngagement/>}{view==="profile"&&<ProfileQuestions/>}
+        {view==="contentgap"&&<ContentGap/>}{view==="roadmap"&&<RoadmapAnalysis/>}{view==="sectorhealth"&&<SectorHealth/>}{view==="journey"&&<UserJourney/>}{view==="industries"&&<Industries/>}{view==="detail"&&<Detail/>}{view==="tasks"&&<TaskReuse/>}{view==="engagement"&&<TaskEngagement/>}{view==="permits"&&<PermitCoverage/>}{view==="profile"&&<ProfileQuestions/>}
       </div>
     </div>
   );
