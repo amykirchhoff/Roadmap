@@ -94,11 +94,11 @@ export default function App() {
       <Alert color={C.red}><strong>14 industries</strong> serving <strong>{fmt(mismatchUsers)} users</strong> are assigned to the wrong sector. Content tagged to their correct sector — including anytime actions for vehicle registration, CDL, IFTA, and IRP — is invisible to them. Separately, <strong>10 of 25 sectors</strong> are completely unreachable by STARTING users.</Alert>
       <Insight><strong>Why this matters:</strong> The content team has built 64 anytime actions and 64 fundings, but this content only reaches users in the "operate" phases — about <strong>{fmt(phases.seesAAFunding)}</strong> users, or <strong>{pct(phases.seesAAFunding,totalBiz)}</strong> of the total base. Of those who <em>do</em> see it, the sector mismatch means {fmt(mismatchUsers)} are getting results filtered against the wrong sector. They see generic "Other Services" content instead of industry-relevant actions like IFTA registration and CDL requirements.</Insight>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
-        <Stat label="Businesses on Platform" value={fmt(totalBiz)} />
-        <Stat label="See AA + Fundings" value={fmt(phases.seesAAFunding)} sub={pct(phases.seesAAFunding,totalBiz)+" of total"} color={C.green} />
-        <Stat label="In Other Services" value={fmt(otherServicesUsers)} sub={pct(otherServicesUsers,totalBiz)+" — incl. "+fmt(genericUsers)+" generic"} color={C.orange} />
-        <Stat label="Mismatched Industries" value={mismatchInds.length} sub={fmt(mismatchUsers)+" users affected"} color={C.red} />
-        <Stat label="Orphaned Sectors" value={DATA.orphanedSectors.length+" / 25"} sub="No STARTING industry maps here" color={C.red} />
+        <Stat label="Businesses on Platform" value={fmt(totalBiz)} sub="All business accounts in the system" />
+        <Stat label="Businesses That See Operate Content" value={fmt(phases.seesAAFunding)} sub={"Only "+pct(phases.seesAAFunding,totalBiz)+" of businesses are in a phase where anytime actions and fundings are displayed"} color={C.green} />
+        <Stat label="Businesses Assigned to 'Other Services'" value={fmt(otherServicesUsers)} sub={pct(otherServicesUsers,totalBiz)+" of all businesses land in this catch-all sector, including "+fmt(genericUsers)+" who picked 'All Other Businesses' as their industry"} color={C.orange} />
+        <Stat label="Industries With Wrong Sector" value={mismatchInds.length} sub={fmt(mismatchUsers)+" businesses in these industries are matched against the wrong sector for content filtering"} color={C.red} />
+        <Stat label="Orphaned Sectors" value={DATA.orphanedSectors.length+" / 25"} sub="These sectors exist in the taxonomy but no industry's defaultSectorId points to them — only OWNING users can reach them" color={C.red} />
       </div>
       <Sec title="Industries by Anytime Actions Visible (Starting Path)" sub="Each dot is an industry. Vertical = user count. Red = sector mismatch. Orange = Other Services. Green = correct sector. Click any dot.">
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:14}}>
@@ -139,14 +139,14 @@ export default function App() {
       <Alert color={C.orange}>7 universal tasks excluded (business plan, structure, NAICS, EIN, taxes, bank account, vehicles). Showing only the tasks that differentiate one industry's roadmap from another.</Alert>
       <Insight><strong>The differentiation problem:</strong> {diffStats.zeroDiff.length} industries have <strong>zero differentiating tasks</strong> (Courier Service and Remediation &amp; Waste) — their {fmt(diffStats.zeroDiffUsers)} users get an identical-to-generic roadmap. Another {diffStats.noUnique.length} industries have tasks but <strong>none unique to them</strong> — including some of the largest: Online Business (21K users), Real Estate Investing (13K), Management Consulting (7K), and Cleaning &amp; Janitorial (6K). Only {diffStats.hasUnique.length} industries have truly unique content, led by Retail, Home Improvement Contractor, Healthcare, and Trucking. Meanwhile, {uniqueOnly.length} of {DATA.totalDiffTasks} differentiating tasks appear in just one industry — purpose-built content like the Food Truck License, Cosmetology Shop License, and Trucking USDOT registration that serves a single audience.</Insight>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
-        <Stat label="Industry Roadmaps" value={inds.length} />
-        <Stat label="Differentiating Tasks" value={DATA.totalDiffTasks} sub="After removing 7 universal" />
-        <Stat label="Single-Industry Tasks" value={uniqueOnly.length} sub={pct(uniqueOnly.length,DATA.totalDiffTasks)+" of diff. tasks"} color={C.red} />
+        <Stat label="Industry Roadmaps" value={inds.length} sub="Total enabled industries with a roadmap definition" />
+        <Stat label="Differentiating Tasks" value={DATA.totalDiffTasks} sub="Industry-specific tasks remaining after removing 7 universal tasks every industry shares" />
+        <Stat label="Single-Industry Tasks" value={uniqueOnly.length} sub={pct(uniqueOnly.length,DATA.totalDiffTasks)+" of differentiating tasks appear in only one industry's roadmap"} color={C.red} />
       </div>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:20}}>
-        <Stat label="Industries w/ Zero Diff. Tasks" value={diffStats.zeroDiff.length} sub={fmt(diffStats.zeroDiffUsers)+" users get generic roadmap"} color={C.red} />
-        <Stat label="Industries w/ Shared Tasks Only" value={diffStats.noUnique.length} sub={fmt(diffStats.noUniqueUsers)+" users"} color={C.orange} />
-        <Stat label="Industries w/ Unique Tasks" value={diffStats.hasUnique.length} sub="Truly differentiated roadmaps" color={C.green} />
+        <Stat label="Industries w/ Zero Diff. Tasks" value={diffStats.zeroDiff.length} sub={fmt(diffStats.zeroDiffUsers)+" businesses see a roadmap identical to the generic baseline"} color={C.red} />
+        <Stat label="Industries w/ Shared Tasks Only" value={diffStats.noUnique.length} sub={fmt(diffStats.noUniqueUsers)+" businesses — every task in their roadmap also appears in other industries"} color={C.orange} />
+        <Stat label="Industries w/ Unique Tasks" value={diffStats.hasUnique.length} sub="These industries have at least one task no other industry includes" color={C.green} />
       </div>
       <Sec title="Users vs. Differentiating Tasks" sub="Each dot is one industry. Color = degree of uniqueness. Click for details.">
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:14}}>
@@ -238,9 +238,9 @@ export default function App() {
       </Sec>
       <Sec title="Where Content Actually Lands">
         <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-          <Stat label="Roadmap content serves" value={fmt(phases.seesRoadmap)} sub={"~"+pct(phases.seesRoadmap,totalBiz)} color={C.accent} />
-          <Stat label="Operate content serves" value={fmt(phases.seesAAFunding)} sub={"~"+pct(phases.seesAAFunding,totalBiz)} color={C.green} />
-          <Stat label="Content built but unseen" value="64 AAs + 64 fundings" sub={"Invisible to "+pct(totalBiz-phases.seesAAFunding,totalBiz)} color={C.red} />
+          <Stat label="Businesses that see roadmap tasks" value={fmt(phases.seesRoadmap)} sub={"~"+pct(phases.seesRoadmap,totalBiz)+" of businesses are in phases where the step-by-step roadmap is displayed"} color={C.accent} />
+          <Stat label="Businesses that see operate content" value={fmt(phases.seesAAFunding)} sub={"~"+pct(phases.seesAAFunding,totalBiz)+" are in phases where anytime actions, fundings, and the full calendar appear"} color={C.green} />
+          <Stat label="Operate content not displayed" value="64 AAs + 64 fundings" sub={pct(totalBiz-phases.seesAAFunding,totalBiz)+" of businesses are in phases where this content is hidden"} color={C.red} />
         </div>
       </Sec>
     </div>);
