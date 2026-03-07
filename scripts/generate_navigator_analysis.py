@@ -57,6 +57,7 @@ for f in os.listdir(ind_dir):
             "nonEssentialQuestionsIds": d.get("nonEssentialQuestionsIds",[]),
             "industryOnboardingQuestions": d.get("industryOnboardingQuestions",{}),
             "roadmapStepCount": len([s for s in d.get("roadmapSteps",[]) if s.get("task") or s.get("licenseTask")]),
+            "roadmapTaskNames": [s.get("task") or s.get("licenseTask") for s in d.get("roadmapSteps",[]) if s.get("task") or s.get("licenseTask")],
         }
 
 # Sectors
@@ -131,6 +132,8 @@ output = {
     "industries": industries, "sectors": sectors, "addons": addons,
     "anytimeActions": anytime_actions, "fundings": fundings,
     "certifications": certifications, "sectorMismatches": sector_mismatches,
+    "universalTasks": ["bank-account","business-plan","business-structure","determine-naics-code",
+                       "manage-business-vehicles","register-for-ein","register-for-taxes"],
 }
 
 os.makedirs(os.path.dirname(OUT), exist_ok=True)

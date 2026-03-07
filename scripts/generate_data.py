@@ -142,6 +142,41 @@ def count_fundings(sector_id):
     return len(names), names
 
 # ============================================================
+# Compute roadmap task differentiation
+# ============================================================
+universal_tasks = nav.get("universalTasks", [])
+
+# Build task -> industry mapping (excluding universal tasks)
+task_to_industries = {}
+enabled_industries = {k: v for k, v in nav_industries.items() if v.get("isEnabled")}
+for ind_id, ind in enabled_industries.items():
+    for task in ind.get("roadmapTaskNames", []):
+        if task in universal_tasks: continue
+        if task not in task_to_industries:
+            task_to_industries[task] = []
+        task_to_industries[task].append(ind_id)
+
+# For each industry, classify tasks as unique (only this industry) or shared
+industry_task_analysis = {}
+for ind_id, ind in enabled_industries.items():
+    diff_tasks = [t for t in ind.get("roadmapTaskNames", []) if t not in universal_tasks]
+    unique = [t for t in diff_tasks if len(task_to_industries.get(t, [])) == 1]
+    shared = [t for t in diff_tasks if len(task_to_industries.get(t, [])) > 1]
+    industry_task_analysis[ind_id] = {
+        "allTasks": diff_tasks,
+        "uniqueTaskNames": unique,
+        "sharedTaskNames": shared,
+        "totalTasks": len(diff_tasks),
+        "uniqueTasks": len(unique),
+        "sharedTasks": len(shared),
+    }
+
+# Build task frequency for output
+task_frequency = {}
+for task, inds_list in sorted(task_to_industries.items()):
+    task_frequency[task] = {"count": len(inds_list), "industries": inds_list}
+
+# ============================================================
 # Build combined industry data
 # ============================================================
 combined_industries = []
@@ -174,6 +209,8 @@ for ind_id, ind in sorted(nav_industries.items(), key=lambda x: x[1]["name"]):
     else:
         f_total, missed_aa, missed_fund = s_total, 0, 0
 
+    ta = industry_task_analysis.get(ind_id, {})
+
     combined_industries.append({
         "id": ind_id,
         "name": ind["name"],
@@ -184,6 +221,12 @@ for ind_id, ind in sorted(nav_industries.items(), key=lambda x: x[1]["name"]):
         "sectorMismatchName": suggested_sector_name or None,
         "roadmapTasks": ind["roadmapStepCount"],
         "nonEssentialQs": len(ind.get("nonEssentialQuestionsIds", [])),
+        "totalDiffTasks": ta.get("totalTasks", 0),
+        "uniqueTasks": ta.get("uniqueTasks", 0),
+        "sharedTasks": ta.get("sharedTasks", 0),
+        "uniqueTaskNames": ta.get("uniqueTaskNames", []),
+        "sharedTaskNames": ta.get("sharedTaskNames", []),
+        "allDiffTasks": ta.get("allTasks", []),
         "starting": {
             "aaTotal": s_total, "aaByIndustry": s_ind, "aaBySector": s_sec, "aaUniversal": s_uni,
             "aaNamesByIndustry": s_ni, "aaNamesBySector": s_ns,
@@ -295,6 +338,9 @@ output = {
     "legalStructures": legal_data,
     "orphanedSectors": sorted(orphaned_sectors),
     "sectorMismatches": nav_mismatches,
+    "taskFrequency": task_frequency,
+    "universalTasks": universal_tasks,
+    "totalDiffTasks": len(task_to_industries),
 }
 
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
