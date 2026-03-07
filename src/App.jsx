@@ -231,7 +231,7 @@ export default function App() {
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:4}}>
               <span style={{width:180,fontSize:12,fontWeight:600,color:gc[p.g],fontFamily:C.sans}}>{p.label}</span>
               <span style={{fontSize:14,fontWeight:800,color:C.text,fontFamily:C.mono,width:70,textAlign:"right"}}>{fmt(c)}</span>
-              <div style={{flex:1,height:10,background:C.bg,borderRadius:5,overflow:"hidden"}}><div style={{width:`${c/mx*100}%`,height:"100%",background:gc[p.g],borderRadius:5,opacity:.7}}/></div>
+              <div style={{flex:1,height:10,background:C.bg,borderRadius:5,overflow:"hidden"}}><div style={{width:`${c/totalBiz*100}%`,height:"100%",background:gc[p.g],borderRadius:5,opacity:.7}}/></div>
               <span style={{fontSize:10,color:C.muted,width:40,textAlign:"right"}}>{pct(c,totalBiz)}</span>
             </div>
             <div style={{display:"flex",gap:8,marginLeft:190,fontSize:9,color:C.muted,fontFamily:C.sans}}>
