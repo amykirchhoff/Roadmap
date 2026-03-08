@@ -741,9 +741,10 @@ export default function App() {
           industryIds: aa.industryIds, sectorIds: aa.sectorIds,
         });
       }
-      // Permits
+      // Permits (only those actually on the platform)
       if(pc){
         for(const p of pc.plurmits){
+          if(p.level==="none" && !p.tasks.length && !p.api) continue;
           list.push({
             type:"permit", id:"permit-"+p.name.slice(0,30), name:p.name, slug:null,
             isUniversal:false, isAddon:false, hasApi:p.api||p.level==="api",
