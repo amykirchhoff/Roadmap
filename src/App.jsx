@@ -19,7 +19,7 @@ const Stat = ({label,value,sub,color,small}) => (
   <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:small?"10px 14px":"14px 18px",flex:1,minWidth:small?100:140}}>
     <div style={{fontSize:small?18:26,fontWeight:800,color:color||C.accent,fontFamily:C.mono}}>{value}</div>
     <div style={{fontSize:11,color:C.muted,marginTop:2,fontFamily:C.sans}}>{label}</div>
-    {sub && <div style={{fontSize:10,color:C.muted,marginTop:2,opacity:.7}}>{sub}</div>}
+    {sub && <div style={{fontSize:10,color:C.muted,marginTop:2,opacity:.7}}>{typeof sub==="string"?sub.split("\n").map((line,i)=><span key={i}>{i>0&&<br/>}{line}</span>):sub}</div>}
   </div>
 );
 const Alert = ({children,color}) => (
@@ -580,20 +580,34 @@ export default function App() {
     return (<div>
       <Alert color={C.accent}>Cross-referencing the <strong>Plurmits inventory</strong> ({fmt(cov.total)} permits across {depts.length} NJ agencies) with the Navigator codebase to show which state permits are integrated with live database connections, mentioned as informational content, or completely absent.</Alert>
       <Insight>
-        <strong>Theoretical vs. actual:</strong> NJ businesses submit roughly <strong>{fmt(cov.bizVolume)}</strong> permit applications per year. If every one of those came through Business.NJ.gov, existing coverage could handle <strong>{pct(cov.bizVolume - cov.bizNoneVol,cov.bizVolume)}</strong> of them — the remaining {pct(cov.bizNoneVol,cov.bizVolume)} ({fmt(cov.bizNoneVol)}/yr) are permits with no Navigator presence. But actual usage today is <strong>{fmt(cov.bizAllEng)} interactions</strong> across covered permits ({pct(cov.bizAllEng,cov.bizVolume)} of statewide volume). The API-connected tier gets the most traction at {pct(cov.bizApiEng,cov.bizApiVol)} of its statewide volume — almost entirely from formation ({fmt(cov.bizApiComp)} completed). The gap between theoretical reach and actual usage is the top-of-funnel problem: building deep integrations before getting people to the site.
+        <strong>Theoretical vs. actual:</strong> NJ businesses submit roughly <strong>{fmt(cov.bizVolume)}</strong> permit applications per year. If every one came through Business.NJ.gov, existing coverage could handle <strong>{pct(cov.bizVolume - cov.bizNoneVol,cov.bizVolume)}</strong> of them — the remaining {pct(cov.bizNoneVol,cov.bizVolume)} ({fmt(cov.bizNoneVol)}/yr) are permits with no Navigator presence at all.<br/><br/>
+        <strong>But actual usage tells a different story.</strong> Across all covered permits, the Navigator has recorded <strong>{fmt(cov.bizAllEng)} total interactions to date</strong> — overwhelmingly from formation ({fmt(cov.bizApiComp)} completed). The 22 DCA license lookups, CRTK integration, and housing registrations collectively account for a few hundred interactions. Deep integrations were built before the top of funnel was driving volume to use them.
       </Insight>
 
+      <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:10}}>
+        <Stat label="State Permits Inventoried" value={fmt(cov.total)} sub={fmt(cov.totalVolume)+" submissions/yr across "+depts.length+" NJ departments"} />
+        <Stat label="Business-Applicable" value={fmt(cov.bizApplicable)} sub={fmt(cov.bizVolume)+" submissions/yr — "+pct(cov.bizApplicable,cov.total)+" of all permits"} color={C.accent} />
+      </div>
+      <div style={{fontSize:10,color:C.muted,fontFamily:C.sans,marginBottom:6,paddingLeft:2}}>If every NJ business used Business.NJ.gov, each tier below would handle this share of the {fmt(cov.bizVolume)} annual business submissions:</div>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:20}}>
-        <Stat label="State Permits Inventoried" value={fmt(cov.total)} sub={fmt(cov.totalVolume)+" annual submissions across "+depts.length+" NJ departments"} />
-        <Stat label="Business-Applicable" value={fmt(cov.bizApplicable)} sub={fmt(cov.bizVolume)+" annual submissions · "+pct(cov.bizApplicable,cov.total)+" of all permits"} color={C.accent} />
-        <Stat label="Live API Integration" value={hasApiCount} sub={fmt(cov.bizApiVol)+"/yr · If 100% through BNJ: "+pct(cov.bizApiVol,cov.bizVolume)+" · Actual today: "+fmt(cov.bizApiEng)+" ("+pct(cov.bizApiEng,cov.bizApiVol)+")"} color={C.green} />
-        <Stat label="Data Read (no task match)" value={cov.bizRead} sub={fmt(cov.bizReadVol)+"/yr · If 100% through BNJ: "+pct(cov.bizReadVol,cov.bizVolume)+" · Actual today: "+fmt(cov.bizReadEng)+" ("+pct(cov.bizReadEng,cov.bizReadVol)+")"} color={C.cyan} />
-        <Stat label="Informational in Navigator" value={infoOnly} sub={fmt(cov.bizInfoVol)+"/yr · If 100% through BNJ: "+pct(cov.bizInfoVol,cov.bizVolume)+" · Actual today: "+fmt(cov.bizInfoEng)+" ("+pct(cov.bizInfoEng,cov.bizInfoVol)+")"} color={C.cyan} />
-        <Stat label="Mentioned Only" value={bizInteg - hasApiCount - infoOnly - cov.bizRead} sub={fmt(cov.bizMentionedVol)+"/yr · If 100% through BNJ: "+pct(cov.bizMentionedVol,cov.bizVolume)+" · Actual today: "+fmt(cov.bizMentionedEng)+" ("+pct(cov.bizMentionedEng,cov.bizMentionedVol)+")"} color={C.orange} />
-        <Stat label="Not in Navigator" value={fmt(cov.bizNone)} sub={fmt(cov.bizNoneVol)+"/yr · "+pct(cov.bizNoneVol,cov.bizVolume)+" of biz volume has no coverage"} color={C.red} />
+        <Stat label="Live API Integration" value={hasApiCount+" permits"} color={C.green}
+          sub={apis.length+" agency integrations → "+(pc.apiTaskSlugs.length+(pc.apiAASlugs||[]).length)+" connected tasks/AAs → "+hasApiCount+" state permits\n"+fmt(cov.bizApiVol)+"/yr statewide ("+pct(cov.bizApiVol,cov.bizVolume)+" of biz volume)\nBNJ interactions to date: "+fmt(cov.bizApiEng)} />
+        <Stat label="Data Read (no task match)" value={cov.bizRead} color={C.cyan}
+          sub={fmt(cov.bizReadVol)+"/yr statewide ("+pct(cov.bizReadVol,cov.bizVolume)+" of biz volume)\nBNJ interactions to date: "+fmt(cov.bizReadEng)} />
+        <Stat label="Informational in Navigator" value={infoOnly} color={C.cyan}
+          sub={fmt(cov.bizInfoVol)+"/yr statewide ("+pct(cov.bizInfoVol,cov.bizVolume)+" of biz volume)\nBNJ interactions to date: "+fmt(cov.bizInfoEng)} />
+        <Stat label="Mentioned Only" value={bizInteg - hasApiCount - infoOnly - cov.bizRead} color={C.orange}
+          sub={fmt(cov.bizMentionedVol)+"/yr statewide ("+pct(cov.bizMentionedVol,cov.bizVolume)+" of biz volume)\nNo direct task — cannot measure interactions"} />
+        <Stat label="Not in Navigator" value={fmt(cov.bizNone)} color={C.red}
+          sub={fmt(cov.bizNoneVol)+"/yr statewide ("+pct(cov.bizNoneVol,cov.bizVolume)+" of biz volume)\nZero coverage — these permits have nowhere to go"} />
       </div>
 
       <Sec title="Agency Database Integrations" sub="Live connections between the Navigator and NJ agency systems. These are the permits where users can query status, submit applications, or receive real-time data — not just read about them.">
+        <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:14}}>
+          <Stat label="Agency Integrations" value={apis.length} sub="Distinct DB connections identified in the codebase (api/src/client/)" color={C.green} small />
+          <Stat label="Connected Tasks & AAs" value={pc.apiTaskSlugs.length + (pc.apiAASlugs||[]).length} sub="Navigator task slugs and anytime actions that call these APIs" color={C.cyan} small />
+          <Stat label="State Permits Covered" value={hasApiCount} sub="Plurmit inventory rows that map to those tasks (many permits → one task)" color={C.purple} small />
+        </div>
         <div style={{display:"grid",gap:4}}>
           <div style={{display:"grid",gridTemplateColumns:"1fr 100px 80px 90px",gap:8,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
             <span>Agency / Integration</span><span>Type</span><span style={{textAlign:"right"}}>Tasks</span><span style={{textAlign:"right"}}>Feature</span>
