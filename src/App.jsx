@@ -51,6 +51,8 @@ export default function App() {
   const [pDept,setPDept] = useState("all");
   const [finderSearch,setFinderSearch] = useState("");
   const [selItem,setSelItem] = useState(null);
+  const [finderType,setFinderType] = useState("all");
+  const [finderOpen,setFinderOpen] = useState(false);
 
   const inds = DATA.industries;
   const sectors = DATA.sectors;
@@ -757,17 +759,26 @@ export default function App() {
     },[tp,inds,pc]);
 
     const filtered = useMemo(()=>{
-      if(!finderSearch || finderSearch.length<2) return [];
-      const q = finderSearch.toLowerCase();
-      return items.filter(it=>it.name.toLowerCase().includes(q)).sort((a,b)=>{
-        // Prioritize: exact start match, then type order (task, aa, permit), then alpha
-        const aStart = a.name.toLowerCase().startsWith(q)?0:1;
-        const bStart = b.name.toLowerCase().startsWith(q)?0:1;
-        if(aStart!==bStart) return aStart-bStart;
-        const typeOrder = {task:0,aa:1,permit:2};
-        return (typeOrder[a.type]||3)-(typeOrder[b.type]||3);
-      }).slice(0,30);
-    },[finderSearch,items]);
+      let f = items;
+      if(finderType!=="all") f = f.filter(it=>it.type===finderType);
+      if(finderSearch && finderSearch.length>=1){
+        const q = finderSearch.toLowerCase();
+        f = f.filter(it=>it.name.toLowerCase().includes(q)).sort((a,b)=>{
+          const aStart = a.name.toLowerCase().startsWith(q)?0:1;
+          const bStart = b.name.toLowerCase().startsWith(q)?0:1;
+          if(aStart!==bStart) return aStart-bStart;
+          const typeOrder = {task:0,aa:1,permit:2};
+          return (typeOrder[a.type]||3)-(typeOrder[b.type]||3);
+        });
+      } else {
+        f = [...f].sort((a,b)=>{
+          const typeOrder = {task:0,aa:1,permit:2};
+          if(a.type!==b.type) return (typeOrder[a.type]||3)-(typeOrder[b.type]||3);
+          return a.name.localeCompare(b.name);
+        });
+      }
+      return f.slice(0,50);
+    },[finderSearch,finderType,items]);
 
     const getAgency = (slug) => {
       if(!pc) return null;
@@ -849,23 +860,36 @@ export default function App() {
     };
 
     return (<div>
-      <Alert color={C.accent}>Search for any roadmap task, anytime action, or state permit to see a step-by-step guide for how a Business.NJ.gov user would encounter it. This traces the full path from account creation through the relevant content.</Alert>
+      <Alert color={C.accent}>Search or browse any roadmap task, anytime action, or state permit to see a step-by-step guide for how a Business.NJ.gov user would encounter it.</Alert>
+      <div style={{display:"flex",gap:6,marginBottom:8,flexWrap:"wrap",alignItems:"center"}}>
+        <span style={{fontSize:10,color:C.muted}}>Show:</span>
+        {[["all","All ("+items.length+")"],["task","Tasks ("+items.filter(i=>i.type==="task").length+")"],["aa","Anytime Actions ("+items.filter(i=>i.type==="aa").length+")"],["permit","Permits ("+items.filter(i=>i.type==="permit").length+")"]].map(([k,l])=>(
+          <button key={k} onClick={()=>{setFinderType(k);setSelItem(null);setFinderOpen(true);}} style={{padding:"4px 10px",background:finderType===k?C.accentDim:"transparent",color:finderType===k?C.text:C.muted,border:`1px solid ${C.border}`,borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:C.sans}}>{l}</button>
+        ))}
+      </div>
       <div style={{position:"relative",marginBottom:selItem?0:20}}>
-        <input placeholder="Search tasks, anytime actions, or permits..." value={finderSearch} onChange={e=>{setFinderSearch(e.target.value);setSelItem(null);}}
-          style={{width:"100%",padding:"12px 16px",background:C.card,border:`1px solid ${C.border}`,borderRadius:8,color:C.text,fontSize:14,outline:"none",fontFamily:C.sans,boxSizing:"border-box"}} />
-        {filtered.length>0 && !selItem && <div style={{position:"absolute",top:"100%",left:0,right:0,background:C.card,border:`1px solid ${C.border}`,borderRadius:"0 0 8px 8px",maxHeight:400,overflowY:"auto",zIndex:10}}>
+        <input placeholder="Type to filter, or click to browse..." value={finderSearch}
+          onChange={e=>{setFinderSearch(e.target.value);setSelItem(null);setFinderOpen(true);}}
+          onFocus={()=>setFinderOpen(true)}
+          style={{width:"100%",padding:"12px 16px",background:C.card,border:`1px solid ${finderOpen&&!selItem?C.accent:C.border}`,borderRadius:finderOpen&&!selItem?"8px 8px 0 0":8,color:C.text,fontSize:14,outline:"none",fontFamily:C.sans,boxSizing:"border-box"}} />
+        {finderOpen && !selItem && <div style={{position:"absolute",top:"100%",left:0,right:0,background:C.card,border:`1px solid ${C.border}`,borderTop:"none",borderRadius:"0 0 8px 8px",maxHeight:400,overflowY:"auto",zIndex:10}}>
+          <div style={{padding:"6px 16px",fontSize:9,color:C.muted,fontFamily:C.sans,borderBottom:`1px solid ${C.border}`,position:"sticky",top:0,background:C.card,display:"flex",justifyContent:"space-between"}}>
+            <span>{filtered.length}{filtered.length>=50?"+":""} results{finderSearch?` for "${finderSearch}"`:""}</span>
+            <span onClick={()=>setFinderOpen(false)} style={{cursor:"pointer",color:C.accent}}>close ✕</span>
+          </div>
           {filtered.map((it,i)=>{
             const tc = it.type==="task"?C.accent:it.type==="aa"?C.cyan:C.purple;
             const tl = it.type==="task"?"TASK":it.type==="aa"?"AA":"PERMIT";
-            return (<div key={it.id+i} onClick={()=>{setSelItem(it);setFinderSearch(it.name);}}
+            return (<div key={it.id+i} onClick={()=>{setSelItem(it);setFinderSearch(it.name);setFinderOpen(false);}}
               style={{padding:"10px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:10,borderBottom:`1px solid ${C.border}`}}
               onMouseEnter={e=>e.currentTarget.style.background=C.cardHover} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
               <Tag color={tc}>{tl}</Tag>
-              <span style={{flex:1,fontSize:12,color:C.text,fontFamily:C.sans}}>{it.name}</span>
+              <span style={{flex:1,fontSize:12,color:C.text,fontFamily:C.sans,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{it.name}</span>
               {it.hasApi&&<Tag color={C.green}>API</Tag>}
-              {it.users>0&&<span style={{fontSize:10,color:C.muted,fontFamily:C.mono}}>{fmt(it.users)} users</span>}
+              {it.users>0&&<span style={{fontSize:10,color:C.muted,fontFamily:C.mono,flexShrink:0}}>{fmt(it.users)} users</span>}
             </div>);
           })}
+          {filtered.length===0&&<div style={{padding:"20px 16px",textAlign:"center",fontSize:12,color:C.muted}}>No results found</div>}
         </div>}
       </div>
 
