@@ -557,17 +557,18 @@ export default function App() {
     const pls = pc.plurmits;
     const apiSlugs = new Set(pc.apiTaskSlugs||[]);
     const apiAAs = new Set(pc.apiAASlugs||[]);
-    const hasApiCount = pls.filter(p=>p.api).length;
-    const hasTaskMatch = pls.filter(p=>p.tasks.length>0).length;
-    const infoOnly = hasTaskMatch - hasApiCount;
-    const bizInteg = cov.bizMentioned + cov.bizRead + cov.bizApi;
+    const hasApiCount = pls.filter(p=>p.api||p.level==="api").length;
+    const hasTaskMatch = pls.filter(p=>p.tasks.length>0&&!p.api&&p.level!=="api").length;
+    const infoOnly = hasTaskMatch;
+    const bizInteg = cov.bizApi + cov.bizInfo + cov.bizRead + cov.bizMentioned;
 
     const filteredPls = useMemo(()=>{
       let f = pls;
-      if(pFilter==="api") f = f.filter(p=>p.api);
-      else if(pFilter==="info") f = f.filter(p=>p.tasks.length>0&&!p.api);
-      else if(pFilter==="mentioned") f = f.filter(p=>p.level==="mentioned"&&p.tasks.length===0);
-      else if(pFilter==="none") f = f.filter(p=>p.level==="none");
+      if(pFilter==="api") f = f.filter(p=>p.api||p.level==="api");
+      else if(pFilter==="read") f = f.filter(p=>p.level==="read"&&!p.tasks.length&&!p.api);
+      else if(pFilter==="info") f = f.filter(p=>p.tasks.length>0&&!p.api&&p.level!=="api");
+      else if(pFilter==="mentioned") f = f.filter(p=>p.level==="mentioned"&&!p.tasks.length);
+      else if(pFilter==="none") f = f.filter(p=>p.level==="none"&&!p.tasks.length&&!p.api);
       else if(pFilter==="high") f = f.filter(p=>p.pri==="high");
       if(pDept!=="all") f = f.filter(p=>p.dept===pDept);
       return f.sort((a,b)=>b.vol-a.vol);
@@ -579,17 +580,17 @@ export default function App() {
     return (<div>
       <Alert color={C.accent}>Cross-referencing the <strong>Plurmits inventory</strong> ({fmt(cov.total)} permits across {depts.length} NJ agencies) with the Navigator codebase to show which state permits are integrated with live database connections, mentioned as informational content, or completely absent.</Alert>
       <Insight>
-        <strong>The integration pyramid:</strong> Of <strong>{fmt(cov.bizApplicable)}</strong> business-applicable permits statewide, <strong>{hasApiCount}</strong> have live API/database connections to agency systems (real-time status lookups, form submissions). Another <strong>{infoOnly}</strong> are linked to Navigator tasks as informational content (guides, checklists, external links). <strong>{fmt(cov.bizNone)}</strong> business permits have no presence in the Navigator at all.
-        The API integrations concentrate heavily in DCA (22 license status lookups via Dynamics 365) and Treasury (formation, cigarette, tax clearance). DEP has CRTK and X-ray lookups. ABC has emergency trip permits. The remaining ~{cov.bizApplicable - hasApiCount - infoOnly - cov.bizNone} permits are "mentioned" in content but not linked to specific tasks.
+        <strong>Theoretical vs. actual:</strong> NJ businesses submit roughly <strong>{fmt(cov.bizVolume)}</strong> permit applications per year. If every one of those came through Business.NJ.gov, existing coverage could handle <strong>{pct(cov.bizVolume - cov.bizNoneVol,cov.bizVolume)}</strong> of them — the remaining {pct(cov.bizNoneVol,cov.bizVolume)} ({fmt(cov.bizNoneVol)}/yr) are permits with no Navigator presence. But actual usage today is <strong>{fmt(cov.bizAllEng)} interactions</strong> across covered permits ({pct(cov.bizAllEng,cov.bizVolume)} of statewide volume). The API-connected tier gets the most traction at {pct(cov.bizApiEng,cov.bizApiVol)} of its statewide volume — almost entirely from formation ({fmt(cov.bizApiComp)} completed). The gap between theoretical reach and actual usage is the top-of-funnel problem: building deep integrations before getting people to the site.
       </Insight>
 
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:20}}>
-        <Stat label="State Permits Inventoried" value={fmt(cov.total)} sub={"Across "+depts.length+" NJ departments/agencies"} />
-        <Stat label="Business-Applicable" value={fmt(cov.bizApplicable)} sub={pct(cov.bizApplicable,cov.total)+" of all permits apply to businesses"} color={C.accent} />
-        <Stat label="Live API Integration" value={hasApiCount} sub="Permits with real-time DB connection to agency" color={C.green} />
-        <Stat label="Informational in Navigator" value={infoOnly} sub="Linked to a task but no live data connection" color={C.cyan} />
-        <Stat label="Mentioned Only" value={bizInteg - hasApiCount - infoOnly} sub="Referenced in content, not linked to tasks" color={C.orange} />
-        <Stat label="Not in Navigator" value={fmt(cov.bizNone)} sub={pct(cov.bizNone,cov.bizApplicable)+" of business permits have zero coverage"} color={C.red} />
+        <Stat label="State Permits Inventoried" value={fmt(cov.total)} sub={fmt(cov.totalVolume)+" annual submissions across "+depts.length+" NJ departments"} />
+        <Stat label="Business-Applicable" value={fmt(cov.bizApplicable)} sub={fmt(cov.bizVolume)+" annual submissions · "+pct(cov.bizApplicable,cov.total)+" of all permits"} color={C.accent} />
+        <Stat label="Live API Integration" value={hasApiCount} sub={fmt(cov.bizApiVol)+"/yr · If 100% through BNJ: "+pct(cov.bizApiVol,cov.bizVolume)+" · Actual today: "+fmt(cov.bizApiEng)+" ("+pct(cov.bizApiEng,cov.bizApiVol)+")"} color={C.green} />
+        <Stat label="Data Read (no task match)" value={cov.bizRead} sub={fmt(cov.bizReadVol)+"/yr · If 100% through BNJ: "+pct(cov.bizReadVol,cov.bizVolume)+" · Actual today: "+fmt(cov.bizReadEng)+" ("+pct(cov.bizReadEng,cov.bizReadVol)+")"} color={C.cyan} />
+        <Stat label="Informational in Navigator" value={infoOnly} sub={fmt(cov.bizInfoVol)+"/yr · If 100% through BNJ: "+pct(cov.bizInfoVol,cov.bizVolume)+" · Actual today: "+fmt(cov.bizInfoEng)+" ("+pct(cov.bizInfoEng,cov.bizInfoVol)+")"} color={C.cyan} />
+        <Stat label="Mentioned Only" value={bizInteg - hasApiCount - infoOnly - cov.bizRead} sub={fmt(cov.bizMentionedVol)+"/yr · If 100% through BNJ: "+pct(cov.bizMentionedVol,cov.bizVolume)+" · Actual today: "+fmt(cov.bizMentionedEng)+" ("+pct(cov.bizMentionedEng,cov.bizMentionedVol)+")"} color={C.orange} />
+        <Stat label="Not in Navigator" value={fmt(cov.bizNone)} sub={fmt(cov.bizNoneVol)+"/yr · "+pct(cov.bizNoneVol,cov.bizVolume)+" of biz volume has no coverage"} color={C.red} />
       </div>
 
       <Sec title="Agency Database Integrations" sub="Live connections between the Navigator and NJ agency systems. These are the permits where users can query status, submit applications, or receive real-time data — not just read about them.">
@@ -646,7 +647,7 @@ export default function App() {
       <Sec title="Business Permits Inventory" sub="All 521 business-applicable permits. Filter by integration depth.">
         <div style={{display:"flex",gap:6,marginBottom:10,flexWrap:"wrap",alignItems:"center"}}>
           <span style={{fontSize:10,color:C.muted}}>Filter:</span>
-          {[["all","All ("+cov.bizApplicable+")"],["api","API Connected ("+hasApiCount+")"],["info","Informational ("+infoOnly+")"],["mentioned","Mentioned Only"],["none","Not in Navigator ("+cov.bizNone+")"],["high","High Priority ("+cov.bizHighPri+")"]].map(([k,l])=>(
+          {[["all","All ("+cov.bizApplicable+")"],["api","API Connected ("+hasApiCount+")"],["read","Data Read ("+cov.bizRead+")"],["info","Informational ("+infoOnly+")"],["mentioned","Mentioned Only"],["none","Not in Navigator ("+cov.bizNone+")"],["high","High Priority ("+cov.bizHighPri+")"]].map(([k,l])=>(
             <button key={k} onClick={()=>setPFilter(k)} style={{padding:"4px 10px",background:pFilter===k?C.accentDim:"transparent",color:pFilter===k?C.text:C.muted,border:`1px solid ${C.border}`,borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:C.sans}}>{l}</button>
           ))}
           <select value={pDept} onChange={e=>setPDept(e.target.value)} style={{padding:"4px 8px",background:C.card,border:`1px solid ${C.border}`,borderRadius:4,color:C.text,fontSize:10,fontFamily:C.sans}}>
@@ -660,8 +661,8 @@ export default function App() {
             <span>Permit</span><span>Department</span><span style={{textAlign:"right"}}>Volume</span><span>Status</span>
           </div>
           {filteredPls.map((p,i)=>{
-            const sc = p.api?C.green:p.tasks.length>0?C.cyan:p.level==="mentioned"?C.orange:p.level==="read"?C.cyan:C.muted;
-            const sl = p.api?"API":p.tasks.length>0?"Info":p.level==="mentioned"?"Mention":p.level==="read"?"Read":"—";
+            const sc = (p.api||p.level==="api")?C.green:p.tasks.length>0?C.cyan:p.level==="read"?C.cyan:p.level==="mentioned"?C.orange:C.muted;
+            const sl = (p.api||p.level==="api")?"API":p.tasks.length>0?"Info":p.level==="read"?"Read":p.level==="mentioned"?"Mention":"—";
             return(
             <div key={i} style={{background:C.card,border:`1px solid ${p.pri==="high"?C.red+"44":C.border}`,borderRadius:5,padding:"6px 14px",display:"grid",gridTemplateColumns:"1fr 120px 70px 70px",gap:6,alignItems:"center",fontSize:11}}>
               <div style={{color:C.text,fontFamily:C.sans,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}} title={p.name}>{p.pri==="high"&&<span style={{color:C.red,fontSize:9,marginRight:3}}>★</span>}{p.name}</div>
