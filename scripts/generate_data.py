@@ -680,6 +680,124 @@ if os.path.exists(PLURMIT_FILE):
     print(f"  Plurmits: {len(plurmits_out)} total, {len(biz_only)} business-applicable")
     print(f"  API-connected tasks: {len(api_task_slugs)}, API-connected AAs: {len(api_aa_slugs)}")
 
+# ============================================================
+# Task trigger mapping (how to reach each add-on task)
+# ============================================================
+import glob as _glob
+
+ADDON_DIR = os.path.join(ROOT, "data", "add-ons")
+NEQ_FILE = os.path.join(ROOT, "data", "nonEssentialQuestions.json")
+
+# Try loading from navigator repo if available, fall back to cached copies
+nav_content_addons = os.path.join(ROOT, "..", "nav", "content", "src", "roadmaps", "add-ons")
+nav_content_neq = os.path.join(ROOT, "..", "nav", "content", "src", "roadmaps", "nonEssentialQuestions.json")
+
+addon_source = nav_content_addons if os.path.isdir(nav_content_addons) else ADDON_DIR
+neq_source = nav_content_neq if os.path.isfile(nav_content_neq) else NEQ_FILE
+
+task_triggers = {}
+
+if os.path.isdir(addon_source):
+    # Load add-on -> task mapping
+    addon_to_tasks = {}
+    for f in _glob.glob(os.path.join(addon_source, "*.json")):
+        aname = os.path.basename(f).replace(".json","")
+        adata = json.load(open(f))
+        atasks = []
+        for step in adata.get("roadmapSteps", []):
+            t = step.get("task") or step.get("licenseTask")
+            if t: atasks.append(t)
+        addon_to_tasks[aname] = atasks
+
+    # Load NEQ -> addon mapping
+    neq_addon_map = {}
+    if os.path.isfile(neq_source):
+        neq_list = json.load(open(neq_source)).get("nonEssentialQuestionsArray", [])
+        for nq in neq_list:
+            if nq.get("addOnWhenYes"):
+                raw_q = nq["questionText"].replace("`","")
+                # Strip markdown links [text](url) -> text
+                import re as _re
+                clean_q = _re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', raw_q).strip()
+                neq_addon_map[nq["addOnWhenYes"]] = {"neqId":nq["id"],"q":clean_q,"answer":"Yes"}
+            if nq.get("addOnWhenNo"):
+                raw_q = nq["questionText"].replace("`","")
+                import re as _re
+                clean_q = _re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', raw_q).strip()
+                neq_addon_map[nq["addOnWhenNo"]] = {"neqId":nq["id"],"q":clean_q,"answer":"No"}
+
+    # Profile/legal structure triggers (from buildUserRoadmap.ts analysis)
+    hardcoded_triggers = {
+        "permanent-location-business":{"t":"profile","d":"Answer 'No' to 'Is this a home-based business?'"},
+        "liquor-license":{"t":"profile","d":"Answer 'Yes' to 'Will you need a liquor license?'"},
+        "cpa":{"t":"profile","d":"Answer 'Yes' to 'Does your business require a CPA?'"},
+        "petcare-license":{"t":"profile","d":"Answer 'Yes' to 'Will you house animals?'"},
+        "home-based-transportation":{"t":"profile","d":"Answer 'Yes' to home-based (transportation industries only)"},
+        "planned-renovation":{"t":"profile","d":"Answer 'No' to home-based, then 'Yes' to 'Are you planning renovations?'"},
+        "cannabis-annual":{"t":"profile","d":"Select 'Annual' cannabis license type"},
+        "cannabis-conditional":{"t":"profile","d":"Select 'Conditional' cannabis license type"},
+        "real-estate-appraisal-management":{"t":"profile","d":"Answer 'Yes' — is this an appraisal management company?"},
+        "real-estate-appraiser":{"t":"profile","d":"Answer 'No' — not an appraisal management company"},
+        "car-service-standard":{"t":"profile","d":"Select 'Standard' or 'Both' for car service type"},
+        "car-service-high-capacity":{"t":"profile","d":"Select 'High capacity' or 'Both' for car service type"},
+        "public-works-contractor":{"t":"profile","d":"Answer 'Yes' to 'Are you a public works contractor?'"},
+        "employment-agency-job-seekers":{"t":"profile","d":"Select 'Job seekers' for employment personnel service type"},
+        "employment-agency-employers-temporary":{"t":"profile","d":"Select 'Employers' → 'Temporary' placement type"},
+        "employment-agency-employers-permanent":{"t":"profile","d":"Select 'Employers' → 'Permanent' placement type"},
+        "employment-agency-employers-both":{"t":"profile","d":"Select 'Employers' → 'Both' placement type"},
+        "interstate-logistics":{"t":"profile","d":"Answer 'Yes' to 'Will you transport goods interstate?'"},
+        "interstate-moving":{"t":"profile","d":"Answer 'Yes' to 'Will you move goods interstate?'"},
+        "elevator-owning-business":{"t":"profile","d":"Answer 'Yes' to 'Does your business own elevators?'"},
+        "daycare":{"t":"profile","d":"Answer 'Yes' to 'Will you care for 6 or more children?'"},
+        "family-daycare":{"t":"profile","d":"Answer 'No' to 'Will you care for 6 or more children?'"},
+        "will-sell-pet-care-items":{"t":"profile","d":"Answer 'Yes' to 'Will you sell pet care items?'"},
+        "residential-landlord-long-term-many-units":{"t":"profile","d":"Select 'Long-term' or 'Both' lease type, then 'Yes' to 3+ rental units"},
+        "residential-landlord-long-term-few-units":{"t":"profile","d":"Select 'Long-term' or 'Both' lease type, then 'No' to 3+ rental units"},
+        "short-term-rental-registration":{"t":"profile","d":"Select 'Short-term rental' or 'Both' for property lease type"},
+        "construction-home-renovation":{"t":"profile","d":"Select 'Home renovations' or 'Both' for construction type"},
+        "construction-new-home-construction":{"t":"profile","d":"Select 'New home construction' or 'Both' for construction type"},
+        "env-requirements":{"t":"profile","d":"Select 'All Other Businesses' industry AND answer 'No' to home-based"},
+        "logistics-modification":{"t":"auto","d":"Automatically applied for Logistics industry"},
+        "permanent-location-business-landlord":{"t":"auto","d":"Automatically applied for Residential Landlord industry"},
+        "public-record-filing":{"t":"legalStructure","d":"Select LLC, C-Corp, S-Corp, LP, LLP, or Nonprofit as your business structure"},
+        "public-record-filing-foreign":{"t":"legalStructure","d":"Foreign business with a legal structure requiring public filing"},
+        "trade-name":{"t":"legalStructure","d":"Select Sole Proprietorship or General Partnership as your business structure"},
+        "llc":{"t":"legalStructure","d":"Select LLC as your business structure"},
+        "scorp":{"t":"legalStructure","d":"Select S-Corporation as your business structure"},
+        "nonprofit":{"t":"legalStructure","d":"Select Nonprofit as your business structure"},
+        "nonprofit-and-corp-foreign":{"t":"legalStructure","d":"Foreign business with S-Corp, C-Corp, or Nonprofit structure"},
+        "raffle-bingo-games":{"t":"legalStructure+profile","d":"Select Nonprofit, then answer 'Yes' to 'Will your nonprofit hold raffle or bingo games?' in your Profile"},
+        "business-vehicle":{"t":"roadmapTask","d":"Click 'Manage Business Vehicles' in your roadmap and indicate you manage business vehicles"},
+        "foreign-remote-worker":{"t":"persona","d":"Select 'Foreign business' → indicate you have employees in NJ"},
+        "foreign-remote-seller":{"t":"persona","d":"Select 'Foreign business' → indicate you have revenue/transactions in NJ"},
+        "foreign-nexus":{"t":"persona","d":"Select 'Foreign business' → indicate you have office/property/employees/vehicles in NJ"},
+        "oos-pharmacy":{"t":"persona+industry","d":"Foreign nexus business in Pharmacy industry"},
+    }
+
+    # Build task_slug -> triggers
+    for addon_name, atasks in addon_to_tasks.items():
+        for task_slug in atasks:
+            if task_slug not in task_triggers:
+                task_triggers[task_slug] = []
+            trigger = {"addon": addon_name}
+            if addon_name in neq_addon_map:
+                ni = neq_addon_map[addon_name]
+                trigger["type"] = "neq"
+                trigger["neqId"] = ni["neqId"]
+                trigger["question"] = ni["q"]
+                trigger["answer"] = ni["answer"]
+                trigger["detail"] = f"Answer '{ni['answer']}' to: \"{ni['q'][:120]}\""
+            elif addon_name in hardcoded_triggers:
+                ht = hardcoded_triggers[addon_name]
+                trigger["type"] = ht["t"]
+                trigger["detail"] = ht["d"]
+            else:
+                trigger["type"] = "unknown"
+                trigger["detail"] = f"Triggered by add-on '{addon_name}'"
+            task_triggers[task_slug].append(trigger)
+
+    print(f"  Task triggers: {len(task_triggers)} add-on tasks mapped")
+
 # Track XLSX industries that didn't match any navigator industry
 matched_names = set(ind["name"].strip() for ind in nav_industries.values() if ind.get("isEnabled"))
 unmatched_xlsx = []
@@ -709,6 +827,7 @@ output = {
     "universalTasks": universal_tasks,
     "totalDiffTasks": len(task_to_industries),
     "totalDistinctPaths": total_distinct_paths,
+    "taskTriggers": task_triggers,
     "permitCoverage": plurmit_data,
     "unknowns": {
         "industry": unknown_industry,
