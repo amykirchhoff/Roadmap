@@ -53,6 +53,7 @@ export default function App() {
   const [selItem,setSelItem] = useState(null);
   const [finderType,setFinderType] = useState("all");
   const [finderOpen,setFinderOpen] = useState(false);
+  const [expandedQ,setExpandedQ] = useState(null);
 
   const inds = DATA.industries;
   const sectors = DATA.sectors;
@@ -1003,41 +1004,56 @@ export default function App() {
   /* ═══ TAB: PROFILE QUESTIONS ═══ */
   const ProfileQuestions = () => {
     const sorted3 = useMemo(()=>[...neq].sort((a,b)=>{const ta=a.yes+a.no+a.unknown;const tb=b.yes+b.no+b.unknown;const ra=ta>0?(a.yes+a.no)/ta:0;const rb=tb>0?(b.yes+b.no)/tb:0;return rb-ra;}),[neq]);
+    const totalQEng = sorted3.reduce((s,q)=>s+(q.downstream?.engagement||0),0);
+    const activeQs = sorted3.filter(q=>q.downstream?.taskCount>0);
+    const inertQs = sorted3.filter(q=>!q.downstream?.taskCount);
     return (<div>
-    <Alert color={C.muted}>Non-essential questions drive add-ons and anytime action personalization. Most go unanswered because they're industry-specific.</Alert>
-    <Insight><strong>Home-Based Business</strong> is the only question with real engagement ({fmt(neq.find(q=>q.question==="Home-Based Business")?.yes||0)} yes, {fmt(neq.find(q=>q.question==="Home-Based Business")?.no||0)} no) because it's asked of nearly every industry. All others are highly targeted — Liquor License only for restaurants/food trucks, Cannabis Microbusiness only for cannabis. The 99%+ unknown rates are by design. The low absolutes (489 liquor, 233 cannabis micro) reflect industry sizes, not disengagement.</Insight>
+    <Alert color={C.muted}>Profile questions drive roadmap personalization. Each question gates specific add-on tasks — click any row to see the downstream content pipeline it controls.</Alert>
+    <Insight>
+      <strong>The pipeline:</strong> Of {sorted3.length} profile questions, <strong>{activeQs.length} trigger roadmap add-ons</strong> that produce a combined {activeQs.reduce((s,q)=>s+q.downstream.taskCount,0)} tasks with {fmt(totalQEng)} total interactions. The remaining {inertQs.length} either trigger anytime actions only, change the entire roadmap (like Provides Staffing Service overriding the industry), or appear unused.<br/><br/>
+      <strong>Home-Based Business</strong> dominates: it's the only question answered by most users ({fmt(neq.find(q=>q.question==="Home-Based Business")?.yes||0)} yes, {fmt(neq.find(q=>q.question==="Home-Based Business")?.no||0)} no) and its "No" path gates {neq.find(q=>q.question==="Home-Based Business")?.downstream?.taskCount||0} tasks with {fmt(neq.find(q=>q.question==="Home-Based Business")?.downstream?.engagement||0)} interactions — more than all other questions combined. Most other questions have &lt;1% response rates by design (they're only asked of specific industries), and their downstream tasks get minimal engagement.
+    </Insight>
     <div style={{display:"flex",gap:16,marginBottom:8,fontSize:10,color:C.muted,fontFamily:C.sans,alignItems:"center",flexWrap:"wrap"}}>
-      <span>Row color = response rate (yes + no as % of total):</span>
-      <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.green,marginRight:4,verticalAlign:"middle"}}/>{'>'} 10% response</span>
-      <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.cyan,marginRight:4,verticalAlign:"middle"}}/>1–10% response</span>
-      <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.orange,marginRight:4,verticalAlign:"middle"}}/>{'<'} 1% response</span>
-      <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.muted,marginRight:4,verticalAlign:"middle"}}/>0% (never answered)</span>
-    </div>
-    <div style={{display:"flex",gap:16,marginBottom:8,fontSize:10,color:C.muted,fontFamily:C.sans,alignItems:"center",flexWrap:"wrap"}}>
-      <span>Response bar:</span>
-      <span><span style={{display:"inline-block",width:12,height:8,borderRadius:2,background:C.green,marginRight:4,verticalAlign:"middle"}}/>Answered Yes</span>
-      <span><span style={{display:"inline-block",width:12,height:8,borderRadius:2,background:C.red,opacity:.5,marginRight:4,verticalAlign:"middle"}}/>Answered No</span>
-      <span style={{color:C.muted}}>Empty = Unknown (never asked or skipped)</span>
+      <span>Row color = response rate:</span>
+      <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.green,marginRight:4,verticalAlign:"middle"}}/>{'>'} 10%</span>
+      <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.cyan,marginRight:4,verticalAlign:"middle"}}/>1–10%</span>
+      <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.orange,marginRight:4,verticalAlign:"middle"}}/>{'<'} 1%</span>
+      <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.muted,marginRight:4,verticalAlign:"middle"}}/>0%</span>
+      <span style={{marginLeft:8,borderLeft:`1px solid ${C.border}`,paddingLeft:8}}>Click a row to see the downstream tasks it gates</span>
     </div>
     <div style={{display:"grid",gap:3}}>
       <div style={{display:"flex",alignItems:"center",gap:10,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
         <span style={{width:22,textAlign:"right"}}>#</span>
         <span style={{flex:1}}>Question</span>
+        <span style={{width:40,textAlign:"right"}}>Tasks</span>
+        <span style={{width:55,textAlign:"right"}}>Task Eng.</span>
         <span style={{width:55,textAlign:"right"}}>Rate</span>
-        <span style={{width:120,textAlign:"center"}}>Yes / No / Unknown</span>
+        <span style={{width:100,textAlign:"center"}}>Yes / No</span>
         <span style={{width:55,textAlign:"right"}}>Yes</span>
         <span style={{width:55,textAlign:"right"}}>No</span>
-        <span style={{width:65,textAlign:"right"}}>Unknown</span>
       </div>
-      {sorted3.map((q,i)=>{const total=q.yes+q.no+q.unknown;const yp=total>0?q.yes/total*100:0;const np=total>0?q.no/total*100:0;const rate=total>0?(q.yes+q.no)/total*100:0;const rc=rate>10?C.green:rate>=1?C.cyan:rate>0?C.orange:C.muted;return(
-      <div key={i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",display:"flex",alignItems:"center",gap:10}}>
-        <span style={{width:22,fontSize:10,color:C.muted,fontFamily:C.mono,textAlign:"right"}}>{i+1}</span>
-        <span style={{flex:1,fontSize:12,color:rc,fontFamily:C.sans}}>{q.question}</span>
-        <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:10,color:rc}}>{rate.toFixed(1)}%</span>
-        <div style={{width:120,height:8,background:C.bg,borderRadius:4,overflow:"hidden",display:"flex"}}><div style={{width:`${yp}%`,height:"100%",background:C.green}}/><div style={{width:`${np}%`,height:"100%",background:C.red,opacity:.5}}/></div>
-        <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:11,color:C.green}}>{fmt(q.yes)}</span>
-        <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:11,color:C.red}}>{fmt(q.no)}</span>
-        <span style={{width:65,textAlign:"right",fontFamily:C.mono,fontSize:9,color:C.muted}}>{fmt(q.unknown)}</span>
+      {sorted3.map((q,i)=>{const total=q.yes+q.no+q.unknown;const yp=total>0?q.yes/total*100:0;const np=total>0?q.no/total*100:0;const rate=total>0?(q.yes+q.no)/total*100:0;const rc=rate>10?C.green:rate>=1?C.cyan:rate>0?C.orange:C.muted;const ds=q.downstream;const isExpanded=expandedQ===q.question;return(
+      <div key={i}>
+        <div onClick={()=>setExpandedQ(isExpanded?null:q.question)} style={{background:C.card,border:`1px solid ${isExpanded?C.accent+"66":C.border}`,borderRadius:isExpanded?"6px 6px 0 0":6,padding:"8px 14px",display:"flex",alignItems:"center",gap:10,cursor:"pointer"}} onMouseEnter={e=>{if(!isExpanded)e.currentTarget.style.background=C.cardHover;}} onMouseLeave={e=>{if(!isExpanded)e.currentTarget.style.background=C.card;}}>
+          <span style={{width:22,fontSize:10,color:C.muted,fontFamily:C.mono,textAlign:"right"}}>{i+1}</span>
+          <span style={{flex:1,fontSize:12,color:rc,fontFamily:C.sans}}>{q.question}</span>
+          <span style={{width:40,textAlign:"right",fontFamily:C.mono,fontSize:10,color:ds?.taskCount?C.purple:C.muted}}>{ds?.taskCount||"—"}</span>
+          <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:10,color:ds?.engagement?C.accent:C.muted}}>{ds?.engagement?fmt(ds.engagement):"—"}</span>
+          <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:10,color:rc}}>{rate.toFixed(1)}%</span>
+          <div style={{width:100,height:8,background:C.bg,borderRadius:4,overflow:"hidden",display:"flex"}}><div style={{width:`${yp}%`,height:"100%",background:C.green}}/><div style={{width:`${np}%`,height:"100%",background:C.red,opacity:.5}}/></div>
+          <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:11,color:C.green}}>{fmt(q.yes)}</span>
+          <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:11,color:C.red}}>{fmt(q.no)}</span>
+        </div>
+        {isExpanded&&<div style={{background:C.card,border:`1px solid ${C.accent}66`,borderTop:"none",borderRadius:"0 0 6px 6px",padding:"12px 14px 14px 48px"}}>
+          {ds?<div>
+            <div style={{fontSize:11,color:C.text,fontFamily:C.sans,marginBottom:8,lineHeight:1.6}}>{ds.note}</div>
+            {ds.taskCount>0?<div>
+              <div style={{fontSize:10,color:C.purple,fontWeight:600,marginBottom:4}}>Downstream tasks ({ds.taskCount}):</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:3}}>{ds.tasks.map(t=><Tag key={t} color={C.purple} onClick={()=>{setFinderSearch(taskFmt(t));setSelItem(null);setFinderOpen(true);setView("finder");}}>{taskFmt(t)}</Tag>)}</div>
+              <div style={{fontSize:10,color:C.muted,marginTop:6}}>Combined task interactions: <strong style={{color:C.accent}}>{fmt(ds.engagement)}</strong></div>
+            </div>:<div style={{fontSize:10,color:C.muted}}>No roadmap tasks gated. {ds.note.includes("anytime action")?"Triggers anytime actions instead.":ds.note.includes("overrides")?"Changes the entire roadmap path.":"No downstream content impact found."}</div>}
+          </div>:<div style={{fontSize:10,color:C.muted}}>No downstream mapping available for this question.</div>}
+        </div>}
       </div>
     );})}</div>
   </div>);
