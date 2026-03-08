@@ -774,8 +774,19 @@ if os.path.isdir(addon_source):
         "oos-pharmacy":{"t":"persona+industry","d":"Foreign nexus business in Pharmacy industry"},
     }
 
+    # Step names for display
+    step_names = {1:"Plan Your Business",2:"Register Your Business",3:"After Registering Your Business",4:"Before Opening Your Site"}
+
     # Build task_slug -> triggers
     for addon_name, atasks in addon_to_tasks.items():
+        # Get the step numbers for each task from the add-on JSON
+        addon_path = os.path.join(addon_source, f"{addon_name}.json")
+        addon_json = json.load(open(addon_path)) if os.path.isfile(addon_path) else {}
+        task_step_map = {}
+        for rs in addon_json.get("roadmapSteps", []):
+            t = rs.get("task") or rs.get("licenseTask")
+            if t: task_step_map[t] = rs.get("step")
+
         for task_slug in atasks:
             if task_slug not in task_triggers:
                 task_triggers[task_slug] = []
@@ -795,8 +806,44 @@ if os.path.isdir(addon_source):
                 trigger["type"] = "unknown"
                 trigger["detail"] = f"Triggered by add-on '{addon_name}'"
             task_triggers[task_slug].append(trigger)
+            # Add step info
+            step_num = task_step_map.get(task_slug)
+            if step_num and task_slug in task_triggers:
+                for tr in task_triggers[task_slug]:
+                    if tr.get("addon") == addon_name and "step" not in tr:
+                        tr["step"] = step_num
+                        tr["stepName"] = step_names.get(step_num, f"Step {step_num}")
 
     print(f"  Task triggers: {len(task_triggers)} add-on tasks mapped")
+
+    # Also add step numbers for base industry tasks (not add-ons)
+    ind_dir = os.path.join(addon_source.replace("add-ons",""), "industries")
+    if os.path.isdir(ind_dir):
+        base_task_steps = {}  # task_slug -> set of step numbers
+        for f in _glob.glob(os.path.join(ind_dir, "*.json")):
+            idata = json.load(open(f))
+            if not idata.get("isEnabled"): continue
+            for rs in idata.get("roadmapSteps", []):
+                t = rs.get("task") or rs.get("licenseTask")
+                if t:
+                    if t not in base_task_steps:
+                        base_task_steps[t] = set()
+                    base_task_steps[t].add(rs.get("step"))
+        # Store in task_triggers for tasks NOT already there
+        for tslug, step_nums in base_task_steps.items():
+            if tslug not in task_triggers:
+                task_triggers[tslug] = []
+            # Add a "base" entry if no triggers exist
+            if not any(tr.get("type") for tr in task_triggers.get(tslug, [])):
+                sn = min(step_nums) if step_nums else None
+                task_triggers[tslug] = [{"type":"base","addon":None,
+                    "detail":"Base industry roadmap task — included automatically for this industry",
+                    "step":sn,"stepName":step_names.get(sn, f"Step {sn}") if sn else None}]
+            # Ensure all entries have step info
+            for tr in task_triggers.get(tslug, []):
+                if "step" not in tr and step_nums:
+                    tr["step"] = min(step_nums)
+                    tr["stepName"] = step_names.get(min(step_nums), f"Step {min(step_nums)}")
 
 # ============================================================
 # Enrich NEQ data with downstream tasks and engagement
@@ -905,6 +952,7 @@ output = {
     "orphanedSectors": sorted(orphaned_sectors),
     "sectorMismatches": nav_mismatches,
     "taskFrequency": task_frequency,
+    "taskNameToSlug": task_name_to_slug,
     "universalTasks": universal_tasks,
     "totalDiffTasks": len(task_to_industries),
     "totalDistinctPaths": total_distinct_paths,
