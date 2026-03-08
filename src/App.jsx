@@ -49,6 +49,8 @@ export default function App() {
   const [taskSort,setTaskSort] = useState("total");
   const [pFilter,setPFilter] = useState("all");
   const [pDept,setPDept] = useState("all");
+  const [finderSearch,setFinderSearch] = useState("");
+  const [selItem,setSelItem] = useState(null);
 
   const inds = DATA.industries;
   const sectors = DATA.sectors;
@@ -581,7 +583,7 @@ export default function App() {
       <Alert color={C.accent}>Cross-referencing the <strong>Plurmits inventory</strong> ({fmt(cov.total)} permits across {depts.length} NJ agencies) with the Navigator codebase to show which state permits are integrated with live database connections, mentioned as informational content, or completely absent.</Alert>
       <Insight>
         <strong>Theoretical vs. actual:</strong> NJ businesses submit roughly <strong>{fmt(cov.bizVolume)}</strong> permit applications per year. If every one came through Business.NJ.gov, existing coverage could handle <strong>{pct(cov.bizVolume - cov.bizNoneVol,cov.bizVolume)}</strong> of them — the remaining {pct(cov.bizNoneVol,cov.bizVolume)} ({fmt(cov.bizNoneVol)}/yr) are permits with no Navigator presence at all.<br/><br/>
-        <strong>But actual usage tells a different story.</strong> Across all covered permits, the Navigator has recorded <strong>{fmt(cov.bizAllEng)} total interactions to date</strong> — overwhelmingly from formation ({fmt(cov.bizApiComp)} completed). The 22 DCA license lookups, CRTK integration, and housing registrations collectively account for a few hundred interactions. Deep integrations were built before the top of funnel was driving volume to use them.
+        <strong>A note on measuring usage:</strong> "Interactions" below reflect users who clicked a task's status button (marking it complete or to-do). This undercounts actual engagement — users who read a task's content and act on it externally without clicking the button are invisible. Roadmap reach (how many of the 64 industry roadmaps include a given task) is a more reliable measure of how many users <em>encounter</em> the content.
       </Insight>
 
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:10}}>
@@ -591,16 +593,17 @@ export default function App() {
       <div style={{fontSize:10,color:C.muted,fontFamily:C.sans,marginBottom:6,paddingLeft:2}}>If every NJ business used Business.NJ.gov, each tier below would handle this share of the {fmt(cov.bizVolume)} annual business submissions:</div>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:20}}>
         <Stat label="Live API Integration" value={hasApiCount+" permits"} color={C.green}
-          sub={apis.length+" agency integrations → "+(pc.apiTaskSlugs.length+(pc.apiAASlugs||[]).length)+" connected tasks/AAs → "+hasApiCount+" state permits\n"+fmt(cov.bizApiVol)+"/yr statewide ("+pct(cov.bizApiVol,cov.bizVolume)+" of biz volume)\nBNJ interactions to date: "+fmt(cov.bizApiEng)} />
+          sub={apis.length+" agency integrations → "+(pc.apiTaskSlugs.length+(pc.apiAASlugs||[]).length)+" connected tasks/AAs → "+hasApiCount+" state permits\n"+fmt(cov.bizApiVol)+"/yr statewide ("+pct(cov.bizApiVol,cov.bizVolume)+" of biz volume)\n"+fmt(cov.bizApiUsers)+" users with these on their roadmap · "+fmt(cov.bizApiEng)+" interactions*"} />
         <Stat label="Data Read (no task match)" value={cov.bizRead} color={C.cyan}
-          sub={fmt(cov.bizReadVol)+"/yr statewide ("+pct(cov.bizReadVol,cov.bizVolume)+" of biz volume)\nBNJ interactions to date: "+fmt(cov.bizReadEng)} />
+          sub={fmt(cov.bizReadVol)+"/yr statewide ("+pct(cov.bizReadVol,cov.bizVolume)+" of biz volume)\nNot linked to specific tasks — reach not measurable"} />
         <Stat label="Informational in Navigator" value={infoOnly} color={C.cyan}
-          sub={fmt(cov.bizInfoVol)+"/yr statewide ("+pct(cov.bizInfoVol,cov.bizVolume)+" of biz volume)\nBNJ interactions to date: "+fmt(cov.bizInfoEng)} />
+          sub={fmt(cov.bizInfoVol)+"/yr statewide ("+pct(cov.bizInfoVol,cov.bizVolume)+" of biz volume)\n"+fmt(cov.bizInfoUsers)+" users with these on their roadmap · "+fmt(cov.bizInfoEng)+" interactions*"} />
         <Stat label="Mentioned Only" value={bizInteg - hasApiCount - infoOnly - cov.bizRead} color={C.orange}
-          sub={fmt(cov.bizMentionedVol)+"/yr statewide ("+pct(cov.bizMentionedVol,cov.bizVolume)+" of biz volume)\nNo direct task — cannot measure interactions"} />
+          sub={fmt(cov.bizMentionedVol)+"/yr statewide ("+pct(cov.bizMentionedVol,cov.bizVolume)+" of biz volume)\nReferenced in content, not linked to specific tasks"} />
         <Stat label="Not in Navigator" value={fmt(cov.bizNone)} color={C.red}
           sub={fmt(cov.bizNoneVol)+"/yr statewide ("+pct(cov.bizNoneVol,cov.bizVolume)+" of biz volume)\nZero coverage — these permits have nowhere to go"} />
       </div>
+      <div style={{fontSize:9,color:C.muted,fontFamily:C.sans,marginTop:-14,marginBottom:18,paddingLeft:2,opacity:.7}}>* Interactions = users who clicked a task's status button. This undercounts real engagement — users who read and act without clicking are not captured. "Users with these on their roadmap" is a more reliable measure of who encounters the content.</div>
 
       <Sec title="Agency Database Integrations" sub="Live connections between the Navigator and NJ agency systems. These are the permits where users can query status, submit applications, or receive real-time data — not just read about them.">
         <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:14}}>
@@ -690,6 +693,231 @@ export default function App() {
     </div>);
   };
 
+  /* ═══ TAB: CONTENT FINDER ═══ */
+  const ContentFinder = () => {
+    const pc = DATA.permitCoverage;
+    const apiSlugs = pc ? new Set([...(pc.apiTaskSlugs||[]),...(pc.apiTaskNames||[])]) : new Set();
+    const apiSlugSet = pc ? new Set(pc.apiTaskSlugs||[]) : new Set();
+    const apiAASet = pc ? new Set(pc.apiAASlugs||[]) : new Set();
+    const apis = pc ? pc.apiIntegrations : [];
+
+    // Build browsable items
+    const items = useMemo(()=>{
+      const list = [];
+      // Roadmap tasks
+      const seenSlugs = new Set();
+      for(const t of tp){
+        const slug = Object.entries(DATA.taskFrequency||{}).find(([s,info])=>{
+          const n = taskFmt(s);
+          return n===t.task || s===t.task;
+        });
+        const taskSlug = slug ? slug[0] : t.task;
+        if(seenSlugs.has(taskSlug)) continue;
+        seenSlugs.add(taskSlug);
+        const isUniversal = DATA.universalTasks.includes(taskSlug);
+        const freq = DATA.taskFrequency[taskSlug];
+        const isAddon = t.isAddon;
+        const hasApi = apiSlugs.has(t.task) || apiSlugSet.has(taskSlug);
+        const industries = freq ? freq.industries : (isUniversal ? inds.map(i=>i.id) : []);
+        list.push({
+          type:"task", id:taskSlug, name:t.task, slug:taskSlug,
+          isUniversal, isAddon, hasApi, industries,
+          users: industries.reduce((s,iid)=>{const ind=inds.find(i=>i.id===iid);return s+(ind?ind.users:0);},0),
+          interactions: t.total, completed: t.completed,
+        });
+      }
+      // Anytime actions
+      for(const aa of DATA.anytimeActions){
+        const hasApi = apiAASet.has(aa.id);
+        const reachedIds = aa.reached.map(r=>r.id);
+        list.push({
+          type:"aa", id:aa.id, name:aa.name, slug:aa.id,
+          isUniversal: aa.applyToAllUsers, isAddon:false, hasApi,
+          industries: reachedIds,
+          users: reachedIds.reduce((s,iid)=>{const ind=inds.find(i=>i.id===iid);return s+(ind?ind.users:0);},0),
+          interactions: null, completed: null,
+          industryIds: aa.industryIds, sectorIds: aa.sectorIds,
+        });
+      }
+      // Permits
+      if(pc){
+        for(const p of pc.plurmits){
+          list.push({
+            type:"permit", id:"permit-"+p.name.slice(0,30), name:p.name, slug:null,
+            isUniversal:false, isAddon:false, hasApi:p.api||p.level==="api",
+            matchedTasks: p.tasks, department: p.dept, volume: p.vol,
+            level: p.level, priority: p.pri,
+            industries: p.inds,
+            users: p.inds.reduce((s,iid)=>{const ind=inds.find(i=>i.id===iid);return s+(ind?ind.users:0);},0),
+            interactions: null, completed: null,
+          });
+        }
+      }
+      return list;
+    },[tp,inds,pc]);
+
+    const filtered = useMemo(()=>{
+      if(!finderSearch || finderSearch.length<2) return [];
+      const q = finderSearch.toLowerCase();
+      return items.filter(it=>it.name.toLowerCase().includes(q)).sort((a,b)=>{
+        // Prioritize: exact start match, then type order (task, aa, permit), then alpha
+        const aStart = a.name.toLowerCase().startsWith(q)?0:1;
+        const bStart = b.name.toLowerCase().startsWith(q)?0:1;
+        if(aStart!==bStart) return aStart-bStart;
+        const typeOrder = {task:0,aa:1,permit:2};
+        return (typeOrder[a.type]||3)-(typeOrder[b.type]||3);
+      }).slice(0,30);
+    },[finderSearch,items]);
+
+    const getAgency = (slug) => {
+      if(!pc) return null;
+      return apis.find(ai=>ai.tasks.includes(slug)||ai.aas.includes(slug));
+    };
+
+    const renderSteps = (item) => {
+      const steps = [];
+      const typeLabel = item.type==="task"?"Roadmap Task":item.type==="aa"?"Anytime Action":"State Permit";
+      const typeColor = item.type==="task"?C.accent:item.type==="aa"?C.cyan:C.purple;
+
+      // For permits, show what it maps to first
+      if(item.type==="permit"){
+        steps.push({step:"This is a state permit from "+item.department,detail:item.volume>0?"~"+fmt(item.volume)+" submissions/yr statewide":null});
+        if(item.matchedTasks && item.matchedTasks.length>0){
+          steps.push({step:"Maps to Navigator task"+(item.matchedTasks.length>1?"s":""),detail:item.matchedTasks.map(t=>taskFmt(t)).join(", "),color:C.accent});
+        } else if(item.hasApi){
+          steps.push({step:"Has a live API integration but is not matched to a specific task slug",color:C.green});
+        } else if(item.level==="mentioned"){
+          steps.push({step:"Mentioned in Navigator content but not linked to a specific task",color:C.orange});
+        } else if(item.level==="read"){
+          steps.push({step:"Navigator reads data related to this permit but it's not linked to a specific task",color:C.cyan});
+        } else {
+          steps.push({step:"Not currently in the Navigator — no task, mention, or integration exists",color:C.red});
+          return steps;
+        }
+      }
+
+      // Determine the underlying task/AA for navigation
+      const underlying = item.type==="permit" && item.matchedTasks?.length>0
+        ? items.find(it=>(it.type==="task"||it.type==="aa") && item.matchedTasks.includes(it.slug))
+        : item;
+
+      if(!underlying || (item.type==="permit" && !item.matchedTasks?.length)) return steps;
+
+      const u = underlying;
+      steps.push({step:"Go to Business.NJ.gov and sign in (or create an account)",color:C.muted});
+
+      if(u.type==="task"){
+        if(u.isUniversal){
+          steps.push({step:"Select any industry during onboarding",detail:"This is a universal task — it appears on all 64 industry roadmaps",color:C.accent});
+        } else if(u.industries.length>0){
+          const indNames = u.industries.map(iid=>{const ind=inds.find(i=>i.id===iid);return ind?ind.name:iid;});
+          if(indNames.length<=5){
+            steps.push({step:"Select one of these industries during onboarding:",detail:indNames.join(", "),color:C.accent});
+          } else {
+            steps.push({step:"Select one of "+indNames.length+" industries during onboarding",detail:indNames.slice(0,5).join(", ")+" and "+(indNames.length-5)+" more",color:C.accent});
+          }
+        }
+        if(u.isAddon){
+          steps.push({step:"Answer the relevant profile question(s) during onboarding",detail:"This is an add-on task triggered by a non-essential question or legal structure selection",color:C.purple});
+        }
+        steps.push({step:"The task appears in your step-by-step roadmap",detail:"Look for \""+u.name+"\" in the task checklist. It will show as a to-do item you can expand for details."+(u.hasApi?" This task has a live data connection — you may be able to check status or submit directly.":""),color:u.hasApi?C.green:C.text});
+      } else if(u.type==="aa"){
+        if(u.isUniversal){
+          steps.push({step:"Select any industry during onboarding",detail:"This is a universal anytime action — visible to all industries",color:C.accent});
+        } else if(u.industries.length>0){
+          const indNames = u.industries.map(iid=>{const ind=inds.find(i=>i.id===iid);return ind?ind.name:iid;});
+          if(indNames.length<=5){
+            steps.push({step:"Select one of these industries:",detail:indNames.join(", "),color:C.accent});
+          } else {
+            steps.push({step:"Select one of "+indNames.length+" eligible industries",detail:indNames.slice(0,5).join(", ")+" and "+(indNames.length-5)+" more",color:C.accent});
+          }
+        }
+        steps.push({step:"Progress your account to an \"operate\" phase",detail:"Anytime actions only appear once you reach Up & Running, Guest Mode Owning, or Up & Running Owning. Currently "+fmt(DATA.phases.seesAAFunding)+" of "+fmt(DATA.phases.totalBusinesses)+" businesses ("+pct(DATA.phases.seesAAFunding,DATA.phases.totalBusinesses)+") are in these phases.",color:C.orange});
+        steps.push({step:"Find \""+u.name+"\" in the Anytime Actions section",detail:"It will appear in the operate dashboard alongside other actions for your industry and sector."+(u.hasApi?" This action has a live connection to an agency system.":""),color:u.hasApi?C.green:C.text});
+      }
+
+      // API info
+      if(u.hasApi || item.hasApi){
+        const slug = u.slug || (item.matchedTasks||[])[0];
+        const agency = slug ? getAgency(slug) : null;
+        if(agency){
+          steps.push({step:"Live integration: "+agency.agency,detail:agency.desc+" ("+agency.type+")",color:C.green});
+        }
+      }
+
+      return steps;
+    };
+
+    return (<div>
+      <Alert color={C.accent}>Search for any roadmap task, anytime action, or state permit to see a step-by-step guide for how a Business.NJ.gov user would encounter it. This traces the full path from account creation through the relevant content.</Alert>
+      <div style={{position:"relative",marginBottom:selItem?0:20}}>
+        <input placeholder="Search tasks, anytime actions, or permits..." value={finderSearch} onChange={e=>{setFinderSearch(e.target.value);setSelItem(null);}}
+          style={{width:"100%",padding:"12px 16px",background:C.card,border:`1px solid ${C.border}`,borderRadius:8,color:C.text,fontSize:14,outline:"none",fontFamily:C.sans,boxSizing:"border-box"}} />
+        {filtered.length>0 && !selItem && <div style={{position:"absolute",top:"100%",left:0,right:0,background:C.card,border:`1px solid ${C.border}`,borderRadius:"0 0 8px 8px",maxHeight:400,overflowY:"auto",zIndex:10}}>
+          {filtered.map((it,i)=>{
+            const tc = it.type==="task"?C.accent:it.type==="aa"?C.cyan:C.purple;
+            const tl = it.type==="task"?"TASK":it.type==="aa"?"AA":"PERMIT";
+            return (<div key={it.id+i} onClick={()=>{setSelItem(it);setFinderSearch(it.name);}}
+              style={{padding:"10px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:10,borderBottom:`1px solid ${C.border}`}}
+              onMouseEnter={e=>e.currentTarget.style.background=C.cardHover} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+              <Tag color={tc}>{tl}</Tag>
+              <span style={{flex:1,fontSize:12,color:C.text,fontFamily:C.sans}}>{it.name}</span>
+              {it.hasApi&&<Tag color={C.green}>API</Tag>}
+              {it.users>0&&<span style={{fontSize:10,color:C.muted,fontFamily:C.mono}}>{fmt(it.users)} users</span>}
+            </div>);
+          })}
+        </div>}
+      </div>
+
+      {selItem && (()=>{
+        const it = selItem;
+        const steps = renderSteps(it);
+        const tc = it.type==="task"?C.accent:it.type==="aa"?C.cyan:C.purple;
+        const tl = it.type==="task"?"Roadmap Task":it.type==="aa"?"Anytime Action":"State Permit";
+        return (<div style={{marginTop:16}}>
+          <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:20,marginBottom:16}}>
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
+              <Tag color={tc}>{tl}</Tag>
+              {it.hasApi&&<Tag color={C.green}>Live API</Tag>}
+              {it.isUniversal&&<Tag color={C.accent}>Universal</Tag>}
+              {it.isAddon&&<Tag color={C.purple}>Add-on</Tag>}
+              {it.type==="permit"&&it.priority==="high"&&<Tag color={C.red}>High Priority</Tag>}
+            </div>
+            <h3 style={{fontSize:18,fontWeight:700,color:C.text,margin:"0 0 8px",fontFamily:C.sans}}>{it.name}</h3>
+            <div style={{display:"flex",gap:16,flexWrap:"wrap",fontSize:11,color:C.muted,fontFamily:C.sans}}>
+              {it.users>0&&<span><strong style={{color:C.accent}}>{fmt(it.users)}</strong> users with this on their roadmap</span>}
+              {it.interactions!=null&&<span><strong style={{color:C.green}}>{fmt(it.interactions)}</strong> interactions* ({fmt(it.completed)} completed)</span>}
+              {it.type==="permit"&&it.volume>0&&<span><strong style={{color:C.purple}}>{fmt(it.volume)}</strong> statewide submissions/yr</span>}
+              {it.industries&&it.industries.length>0&&<span>Visible to <strong style={{color:C.cyan}}>{it.industries.length}</strong> of 64 industries</span>}
+            </div>
+          </div>
+
+          <Sec title="How to find this in Business.NJ.gov" sub="Step-by-step path from account creation to this content.">
+            <div style={{display:"grid",gap:4}}>
+              {steps.map((s,i)=>(
+                <div key={i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"12px 16px",display:"flex",gap:14,alignItems:"flex-start"}}>
+                  <div style={{width:28,height:28,borderRadius:"50%",background:`${s.color||C.accent}18`,border:`2px solid ${s.color||C.accent}44`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,color:s.color||C.accent,fontFamily:C.mono,flexShrink:0}}>{i+1}</div>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:13,color:C.text,fontWeight:600,fontFamily:C.sans}}>{s.step}</div>
+                    {s.detail&&<div style={{fontSize:11,color:C.muted,marginTop:4,fontFamily:C.sans,lineHeight:1.5}}>{s.detail}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Sec>
+
+          {it.industries && it.industries.length>0 && it.industries.length<=20 && <Sec title={"Industries ("+it.industries.length+")"} sub="Click to view industry detail.">
+            <div style={{display:"flex",flexWrap:"wrap",gap:3}}>
+              {it.industries.map(iid=>{const ind=inds.find(i=>i.id===iid);return ind?<Tag key={iid} color={C.accent} onClick={()=>{setSelInd(ind);setView("detail");}}>{ind.name} ({fmt(ind.users)})</Tag>:null;})}
+            </div>
+          </Sec>}
+
+          <div style={{fontSize:9,color:C.muted,fontFamily:C.sans,marginTop:12,opacity:.7}}>* Interactions = users who clicked a task's status button. Users who read the content and act without clicking are not captured.</div>
+        </div>);
+      })()}
+    </div>);
+  };
+
   /* ═══ TAB: PROFILE QUESTIONS ═══ */
   const ProfileQuestions = () => {
     const sorted3 = useMemo(()=>[...neq].sort((a,b)=>{const ta=a.yes+a.no+a.unknown;const tb=b.yes+b.no+b.unknown;const ra=ta>0?(a.yes+a.no)/ta:0;const rb=tb>0?(b.yes+b.no)/tb:0;return rb-ra;}),[neq]);
@@ -745,9 +973,9 @@ export default function App() {
           Source: {DATA.meta.xlsxFile} · {fmt(DATA.meta.totalBusinesses)} businesses · {inds.length} industries · {DATA.totalDiffTasks} diff. tasks · {DATA.anytimeActions.length} AAs · {sectors.length} sectors{DATA.permitCoverage&&` · ${fmt(DATA.permitCoverage.coverage.total)} state permits`}
         </div>
         <div style={{display:"flex",gap:5,marginBottom:20,flexWrap:"wrap"}}>
-          {nav("contentgap","Content Gap")}{nav("roadmap","Roadmap Analysis")}{nav("sectorhealth","Sector Health")}{nav("journey","User Journey")}{nav("industries","Industries")}{nav("detail","Industry Detail")}{nav("tasks","Task Reuse")}{nav("engagement","Task Engagement")}{nav("permits","Permit Coverage")}{nav("profile","Profile Questions")}
+          {nav("contentgap","Content Gap")}{nav("roadmap","Roadmap Analysis")}{nav("sectorhealth","Sector Health")}{nav("journey","User Journey")}{nav("industries","Industries")}{nav("detail","Industry Detail")}{nav("tasks","Task Reuse")}{nav("engagement","Task Engagement")}{nav("permits","Permit Coverage")}{nav("finder","Content Finder")}{nav("profile","Profile Questions")}
         </div>
-        {view==="contentgap"&&<ContentGap/>}{view==="roadmap"&&<RoadmapAnalysis/>}{view==="sectorhealth"&&<SectorHealth/>}{view==="journey"&&<UserJourney/>}{view==="industries"&&<Industries/>}{view==="detail"&&<Detail/>}{view==="tasks"&&<TaskReuse/>}{view==="engagement"&&<TaskEngagement/>}{view==="permits"&&<PermitCoverage/>}{view==="profile"&&<ProfileQuestions/>}
+        {view==="contentgap"&&<ContentGap/>}{view==="roadmap"&&<RoadmapAnalysis/>}{view==="sectorhealth"&&<SectorHealth/>}{view==="journey"&&<UserJourney/>}{view==="industries"&&<Industries/>}{view==="detail"&&<Detail/>}{view==="tasks"&&<TaskReuse/>}{view==="engagement"&&<TaskEngagement/>}{view==="permits"&&<PermitCoverage/>}{view==="finder"&&<ContentFinder/>}{view==="profile"&&<ProfileQuestions/>}
       </div>
     </div>
   );
