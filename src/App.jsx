@@ -709,12 +709,17 @@ export default function App() {
       const list = [];
       // Roadmap tasks
       const seenSlugs = new Set();
+      const nameToSlug = DATA.taskNameToSlug || {};
       for(const t of tp){
-        const slug = Object.entries(DATA.taskFrequency||{}).find(([s,info])=>{
-          const n = taskFmt(s);
-          return n===t.task || s===t.task;
-        });
-        const taskSlug = slug ? slug[0] : t.task;
+        // Resolve slug: first try the authoritative name-to-slug map, then taskFrequency, then fall back to raw name
+        let taskSlug = nameToSlug[t.task];
+        if(!taskSlug){
+          const slug = Object.entries(DATA.taskFrequency||{}).find(([s,info])=>{
+            const n = taskFmt(s);
+            return n===t.task || s===t.task;
+          });
+          taskSlug = slug ? slug[0] : t.task;
+        }
         if(seenSlugs.has(taskSlug)) continue;
         seenSlugs.add(taskSlug);
         const isUniversal = DATA.universalTasks.includes(taskSlug);
@@ -838,19 +843,34 @@ export default function App() {
             } else {
               steps.push({step:"Select one of "+indNames.length+" industries during onboarding",detail:indNames.slice(0,5).join(", ")+" and "+(indNames.length-5)+" more",color:C.accent});
             }
+          } else if(isAddonTask){
+            // Add-on task with no specific industry — available to any industry that asks the triggering question
+            const hasLegalTrig = taskTrigs.some(t=>t.type==="legalStructure"||t.type==="legalStructure+profile");
+            const hasNeqTrig = taskTrigs.some(t=>t.type==="neq");
+            steps.push({step:"Select any industry during onboarding",detail:hasLegalTrig?"This task is triggered by your business structure choice, not your industry — it can appear on any industry's roadmap.":hasNeqTrig?"This task is triggered by a profile question that is asked of specific industries.":"This is an add-on task triggered by profile choices, not industry selection.",color:C.accent});
           }
         }
 
         // Step: Legal structure (if triggered by legal structure)
-        const legalTrigs = taskTrigs.filter(t=>t.type==="legalStructure" || t.type==="legalStructure+profile");
+        const legalTrigs = taskTrigs.filter(t=>t.type==="legalStructure");
+        const legalProfileTrigs = taskTrigs.filter(t=>t.type==="legalStructure+profile");
         if(legalTrigs.length > 0){
           steps.push({step:"Select the required business structure",detail:legalTrigs.map(t=>t.detail).join("; "),color:C.purple});
+        }
+        if(legalProfileTrigs.length > 0){
+          // Show the legal structure part
+          const legalPart = legalProfileTrigs.map(t=>t.detail.split(", then ")[0]).join("; ");
+          steps.push({step:"Select the required business structure",detail:legalPart,color:C.purple});
+          // Show the profile question part
+          const profilePart = legalProfileTrigs.map(t=>{const parts=t.detail.split(", then ");return parts.length>1?parts.slice(1).join(", then "):null;}).filter(Boolean);
+          if(profilePart.length>0){
+            steps.push({step:"Answer a follow-up question in your Profile",detail:profilePart.join("; "),color:C.purple});
+          }
         }
 
         // Step: Profile / NEQ questions
         const neqTrigs = taskTrigs.filter(t=>t.type==="neq");
         const profileTrigs = taskTrigs.filter(t=>t.type==="profile");
-        const legalProfileTrigs = taskTrigs.filter(t=>t.type==="legalStructure+profile");
 
         if(neqTrigs.length > 0){
           for(const nt of neqTrigs){
@@ -860,15 +880,6 @@ export default function App() {
         if(profileTrigs.length > 0){
           for(const pt of profileTrigs){
             steps.push({step:"Answer a profile question during or after onboarding",detail:pt.detail,color:C.purple});
-          }
-        }
-        if(legalProfileTrigs.length > 0){
-          for(const lt of legalProfileTrigs){
-            // The legal structure part was already shown above; show the profile part
-            const profilePart = lt.detail.split(", then ").slice(1).join(", then ");
-            if(profilePart){
-              steps.push({step:"Answer an additional question in your Profile",detail:profilePart,color:C.purple});
-            }
           }
         }
 
@@ -885,7 +896,9 @@ export default function App() {
         }
 
         // Final: find it in roadmap
-        steps.push({step:"Find \""+u.name+"\" in your step-by-step roadmap",detail:"It appears as a to-do item in your task checklist that you can expand for details and instructions."+(u.hasApi?" This task has a live data connection — you may be able to check status or submit directly.":""),color:u.hasApi?C.green:C.text});
+        const stepInfo = taskTrigs.length>0 && taskTrigs[0].step ? taskTrigs[0] : null;
+        const stepLabel = stepInfo ? " under Step "+stepInfo.step+": \""+stepInfo.stepName+"\"" : "";
+        steps.push({step:"Find \""+u.name+"\" in your step-by-step roadmap",detail:"It appears"+stepLabel+" as a to-do item in your task checklist that you can expand for details and instructions."+(u.hasApi?" This task has a live data connection — you may be able to check status or submit directly.":""),color:u.hasApi?C.green:C.text});
 
       } else if(u.type==="aa"){
         if(u.isUniversal){
