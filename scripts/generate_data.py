@@ -575,6 +575,69 @@ if os.path.exists(PLURMIT_FILE):
     all_eng = api_eng + info_eng + read_eng + ment_eng
     all_comp = api_comp + info_comp + read_comp + ment_comp
 
+    # Compute roadmap reach per category: how many of 64 industries include at
+    # least one task from this category in their roadmap?
+    def cat_reach(permits, include_unmatched_api=False):
+        task_set = set()
+        for p in permits:
+            task_set.update(p["matchedTasks"])
+        if include_unmatched_api:
+            for ai in api_integrations:
+                task_set.update(ai["tasks"])
+                task_set.update(ai["aas"])
+        # Count industries whose roadmap includes at least one of these tasks
+        # (checking both differentiating and universal tasks)
+        count = 0
+        aa_list = nav.get("anytimeActions", [])
+        for ind_id, ind_data in enabled_industries.items():
+            all_tasks = set(ind_data.get("roadmapTaskNames", []))
+            if all_tasks & task_set:
+                count += 1
+                continue
+            # Also check AAs: does any AA in task_set reach this industry?
+            for aa in aa_list:
+                if aa["id"] in task_set:
+                    if aa.get("applyToAllUsers"):
+                        count += 1; break
+                    elif ind_id in aa.get("industryIds", []):
+                        count += 1; break
+                    elif ind_data.get("defaultSectorId") in aa.get("sectorIds", []):
+                        count += 1; break
+        return count
+
+    api_reach = cat_reach(api_pls, include_unmatched_api=True)
+    info_reach = cat_reach(info_pls)
+
+    # Compute user reach per category (total users across industries that see these tasks)
+    def cat_user_reach(permits, include_unmatched_api=False):
+        task_set = set()
+        for p in permits:
+            task_set.update(p["matchedTasks"])
+        if include_unmatched_api:
+            for ai in api_integrations:
+                task_set.update(ai["tasks"])
+                task_set.update(ai["aas"])
+        aa_list = nav.get("anytimeActions", [])
+        matched_inds = set()
+        for ind_id, ind_data in enabled_industries.items():
+            all_tasks = set(ind_data.get("roadmapTaskNames", []))
+            if all_tasks & task_set:
+                matched_inds.add(ind_id)
+                continue
+            for aa in aa_list:
+                if aa["id"] in task_set:
+                    if aa.get("applyToAllUsers"):
+                        matched_inds.add(ind_id); break
+                    elif ind_id in aa.get("industryIds", []):
+                        matched_inds.add(ind_id); break
+                    elif ind_data.get("defaultSectorId") in aa.get("sectorIds", []):
+                        matched_inds.add(ind_id); break
+        users = sum(industry_users.get(enabled_industries[iid]["name"].strip(), 0) for iid in matched_inds)
+        return users
+
+    api_users = cat_user_reach(api_pls, include_unmatched_api=True)
+    info_users = cat_user_reach(info_pls)
+
     hi_gaps = [{"name":p["name"],"department":p["department"],"volume":p["volume"],"notes":p["notes"]}
                for p in sorted(biz_only, key=lambda x:-x["volume"]) if p["priority"]=="high" and p["integrationLevel"]=="none"]
 
@@ -586,10 +649,10 @@ if os.path.exists(PLURMIT_FILE):
             "bizVolume": biz_vol,
             "bizApi": len(api_pls),
             "bizApiVol": sum(p["volume"] for p in api_pls),
-            "bizApiEng": api_eng, "bizApiComp": api_comp,
+            "bizApiEng": api_eng, "bizApiComp": api_comp, "bizApiReach": api_reach, "bizApiUsers": api_users,
             "bizInfo": len(info_pls),
             "bizInfoVol": sum(p["volume"] for p in info_pls),
-            "bizInfoEng": info_eng, "bizInfoComp": info_comp,
+            "bizInfoEng": info_eng, "bizInfoComp": info_comp, "bizInfoReach": info_reach, "bizInfoUsers": info_users,
             "bizRead": len(read_pls),
             "bizReadVol": sum(p["volume"] for p in read_pls),
             "bizReadEng": read_eng, "bizReadComp": read_comp,
