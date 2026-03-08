@@ -798,6 +798,87 @@ if os.path.isdir(addon_source):
 
     print(f"  Task triggers: {len(task_triggers)} add-on tasks mapped")
 
+# ============================================================
+# Enrich NEQ data with downstream tasks and engagement
+# ============================================================
+# Map analytics question names to profile fields and their add-ons
+question_addon_map = {
+    "Home-Based Business": {"field":"homeBasedBusiness","yes":["home-based-transportation"],"no":["permanent-location-business","planned-renovation"],
+        "note":"No → adds 6 location tasks (evaluate, site requirements, lease, zoning, safety permits, mercantile). Yes + transportation → adds trucking parking."},
+    "Provides Staffing Service": {"field":"providesStaffingService","yes":[],"no":[],
+        "note":"If true, overrides industryId to 'employment-agency' — changes entire roadmap, not just add-ons."},
+    "Interstate Logistics": {"field":"interstateLogistics","yes":["interstate-logistics"],"no":[],
+        "note":"Adds BOC-3, USDOT, IRP, and IFTA tasks for interstate freight."},
+    "Childcare for 6+ Children": {"field":"isChildcareForSixOrMore","yes":["daycare"],"no":["family-daycare"],
+        "note":"Yes → daycare center path (evaluate location, site requirements, license). No → family daycare registration."},
+    "Liquor License": {"field":"liquorLicense","yes":["liquor-license"],"no":[],
+        "note":"Adds liquor license availability confirmation task."},
+    "Requires CPA": {"field":"requiresCpa","yes":["cpa"],"no":[],
+        "note":"Adds public accountant license task."},
+    "Pet Care Housing": {"field":"petCareHousing","yes":["petcare-license"],"no":[],
+        "note":"Adds pet care facility license task."},
+    "Public Works Contractor": {"field":"publicWorksContractor","yes":["public-works-contractor"],"no":[],
+        "note":"Adds public works contractor registration (PWCR) task."},
+    "Sells Pet Care Items": {"field":"willSellPetCareItems","yes":["will-sell-pet-care-items"],"no":[],
+        "note":"Adds retail license search task."},
+    "Interstate Moving": {"field":"interstateMoving","yes":["interstate-moving"],"no":[],
+        "note":"Adds BOC-3, USDOT, IRP, and IFTA tasks for interstate moving."},
+    "Owns Elevators": {"field":"elevatorOwningBusiness","yes":["elevator-owning-business"],"no":[],
+        "note":"Adds elevator registration task (DCA Dynamics API integration)."},
+    "Cannabis Microbusiness": {"field":"cannabisMicrobusiness","yes":[],"no":[],
+        "note":"Stored in profile but does not trigger add-ons. Display purposes only."},
+    "Has 3+ Rental Units": {"field":"hasThreeOrMoreRentalUnits","yes":["residential-landlord-long-term-many-units"],"no":["residential-landlord-long-term-few-units"],
+        "note":"Yes → multiple dwelling registration. No → landlord registration + smoke detector certificate."},
+    "Interstate Transport": {"field":"interstateLogistics","yes":["interstate-logistics"],"no":[],
+        "note":"Same trigger as Interstate Logistics — shown to different industries."},
+    "Certified Interior Designer": {"field":"certifiedInteriorDesigner","yes":[],"no":[],
+        "note":"If false, overrides industryId from 'interior-designer' to 'generic'. Changes entire roadmap."},
+    "Real Estate Appraisal Management": {"field":"realEstateAppraisalManagement","yes":["real-estate-appraisal-management"],"no":["real-estate-appraiser"],
+        "note":"Yes → appraiser certification + AMC registration. No → individual appraiser license."},
+    "Raffle/Bingo Games": {"field":"raffleBingoGames","yes":["raffle-bingo-games"],"no":[],
+        "note":"Only asked if legalStructure = nonprofit. Adds raffle/bingo game license task."},
+    "Car Service": {"field":"carService","yes":["car-service-standard","car-service-high-capacity"],"no":[],
+        "note":"Standard → taxi insurance, local auth, driver certification. High capacity → transport insurance, inspection, CPCN, USDOT."},
+    "Owns Carnival Rides": {"field":"carnivalRideOwningBusiness","yes":[],"no":[],
+        "note":"Triggers anytime actions only (carnival ride modification, operating fire permit)."},
+    "Traveling Circus/Carnival": {"field":"travelingCircusOrCarnivalOwningBusiness","yes":[],"no":[],
+        "note":"Triggers anytime action only (operating carnival fire permit)."},
+    "Vacant Property Owner": {"field":"vacantPropertyOwner","yes":[],"no":[],
+        "note":"Triggers anytime action only (vacant building fire permit)."},
+    "Open 2+ Years": {"field":"openTwoOrMoreYears","yes":[],"no":[],
+        "note":"No add-on or anytime action mapped. Appears unused."},
+}
+
+# Build slug -> engagement lookup
+slug_eng_map = {}
+for tp_row in task_progress:
+    sl = task_name_to_slug.get(tp_row["task"], tp_row["task"])
+    slug_eng_map[sl] = slug_eng_map.get(sl, 0) + tp_row["total"]
+
+for nq in neq_data:
+    qname = nq["question"]
+    qmap = question_addon_map.get(qname)
+    if not qmap:
+        nq["downstream"] = None
+        continue
+    
+    all_addons = qmap["yes"] + qmap["no"]
+    downstream_tasks = set()
+    for addon in all_addons:
+        for task_slug, trigs in task_triggers.items():
+            if any(t.get("addon") == addon for t in trigs):
+                downstream_tasks.add(task_slug)
+    
+    total_eng = sum(slug_eng_map.get(ts, 0) for ts in downstream_tasks)
+    
+    nq["downstream"] = {
+        "field": qmap["field"],
+        "note": qmap["note"],
+        "tasks": sorted(downstream_tasks),
+        "taskCount": len(downstream_tasks),
+        "engagement": total_eng,
+    }
+
 # Track XLSX industries that didn't match any navigator industry
 matched_names = set(ind["name"].strip() for ind in nav_industries.values() if ind.get("isEnabled"))
 unmatched_xlsx = []
