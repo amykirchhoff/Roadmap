@@ -788,8 +788,7 @@ export default function App() {
 
     const renderSteps = (item) => {
       const steps = [];
-      const typeLabel = item.type==="task"?"Roadmap Task":item.type==="aa"?"Anytime Action":"State Permit";
-      const typeColor = item.type==="task"?C.accent:item.type==="aa"?C.cyan:C.purple;
+      const triggers = DATA.taskTriggers || {};
 
       // For permits, show what it maps to first
       if(item.type==="permit"){
@@ -819,20 +818,74 @@ export default function App() {
       steps.push({step:"Go to Business.NJ.gov and sign in (or create an account)",color:C.muted});
 
       if(u.type==="task"){
-        if(u.isUniversal){
-          steps.push({step:"Select any industry during onboarding",detail:"This is a universal task — it appears on all 64 industry roadmaps",color:C.accent});
-        } else if(u.industries.length>0){
-          const indNames = u.industries.map(iid=>{const ind=inds.find(i=>i.id===iid);return ind?ind.name:iid;});
-          if(indNames.length<=5){
-            steps.push({step:"Select one of these industries during onboarding:",detail:indNames.join(", "),color:C.accent});
-          } else {
-            steps.push({step:"Select one of "+indNames.length+" industries during onboarding",detail:indNames.slice(0,5).join(", ")+" and "+(indNames.length-5)+" more",color:C.accent});
+        const taskSlug = u.slug;
+        const taskTrigs = triggers[taskSlug] || [];
+        const isAddonTask = taskTrigs.length > 0;
+
+        // Step: Choose persona
+        if(taskTrigs.some(t=>t.type==="persona" || t.type==="persona+industry")){
+          const pt = taskTrigs.find(t=>t.type==="persona" || t.type==="persona+industry");
+          steps.push({step:"During onboarding, select your business persona",detail:pt.detail,color:C.accent});
+        } else {
+          // Industry selection
+          if(u.isUniversal){
+            steps.push({step:"Select any industry during onboarding",detail:"This is a universal task — it appears on all 64 industry roadmaps",color:C.accent});
+          } else if(u.industries.length>0){
+            const indNames = u.industries.map(iid=>{const ind=inds.find(i=>i.id===iid);return ind?ind.name:iid;});
+            if(indNames.length<=5){
+              steps.push({step:"Select one of these industries during onboarding:",detail:indNames.join(", "),color:C.accent});
+            } else {
+              steps.push({step:"Select one of "+indNames.length+" industries during onboarding",detail:indNames.slice(0,5).join(", ")+" and "+(indNames.length-5)+" more",color:C.accent});
+            }
           }
         }
-        if(u.isAddon){
-          steps.push({step:"Answer the relevant profile question(s) during onboarding",detail:"This is an add-on task triggered by a non-essential question or legal structure selection",color:C.purple});
+
+        // Step: Legal structure (if triggered by legal structure)
+        const legalTrigs = taskTrigs.filter(t=>t.type==="legalStructure" || t.type==="legalStructure+profile");
+        if(legalTrigs.length > 0){
+          steps.push({step:"Select the required business structure",detail:legalTrigs.map(t=>t.detail).join("; "),color:C.purple});
         }
-        steps.push({step:"The task appears in your step-by-step roadmap",detail:"Look for \""+u.name+"\" in the task checklist. It will show as a to-do item you can expand for details."+(u.hasApi?" This task has a live data connection — you may be able to check status or submit directly.":""),color:u.hasApi?C.green:C.text});
+
+        // Step: Profile / NEQ questions
+        const neqTrigs = taskTrigs.filter(t=>t.type==="neq");
+        const profileTrigs = taskTrigs.filter(t=>t.type==="profile");
+        const legalProfileTrigs = taskTrigs.filter(t=>t.type==="legalStructure+profile");
+
+        if(neqTrigs.length > 0){
+          for(const nt of neqTrigs){
+            steps.push({step:"Answer a profile question",detail:nt.detail,color:C.purple});
+          }
+        }
+        if(profileTrigs.length > 0){
+          for(const pt of profileTrigs){
+            steps.push({step:"Answer a profile question during or after onboarding",detail:pt.detail,color:C.purple});
+          }
+        }
+        if(legalProfileTrigs.length > 0){
+          for(const lt of legalProfileTrigs){
+            // The legal structure part was already shown above; show the profile part
+            const profilePart = lt.detail.split(", then ").slice(1).join(", then ");
+            if(profilePart){
+              steps.push({step:"Answer an additional question in your Profile",detail:profilePart,color:C.purple});
+            }
+          }
+        }
+
+        // Step: Roadmap task trigger
+        const rtTrigs = taskTrigs.filter(t=>t.type==="roadmapTask");
+        if(rtTrigs.length > 0){
+          steps.push({step:"Complete a prerequisite task in your roadmap",detail:rtTrigs[0].detail,color:C.purple});
+        }
+
+        // Step: Auto triggers (just note)
+        const autoTrigs = taskTrigs.filter(t=>t.type==="auto");
+        if(autoTrigs.length > 0){
+          steps.push({step:"Automatically included",detail:autoTrigs[0].detail,color:C.muted});
+        }
+
+        // Final: find it in roadmap
+        steps.push({step:"Find \""+u.name+"\" in your step-by-step roadmap",detail:"It appears as a to-do item in your task checklist that you can expand for details and instructions."+(u.hasApi?" This task has a live data connection — you may be able to check status or submit directly.":""),color:u.hasApi?C.green:C.text});
+
       } else if(u.type==="aa"){
         if(u.isUniversal){
           steps.push({step:"Select any industry during onboarding",detail:"This is a universal anytime action — visible to all industries",color:C.accent});
@@ -845,7 +898,7 @@ export default function App() {
           }
         }
         steps.push({step:"Progress your account to an \"operate\" phase",detail:"Anytime actions only appear once you reach Up & Running, Guest Mode Owning, or Up & Running Owning. Currently "+fmt(DATA.phases.seesAAFunding)+" of "+fmt(DATA.phases.totalBusinesses)+" businesses ("+pct(DATA.phases.seesAAFunding,DATA.phases.totalBusinesses)+") are in these phases.",color:C.orange});
-        steps.push({step:"Find \""+u.name+"\" in the Anytime Actions section",detail:"It will appear in the operate dashboard alongside other actions for your industry and sector."+(u.hasApi?" This action has a live connection to an agency system.":""),color:u.hasApi?C.green:C.text});
+        steps.push({step:"Find \""+u.name+"\" in the Anytime Actions section",detail:"It appears in the operate dashboard alongside other actions for your industry and sector."+(u.hasApi?" This action has a live connection to an agency system.":""),color:u.hasApi?C.green:C.text});
       }
 
       // API info
