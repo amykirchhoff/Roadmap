@@ -869,10 +869,14 @@ export default function App() {
         ))}
       </div>
       <div style={{position:"relative",marginBottom:selItem?0:20}}>
-        <input placeholder="Type to filter, or click to browse..." value={finderSearch}
-          onChange={e=>{setFinderSearch(e.target.value);setSelItem(null);setFinderOpen(true);}}
-          onFocus={()=>setFinderOpen(true)}
-          style={{width:"100%",padding:"12px 16px",background:C.card,border:`1px solid ${finderOpen&&!selItem?C.accent:C.border}`,borderRadius:finderOpen&&!selItem?"8px 8px 0 0":8,color:C.text,fontSize:14,outline:"none",fontFamily:C.sans,boxSizing:"border-box"}} />
+        <div style={{position:"relative"}}>
+          <input placeholder="Type to filter, or click to browse..." value={finderSearch}
+            onChange={e=>{setFinderSearch(e.target.value);setSelItem(null);setFinderOpen(true);}}
+            onFocus={()=>setFinderOpen(true)}
+            style={{width:"100%",padding:"12px 16px",paddingRight:finderSearch?40:16,background:C.card,border:`1px solid ${finderOpen&&!selItem?C.accent:C.border}`,borderRadius:finderOpen&&!selItem?"8px 8px 0 0":8,color:C.text,fontSize:14,outline:"none",fontFamily:C.sans,boxSizing:"border-box"}} />
+          {finderSearch&&<button onClick={()=>{setFinderSearch("");setSelItem(null);setFinderOpen(true);}}
+            style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:C.muted,cursor:"pointer",fontSize:16,padding:4,lineHeight:1}}>✕</button>}
+        </div>
         {finderOpen && !selItem && <div style={{position:"absolute",top:"100%",left:0,right:0,background:C.card,border:`1px solid ${C.border}`,borderTop:"none",borderRadius:"0 0 8px 8px",maxHeight:400,overflowY:"auto",zIndex:10}}>
           <div style={{padding:"6px 16px",fontSize:9,color:C.muted,fontFamily:C.sans,borderBottom:`1px solid ${C.border}`,position:"sticky",top:0,background:C.card,display:"flex",justifyContent:"space-between"}}>
             <span>{filtered.length}{filtered.length>=50?"+":""} results{finderSearch?` for "${finderSearch}"`:""}</span>
