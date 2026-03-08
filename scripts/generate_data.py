@@ -531,17 +531,74 @@ if os.path.exists(PLURMIT_FILE):
             ind_plurmit_map[iid]["names"].append(p["name"])
 
     biz_only = [p for p in plurmits_out if p["bizApplicable"]]
+    total_vol = sum(p["volume"] for p in plurmits_out)
+    biz_vol = sum(p["volume"] for p in biz_only)
+    api_pls = [p for p in biz_only if p["hasApi"] or p["integrationLevel"]=="api"]
+    info_pls = [p for p in biz_only if p["matchedTasks"] and not p["hasApi"] and p["integrationLevel"]!="api"]
+    read_pls = [p for p in biz_only if p["integrationLevel"]=="read" and not p["matchedTasks"] and not p["hasApi"]]
+    ment_pls = [p for p in biz_only if p["integrationLevel"]=="mentioned" and not p["matchedTasks"]]
+    none_pls = [p for p in biz_only if p["integrationLevel"]=="none" and not p["matchedTasks"] and not p["hasApi"]]
+
+    # Compute actual BNJ engagement per category
+    slug_eng = {}
+    slug_comp = {}
+    for tp_row in task_progress:
+        tn = tp_row["task"]
+        sl = task_name_to_slug.get(tn, tn)
+        slug_eng[sl] = slug_eng.get(sl, 0) + tp_row["total"]
+        slug_comp[sl] = slug_comp.get(sl, 0) + tp_row["completed"]
+
+    def cat_engagement(permits, include_unmatched_api=False):
+        seen = set()
+        total_eng, total_comp = 0, 0
+        for p in permits:
+            for t in p["matchedTasks"]:
+                if t not in seen:
+                    seen.add(t)
+                    total_eng += slug_eng.get(t, 0)
+                    total_comp += slug_comp.get(t, 0)
+        # For api-level permits without matched tasks, include engagement from
+        # all API integration task slugs (e.g. formation, business name search)
+        if include_unmatched_api:
+            for ai in api_integrations:
+                for t in ai["tasks"] + ai["aas"]:
+                    if t not in seen:
+                        seen.add(t)
+                        total_eng += slug_eng.get(t, 0)
+                        total_comp += slug_comp.get(t, 0)
+        return total_eng, total_comp
+
+    api_eng, api_comp = cat_engagement(api_pls, include_unmatched_api=True)
+    info_eng, info_comp = cat_engagement(info_pls)
+    read_eng, read_comp = cat_engagement(read_pls)
+    ment_eng, ment_comp = cat_engagement(ment_pls)
+    all_eng = api_eng + info_eng + read_eng + ment_eng
+    all_comp = api_comp + info_comp + read_comp + ment_comp
+
     hi_gaps = [{"name":p["name"],"department":p["department"],"volume":p["volume"],"notes":p["notes"]}
                for p in sorted(biz_only, key=lambda x:-x["volume"]) if p["priority"]=="high" and p["integrationLevel"]=="none"]
 
     plurmit_data = {
         "coverage": {
             "total": len(plurmits_out),
-            "bizApplicable": sum(1 for p in plurmits_out if p["bizApplicable"]),
-            "bizMentioned": sum(1 for p in biz_only if p["integrationLevel"]=="mentioned"),
-            "bizRead": sum(1 for p in biz_only if p["integrationLevel"]=="read"),
-            "bizApi": sum(1 for p in biz_only if p["integrationLevel"]=="api"),
-            "bizNone": sum(1 for p in biz_only if p["integrationLevel"]=="none"),
+            "totalVolume": total_vol,
+            "bizApplicable": len(biz_only),
+            "bizVolume": biz_vol,
+            "bizApi": len(api_pls),
+            "bizApiVol": sum(p["volume"] for p in api_pls),
+            "bizApiEng": api_eng, "bizApiComp": api_comp,
+            "bizInfo": len(info_pls),
+            "bizInfoVol": sum(p["volume"] for p in info_pls),
+            "bizInfoEng": info_eng, "bizInfoComp": info_comp,
+            "bizRead": len(read_pls),
+            "bizReadVol": sum(p["volume"] for p in read_pls),
+            "bizReadEng": read_eng, "bizReadComp": read_comp,
+            "bizMentioned": len(ment_pls),
+            "bizMentionedVol": sum(p["volume"] for p in ment_pls),
+            "bizMentionedEng": ment_eng, "bizMentionedComp": ment_comp,
+            "bizNone": len(none_pls),
+            "bizNoneVol": sum(p["volume"] for p in none_pls),
+            "bizAllEng": all_eng, "bizAllComp": all_comp,
             "bizHighPri": sum(1 for p in biz_only if p["priority"]=="high"),
             "bizLowPri": sum(1 for p in biz_only if p["priority"]=="low"),
             "highPriGaps": hi_gaps,
