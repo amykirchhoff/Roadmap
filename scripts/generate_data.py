@@ -947,6 +947,242 @@ for name, cnt in industry_users.items():
         unmatched_xlsx.append({"name": name, "users": cnt})
 
 # ============================================================
+# GA4 Analytics Processing
+# ============================================================
+import csv as _csv
+import re as _re2
+
+GA4_DIR = os.path.join(ROOT, "data")
+ga4_data = None
+
+def parse_ga4_csv(filepath):
+    """Parse GA4 CSV, skipping comment lines starting with #"""
+    if not os.path.isfile(filepath):
+        return []
+    rows = []
+    with open(filepath, "r", encoding="utf-8-sig") as f:
+        lines = [l for l in f if not l.startswith("#")]
+    reader = _csv.DictReader(lines)
+    for r in reader:
+        rows.append(r)
+    return rows
+
+def safe_int(val):
+    """Parse integer from GA4 CSV value, handling commas and empty strings"""
+    if not val: return 0
+    return int(str(val).replace(",","").strip())
+
+def safe_float(val):
+    """Parse float from GA4 CSV value"""
+    if not val: return 0.0
+    return float(str(val).replace(",","").strip())
+
+ga4_pages_file = os.path.join(GA4_DIR, "ga4_page_views.csv")
+ga4_events_file = os.path.join(GA4_DIR, "ga4_events.csv")
+ga4_traffic_file = os.path.join(GA4_DIR, "ga4_traffic_sources.csv")
+ga4_landing_file = os.path.join(GA4_DIR, "ga4_landing_pages.csv")
+
+if os.path.isfile(ga4_pages_file):
+    print("\nProcessing GA4 data...")
+
+    # --- Parse date range from header ---
+    ga4_date_range = {}
+    with open(ga4_pages_file, "r") as f:
+        for line in f:
+            if "Start date" in line:
+                d = line.strip().split(":")[-1].strip()
+                ga4_date_range["start"] = f"{d[:4]}-{d[4:6]}-{d[6:8]}"
+            elif "End date" in line:
+                d = line.strip().split(":")[-1].strip()
+                ga4_date_range["end"] = f"{d[:4]}-{d[4:6]}-{d[6:8]}"
+            elif not line.startswith("#"):
+                break
+
+    # --- Page Views ---
+    page_rows = parse_ga4_csv(ga4_pages_file)
+
+    # Match task pages: /tasks/{slug}
+    task_page_views = {}  # slug -> {views, users, avgEngTime}
+    for r in page_rows:
+        path = r.get("Page path and screen class", "")
+        if path.startswith("/tasks/"):
+            slug = path.replace("/tasks/", "").strip("/").split("?")[0]
+            if not slug or slug == "undefined": continue
+            views = safe_int(r.get("Views"))
+            users = safe_int(r.get("Active users"))
+            avg_time = safe_float(r.get("Average engagement time per active user"))
+            if slug not in task_page_views:
+                task_page_views[slug] = {"views": 0, "users": 0, "avgEngTime": 0}
+            task_page_views[slug]["views"] += views
+            task_page_views[slug]["users"] += users
+            if avg_time > task_page_views[slug]["avgEngTime"]:
+                task_page_views[slug]["avgEngTime"] = round(avg_time, 1)
+
+    # Match anytime action pages: /actions/{slug}
+    aa_page_views = {}
+    for r in page_rows:
+        path = r.get("Page path and screen class", "")
+        if path.startswith("/actions/"):
+            slug = path.replace("/actions/", "").strip("/").split("?")[0]
+            if not slug: continue
+            views = safe_int(r.get("Views"))
+            users = safe_int(r.get("Active users"))
+            if slug not in aa_page_views:
+                aa_page_views[slug] = {"views": 0, "users": 0}
+            aa_page_views[slug]["views"] += views
+            aa_page_views[slug]["users"] += users
+
+    # Top pages overall
+    top_pages = []
+    for r in sorted(page_rows, key=lambda x: -safe_int(x.get("Views"))):
+        path = r.get("Page path and screen class", "")
+        if not path: continue
+        top_pages.append({
+            "path": path,
+            "views": safe_int(r.get("Views")),
+            "users": safe_int(r.get("Active users")),
+            "avgEngTime": round(safe_float(r.get("Average engagement time per active user")), 1),
+        })
+        if len(top_pages) >= 50:
+            break
+
+    # Page category summary
+    page_categories = {}
+    for r in page_rows:
+        path = r.get("Page path and screen class", "")
+        parts = path.strip("/").split("/")
+        prefix = "/" + parts[0] if parts[0] else "/"
+        if prefix not in page_categories:
+            page_categories[prefix] = {"pages": 0, "views": 0, "users": 0}
+        page_categories[prefix]["pages"] += 1
+        page_categories[prefix]["views"] += safe_int(r.get("Views"))
+        page_categories[prefix]["users"] += safe_int(r.get("Active users"))
+    page_cat_list = sorted(page_categories.items(), key=lambda x: -x[1]["views"])
+    page_cat_list = [{"prefix": k, **v} for k, v in page_cat_list[:30]]
+
+    # --- Events ---
+    event_rows = parse_ga4_csv(ga4_events_file)
+    events_summary = []
+    for r in event_rows:
+        name = r.get("Event name", "")
+        if not name: continue
+        events_summary.append({
+            "event": name,
+            "count": safe_int(r.get("Event count")),
+            "users": safe_int(r.get("Total users")),
+        })
+
+    # Key funnel metrics from events
+    event_lookup = {e["event"]: e for e in events_summary}
+    funnel = {
+        "pageViews": event_lookup.get("page_view", {}).get("count", 0),
+        "firstVisit": event_lookup.get("first_visit", {}).get("count", 0),
+        "firstVisitUsers": event_lookup.get("first_visit", {}).get("users", 0),
+        "sessionStart": event_lookup.get("session_start", {}).get("count", 0),
+        "onboardingStep": event_lookup.get("onboarding_step", {}).get("count", 0),
+        "onboardingStepUsers": event_lookup.get("onboarding_step", {}).get("users", 0),
+        "guestSignup": event_lookup.get("SignUp_Success_Guest", {}).get("count", 0),
+        "guestSignupUsers": event_lookup.get("SignUp_Success_Guest", {}).get("users", 0),
+        "fullRegistration": event_lookup.get("SignUp_Success_Registration", {}).get("count", 0),
+        "fullRegistrationUsers": event_lookup.get("SignUp_Success_Registration", {}).get("users", 0),
+        "taskStatusChange": event_lookup.get("task_manual_status_change", {}).get("count", 0),
+        "taskStatusChangeUsers": event_lookup.get("task_manual_status_change", {}).get("users", 0),
+        "taskTabClicked": event_lookup.get("task_tab_clicked", {}).get("count", 0),
+        "taskTabClickedUsers": event_lookup.get("task_tab_clicked", {}).get("users", 0),
+        "phaseChange": event_lookup.get("navigator_phase_change", {}).get("count", 0),
+        "phaseChangeUsers": event_lookup.get("navigator_phase_change", {}).get("users", 0),
+        "clickToNavigator": event_lookup.get("click_to_navigator", {}).get("count", 0),
+        "clickToNavigatorUsers": event_lookup.get("click_to_navigator", {}).get("users", 0),
+        "ctaClicks": event_lookup.get("call_to_action_clicks", {}).get("count", 0),
+        "ctaClicksUsers": event_lookup.get("call_to_action_clicks", {}).get("users", 0),
+        "outboundClicks": event_lookup.get("outbound_link_clicks", {}).get("count", 0),
+        "outboundClicksUsers": event_lookup.get("outbound_link_clicks", {}).get("users", 0),
+        "formSubmits": event_lookup.get("form_submits", {}).get("count", 0),
+        "formSubmitsUsers": event_lookup.get("form_submits", {}).get("users", 0),
+    }
+
+    # --- Traffic Sources ---
+    traffic_rows = parse_ga4_csv(ga4_traffic_file)
+    traffic_summary = []
+    for r in traffic_rows:
+        channel = r.get("Session primary channel group (Default Channel Group)", "")
+        if not channel: continue
+        traffic_summary.append({
+            "channel": channel,
+            "sessions": safe_int(r.get("Sessions")),
+            "engagedSessions": safe_int(r.get("Engaged sessions")),
+            "engagementRate": round(safe_float(r.get("Engagement rate")) * 100, 1),
+            "avgEngTime": round(safe_float(r.get("Average engagement time per session")), 1),
+            "users": safe_int(r.get("Active users")),
+            "keyEvents": safe_int(r.get("Key events")),
+        })
+
+    # --- Landing Pages (channel-level, as exported) ---
+    landing_rows = parse_ga4_csv(ga4_landing_file)
+    landing_summary = []
+    for r in landing_rows:
+        channel = r.get("First user primary channel group (Default Channel Group)", "")
+        if not channel: continue
+        landing_summary.append({
+            "channel": channel,
+            "users": safe_int(r.get("Total users")),
+            "newUsers": safe_int(r.get("New users")),
+            "returningUsers": safe_int(r.get("Returning users")),
+            "avgEngTime": round(safe_float(r.get("Average engagement time per active user")), 1),
+            "keyEvents": safe_int(r.get("Key events")),
+        })
+
+    # --- Enrich task progress with page views ---
+    for tp_row in task_progress:
+        tn = tp_row["task"]
+        sl = task_name_to_slug.get(tn, tn)
+        pv = task_page_views.get(sl)
+        if pv:
+            tp_row["pageViews"] = pv["views"]
+            tp_row["pageUsers"] = pv["users"]
+            tp_row["avgEngTime"] = pv["avgEngTime"]
+        else:
+            tp_row["pageViews"] = 0
+            tp_row["pageUsers"] = 0
+            tp_row["avgEngTime"] = 0
+
+    # --- Enrich anytime actions with page views ---
+    for aa in aa_reach:
+        aa_id = aa["id"]
+        pv = aa_page_views.get(aa_id)
+        if pv:
+            aa["pageViews"] = pv["views"]
+            aa["pageUsers"] = pv["users"]
+        else:
+            aa["pageViews"] = 0
+            aa["pageUsers"] = 0
+
+    # --- Build GA4 output ---
+    ga4_data = {
+        "dateRange": ga4_date_range,
+        "taskPageViews": task_page_views,
+        "aaPageViews": aa_page_views,
+        "topPages": top_pages,
+        "pageCategories": page_cat_list,
+        "events": events_summary,
+        "funnel": funnel,
+        "traffic": traffic_summary,
+        "landing": landing_summary,
+    }
+
+    matched_tasks = sum(1 for sl in task_page_views if sl in task_name_to_slug.values() or sl in set(s for s in task_page_views))
+    print(f"  Date range: {ga4_date_range.get('start','?')} to {ga4_date_range.get('end','?')}")
+    print(f"  Page paths: {len(page_rows)}")
+    print(f"  Task pages matched: {len(task_page_views)} slugs")
+    print(f"  AA pages matched: {len(aa_page_views)} slugs")
+    print(f"  Events: {len(events_summary)}")
+    print(f"  Traffic channels: {len(traffic_summary)}")
+    total_task_views = sum(v["views"] for v in task_page_views.values())
+    total_aa_views = sum(v["views"] for v in aa_page_views.values())
+    print(f"  Total task page views: {total_task_views:,}")
+    print(f"  Total AA page views: {total_aa_views:,}")
+
+# ============================================================
 # Output
 # ============================================================
 output = {
@@ -971,6 +1207,7 @@ output = {
     "totalDistinctPaths": total_distinct_paths,
     "taskTriggers": task_triggers,
     "permitCoverage": plurmit_data,
+    "ga4": ga4_data,
     "unknowns": {
         "industry": unknown_industry,
         "sector": unknown_sector,
