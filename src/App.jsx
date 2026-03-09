@@ -844,10 +844,20 @@ export default function App() {
               steps.push({step:"Select one of "+indNames.length+" industries during onboarding",detail:indNames.slice(0,5).join(", ")+" and "+(indNames.length-5)+" more",color:C.accent});
             }
           } else if(isAddonTask){
-            // Add-on task with no specific industry — available to any industry that asks the triggering question
-            const hasLegalTrig = taskTrigs.some(t=>t.type==="legalStructure"||t.type==="legalStructure+profile");
-            const hasNeqTrig = taskTrigs.some(t=>t.type==="neq");
-            steps.push({step:"Select any industry during onboarding",detail:hasLegalTrig?"This task is triggered by your business structure choice, not your industry — it can appear on any industry's roadmap.":hasNeqTrig?"This task is triggered by a profile question that is asked of specific industries.":"This is an add-on task triggered by profile choices, not industry selection.",color:C.accent});
+            // Add-on task — determine industries from trigger data
+            const neqTrigsForInd = taskTrigs.filter(t=>t.type==="neq" && t.industries?.length>0);
+            if(neqTrigsForInd.length > 0){
+              const neqInds = [...new Set(neqTrigsForInd.flatMap(t=>t.industries))];
+              const indNames = neqInds.map(iid=>{const ind=inds.find(i=>i.id===iid);return ind?ind.name:iid;});
+              if(indNames.length<=5){
+                steps.push({step:"Select one of these industries during onboarding:",detail:indNames.join(", ")+". This question is only shown to these industries.",color:C.accent});
+              } else {
+                steps.push({step:"Select one of "+indNames.length+" industries during onboarding",detail:indNames.slice(0,5).join(", ")+" and "+(indNames.length-5)+" more. This question is only shown to these industries.",color:C.accent});
+              }
+            } else {
+              const hasLegalTrig = taskTrigs.some(t=>t.type==="legalStructure"||t.type==="legalStructure+profile");
+              steps.push({step:"Select any industry during onboarding",detail:hasLegalTrig?"This task is triggered by your business structure choice, not your industry — it can appear on any industry's roadmap.":"This is an add-on task triggered by profile choices.",color:C.accent});
+            }
           }
         }
 
