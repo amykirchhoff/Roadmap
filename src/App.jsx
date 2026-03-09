@@ -784,7 +784,7 @@ export default function App() {
           return a.name.localeCompare(b.name);
         });
       }
-      return f.slice(0,50);
+      return f;
     },[finderSearch,finderType,items]);
 
     const getAgency = (slug) => {
@@ -946,7 +946,7 @@ export default function App() {
         </div>
         {finderOpen && !selItem && <div style={{position:"absolute",top:"100%",left:0,right:0,background:C.card,border:`1px solid ${C.border}`,borderTop:"none",borderRadius:"0 0 8px 8px",maxHeight:400,overflowY:"auto",zIndex:10}}>
           <div style={{padding:"6px 16px",fontSize:9,color:C.muted,fontFamily:C.sans,borderBottom:`1px solid ${C.border}`,position:"sticky",top:0,background:C.card,display:"flex",justifyContent:"space-between"}}>
-            <span>{filtered.length}{filtered.length>=50?"+":""} results{finderSearch?` for "${finderSearch}"`:""}</span>
+            <span>{filtered.length} results{finderSearch?` for "${finderSearch}"`:""}</span>
             <span onClick={()=>setFinderOpen(false)} style={{cursor:"pointer",color:C.accent}}>close ✕</span>
           </div>
           {filtered.map((it,i)=>{
