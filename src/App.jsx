@@ -528,7 +528,7 @@ export default function App() {
         <Stat label="Tasks on <10 Roadmaps" value={under10.length} sub={pct(under10.length,tp.length)+" of "+tp.length+" tracked tasks"} color={C.red} small />
         {staleTasks.length>0&&<Stat label="Likely Stale Tasks" value={staleTasks.length} sub="Completed exceeds GA4 page views — probably renamed or retired task IDs persisting in the database" color={C.red} small />}
         {retiredTasks.length>0&&<Stat label="Retired Task IDs" value={retiredTasks.length} sub="Task ID no longer exists in the codebase — XLSX shows historical data from old accounts" color={C.orange} small />}
-        {orphanedTasks.length>0&&<Stat label="Orphaned Tasks" value={orphanedTasks.length} sub="Task markdown exists in code but is not wired to any industry roadmap or add-on" color={C.muted} small />}
+        {orphanedTasks.length>0&&<Stat label="Orphaned Tasks" value={orphanedTasks.length} sub="Confirmed dead content — markdown exists in codebase but not referenced by any roadmap, add-on, modification, or code file" color={C.muted} small />}
       </div>
       <div style={{display:"grid",gap:3}}>
         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
@@ -546,7 +546,7 @@ export default function App() {
           <span><span style={{background:`${C.green}22`,color:C.green,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.green}33`,fontSize:9,marginRight:4}}>API</span>Live DB connection</span>
           {hasGA4&&<span><span style={{background:`${C.red}22`,color:C.red,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.red}33`,fontSize:9,marginRight:4}}>STALE?</span>Completed {">"} page views — likely a renamed or retired task ID</span>}
           <span><span style={{background:`${C.orange}22`,color:C.orange,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.orange}33`,fontSize:9,marginRight:4}}>RETIRED</span>Task ID no longer in codebase — historical XLSX data only</span>
-          <span><span style={{background:`${C.muted}22`,color:C.muted,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.muted}33`,fontSize:9,marginRight:4}}>ORPHANED</span>Exists in code but not wired to any roadmap or add-on</span>
+          <span><span style={{background:`${C.muted}22`,color:C.muted,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.muted}33`,fontSize:9,marginRight:4}}>ORPHANED</span>Confirmed dead content — markdown exists but not referenced by any roadmap, add-on, or code</span>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:8,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
           <span style={{width:22,textAlign:"right"}}>#</span>
@@ -568,7 +568,7 @@ export default function App() {
             {(apiSlugs.has(t.task)||apiSlugs.has(t.task.toLowerCase().replace(/ /g,"-")))&&<span style={{background:`${C.green}22`,color:C.green,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.green}33`,fontSize:8,flexShrink:0}}>API</span>}
             {hasGA4&&t.stale&&<span style={{background:`${C.red}22`,color:C.red,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.red}33`,fontSize:8,flexShrink:0}} title="Completed exceeds page views — likely a renamed or retired task ID in the XLSX">STALE?</span>}
             {t.dataQuality==="retired"&&<span style={{background:`${C.orange}22`,color:C.orange,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.orange}33`,fontSize:8,flexShrink:0}} title="Task ID no longer exists in the current codebase">RETIRED</span>}
-            {t.dataQuality==="orphaned"&&<span style={{background:`${C.muted}22`,color:C.muted,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.muted}33`,fontSize:8,flexShrink:0}} title="Task exists in code but is not wired to any industry roadmap or add-on">ORPHANED</span>}
+            {t.dataQuality==="orphaned"&&<span style={{background:`${C.muted}22`,color:C.muted,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.muted}33`,fontSize:8,flexShrink:0}} title="Confirmed dead content — markdown exists but not referenced by any roadmap, add-on, or code file">ORPHANED</span>}
           </div>
           {hasGA4&&<span style={{width:70,textAlign:"right",fontFamily:C.mono,fontSize:10,color:t.pageViews>0?C.cyan:C.muted}}>{t.pageViews>0?fmt(t.pageViews):"—"}</span>}
           <div style={{width:120,height:8,background:C.bg,borderRadius:4,overflow:"hidden"}}><div style={{width:`${barVal}%`,height:"100%",background:taskSort==="pageviews"?C.cyan:cc,borderRadius:4,opacity:.6}}/></div>
@@ -1039,8 +1039,8 @@ export default function App() {
             {it.dataQuality==="retired"&&<div style={{background:`${C.orange}11`,border:`1px solid ${C.orange}33`,borderRadius:6,padding:"8px 12px",marginBottom:10,fontSize:11,color:C.orange,fontFamily:C.sans}}>
               <strong>Data quality flag — Retired:</strong> This task ID no longer exists in the current Navigator codebase. The XLSX data reflects historical accounts that were created when this task was active. It has likely been replaced by a different task under a new ID.
             </div>}
-            {it.dataQuality==="orphaned"&&<div style={{background:`${C.muted}11`,border:`1px solid ${C.muted}33`,borderRadius:6,padding:"8px 12px",marginBottom:10,fontSize:11,color:C.muted,fontFamily:C.sans}}>
-              <strong>Data quality flag — Orphaned:</strong> This task's markdown file exists in the codebase, but it is not included in any industry roadmap or triggered by any add-on. It may be unreachable content, or it may be accessed through a non-roadmap path (like the formation flow).
+            {it.dataQuality==="orphaned"&&<div style={{background:`${C.orange}11`,border:`1px solid ${C.orange}33`,borderRadius:6,padding:"8px 12px",marginBottom:10,fontSize:11,color:C.orange,fontFamily:C.sans}}>
+              <strong>Confirmed orphaned:</strong> This task's markdown file exists in the codebase, but it is not referenced by any industry roadmap, add-on, modification, or code file. It is unreachable dead content — likely replaced by a different task under a new ID. The XLSX data reflects historical accounts that still carry the old task assignment.
             </div>}
             <div style={{display:"flex",gap:16,flexWrap:"wrap",fontSize:11,color:C.muted,fontFamily:C.sans}}>
               {it.users>0&&<span><strong style={{color:C.accent}}>{fmt(it.users)}</strong> users on roadmap (XLSX)</span>}
