@@ -1243,26 +1243,67 @@ if os.path.isfile(ga4_pages_file):
             tp_row["pageUsers"] = 0
             tp_row["avgEngTime"] = 0
 
-    # --- Flag likely stale/renamed tasks ---
-    # Tasks where completed > pageViews shouldn't be possible (you must view to complete),
-    # so these are likely tasks whose ID was renamed in the codebase but the old ID persists
-    # in historical account data in the XLSX.
-    stale_tasks = []
+    # --- Flag stale and orphaned tasks ---
+    # Build set of all reachable task slugs
+    reachable_slugs = set(task_frequency.keys()) | set(task_triggers.keys()) | set(universal_tasks)
+    
+    # Build set of task IDs that exist in current markdown files
+    existing_task_ids = set()
+    for tcd in task_content_dirs:
+        if not os.path.isdir(tcd): continue
+        for f in _glob.glob(os.path.join(tcd, "*.md")):
+            content = open(f).read()
+            parts = content.split("---")
+            if len(parts) < 3: continue
+            for line in parts[1].split("\n"):
+                line = line.strip()
+                if line.startswith("id:"):
+                    tid = line[3:].strip().strip('"').strip("'")
+                    if tid: existing_task_ids.add(tid)
+
+    api_task_set = set(api_task_slugs) if plurmit_data else set()
+    api_aa_set = set(api_aa_slugs) if plurmit_data else set()
+
+    stale_count = 0
+    orphan_count = 0
     for tp_row in task_progress:
+        tn = tp_row["task"]
+        sl = task_name_to_slug.get(tn, tn)
+        
+        # Check all possible slugs via name_to_all_ids
+        all_ids = {sl, tn}
+        for tid in name_to_all_ids.get(tn, set()):
+            all_ids.add(tid)
+        
+        is_reachable = any(s in reachable_slugs for s in all_ids)
+        in_codebase = any(s in existing_task_ids for s in all_ids)
+        in_api = any(s in api_task_set or s in api_aa_set for s in all_ids)
+        
+        # Stale: completed > page views (impossible if task page is current)
         pv = tp_row.get("pageViews", 0)
         comp = tp_row.get("completed", 0)
-        if comp > pv and comp > 10:
-            tp_row["stale"] = True
-            stale_tasks.append({
-                "task": tp_row["task"],
-                "completed": comp,
-                "pageViews": pv,
-                "total": tp_row["total"],
-            })
+        is_stale = comp > pv and comp > 10
+        
+        # Categorize
+        if is_reachable:
+            tp_row["dataQuality"] = "ok"
+        elif in_api:
+            tp_row["dataQuality"] = "api_flow"  # accessed via API flow, not roadmap
+        elif not in_codebase:
+            tp_row["dataQuality"] = "retired"    # ID no longer in codebase
+        elif pv > 100:
+            tp_row["dataQuality"] = "orphaned"   # in code, has traffic, not wired to roadmap
         else:
-            tp_row["stale"] = False
-    if stale_tasks:
-        print(f"  Likely stale/renamed tasks: {len(stale_tasks)} (completed > page views)")
+            tp_row["dataQuality"] = "orphaned"   # in code, no traffic, not wired
+
+        tp_row["stale"] = is_stale
+        if is_stale: stale_count += 1
+        if tp_row["dataQuality"] in ("retired", "orphaned"): orphan_count += 1
+
+    if stale_count:
+        print(f"  Likely stale tasks: {stale_count} (completed > page views)")
+    if orphan_count:
+        print(f"  Orphaned/retired tasks: {orphan_count} (in XLSX but not in any current roadmap)")
 
     # --- Enrich anytime actions with page views ---
     for aa in aa_reach:
