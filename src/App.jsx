@@ -497,44 +497,52 @@ export default function App() {
     return mins;
   };
   const TaskEngagement = () => {
+    const hasGA4 = tp.some(t=>t.pageViews>0);
     const sorted2 = useMemo(()=>{
       if(taskSort==="time") return [...tp].sort((a,b)=>parseTime(b.avgTime)-parseTime(a.avgTime));
+      if(taskSort==="pageviews") return [...tp].sort((a,b)=>(b.pageViews||0)-(a.pageViews||0));
       return tp;
     },[taskSort,tp]);
     const topTotal=tp[0]?.total||1;
+    const topPV = hasGA4 ? Math.max(...tp.map(t=>t.pageViews||0)) : 1;
     const apiSlugs = DATA.permitCoverage ? new Set([...(DATA.permitCoverage.apiTaskSlugs||[]),...(DATA.permitCoverage.apiTaskNames||[])]) : new Set();
     const top5Total=tp.slice(0,5).reduce((s,t)=>s+t.total,0);const allTotal=tp.reduce((s,t)=>s+t.total,0);const under10=tp.filter(t=>t.total<10);const under100=tp.filter(t=>t.total<100);
+    const totalPV = tp.reduce((s,t)=>s+(t.pageViews||0),0);
     return (<div>
-      <Alert color={C.orange}>The top 5 tasks account for <strong>{pct(top5Total,allTotal)}</strong> of all engagement. {under10.length} tasks have fewer than 10 interactions ever, and {under100.length} of {tp.length} have fewer than 100.</Alert>
-      <Insight><strong>The long tail:</strong> Engagement concentrates on formation: structure → NAICS → entity auth → EIN → taxes. After that it falls off a cliff. "Business Plan" ({fmt((tp.find(t=>t.task.includes("Business Plan")&&!t.task.includes("Cannabis"))||{}).total||0)}) is the last above 10K. Industry-specific tasks that took significant research effort get single-digit traffic — {under10.length} tasks have been interacted with fewer than 10 times total across the entire platform.</Insight>
+      <Alert color={C.orange}>The top 5 tasks account for <strong>{pct(top5Total,allTotal)}</strong> of all status-click interactions.{hasGA4?" GA4 page views are now overlaid — these show actual readership, which is 2–10x higher than clicks for most tasks.":""}</Alert>
+      {hasGA4&&<Insight><strong>The readership gap:</strong> Across all tasks, GA4 recorded <strong>{fmt(totalPV)} page views</strong> vs. <strong>{fmt(allTotal)} status-button clicks</strong> — a <strong>{(totalPV/Math.max(allTotal,1)).toFixed(1)}x</strong> ratio. Some tasks show extreme gaps: Mercantile License has {fmt(tp.find(t=>t.task.includes("Mercantile"))?.pageViews||0)} page views but only {fmt(tp.find(t=>t.task.includes("Mercantile"))?.total||0)} clicks ({((tp.find(t=>t.task.includes("Mercantile"))?.pageViews||1)/(Math.max(tp.find(t=>t.task.includes("Mercantile"))?.total||1,1))).toFixed(0)}x). Others like "Select Your Business Structure" show a low ratio ({((tp.find(t=>t.task.includes("Structure"))?.pageViews||1)/(Math.max(tp.find(t=>t.task.includes("Structure"))?.total||1,1))).toFixed(1)}x) because users are forced to interact with it to progress. The page view column is a much better signal for content the team has built that people actually read.</Insight>}
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
-        <Stat label="Total Interactions" value={fmt(allTotal)} small /><Stat label="Top 5 Tasks =" value={pct(top5Total,allTotal)} sub="of all interactions" color={C.green} small /><Stat label="Tasks With <10 Interactions" value={under10.length} sub={pct(under10.length,tp.length)+" of "+tp.length+" tracked tasks"} color={C.red} small /><Stat label="Tasks With <100 Interactions" value={under100.length} sub={pct(under100.length,tp.length)+" of "+tp.length+" tracked tasks"} color={C.orange} small />
+        <Stat label="Total Interactions" value={fmt(allTotal)} small />
+        {hasGA4&&<Stat label="Total Page Views" value={fmt(totalPV)} sub={(totalPV/Math.max(allTotal,1)).toFixed(1)+"x more than status clicks"} color={C.cyan} small />}
+        <Stat label="Top 5 Tasks =" value={pct(top5Total,allTotal)} sub="of all interactions" color={C.green} small />
+        <Stat label="Tasks With <10 Interactions" value={under10.length} sub={pct(under10.length,tp.length)+" of "+tp.length+" tracked tasks"} color={C.red} small />
       </div>
       <div style={{display:"grid",gap:3}}>
         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
           <span style={{fontSize:10,color:C.muted,fontFamily:C.sans}}>Sort by:</span>
           <button onClick={()=>setTaskSort("total")} style={{padding:"4px 10px",background:taskSort==="total"?C.accentDim:"transparent",color:taskSort==="total"?C.text:C.muted,border:`1px solid ${C.border}`,borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:C.sans}}>Most Interactions</button>
+          {hasGA4&&<button onClick={()=>setTaskSort("pageviews")} style={{padding:"4px 10px",background:taskSort==="pageviews"?C.accentDim:"transparent",color:taskSort==="pageviews"?C.text:C.muted,border:`1px solid ${C.border}`,borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:C.sans}}>Most Page Views</button>}
           <button onClick={()=>setTaskSort("time")} style={{padding:"4px 10px",background:taskSort==="time"?C.accentDim:"transparent",color:taskSort==="time"?C.text:C.muted,border:`1px solid ${C.border}`,borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:C.sans}}>Longest Avg Time</button>
         </div>
         <div style={{display:"flex",gap:16,marginBottom:8,fontSize:10,color:C.muted,fontFamily:C.sans,alignItems:"center",flexWrap:"wrap"}}>
           <span>Task color (by roadmap count):</span>
-          <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.accent,marginRight:4,verticalAlign:"middle"}}/>Universal (all roadmaps)</span>
-          <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.cyan,marginRight:4,verticalAlign:"middle"}}/>Shared (2+ industries)</span>
-          <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.red,marginRight:4,verticalAlign:"middle"}}/>Unique (1 industry)</span>
-          <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.muted,marginRight:4,verticalAlign:"middle"}}/>Uncategorized</span>
-          <span style={{marginLeft:8,borderLeft:`1px solid ${C.border}`,paddingLeft:8}}><span style={{background:`${C.purple}22`,color:C.purple,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.purple}33`,fontSize:9,marginRight:4}}>ADD-ON · 58</span>Triggered by profile question or legal structure; number = how many industries could see it</span>
-          <span style={{marginLeft:8,borderLeft:`1px solid ${C.border}`,paddingLeft:8}}><span style={{background:`${C.green}22`,color:C.green,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.green}33`,fontSize:9,marginRight:4}}>API</span>Task has live DB connection to agency</span>
+          <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.accent,marginRight:4,verticalAlign:"middle"}}/>Universal</span>
+          <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.cyan,marginRight:4,verticalAlign:"middle"}}/>Shared (2+)</span>
+          <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.red,marginRight:4,verticalAlign:"middle"}}/>Unique (1)</span>
+          <span style={{marginLeft:8,borderLeft:`1px solid ${C.border}`,paddingLeft:8}}><span style={{background:`${C.purple}22`,color:C.purple,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.purple}33`,fontSize:9,marginRight:4}}>ADD-ON</span>Profile/legal triggered</span>
+          <span><span style={{background:`${C.green}22`,color:C.green,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.green}33`,fontSize:9,marginRight:4}}>API</span>Live DB connection</span>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:8,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
           <span style={{width:22,textAlign:"right"}}>#</span>
           <span style={{width:10}}></span>
           <span style={{flex:1}}>Task</span>
-          <span style={{width:120,textAlign:"center"}}>Relative to #1</span>
-          <span style={{width:65,textAlign:"right"}}>Total</span>
+          {hasGA4&&<span style={{width:70,textAlign:"right"}}>Page Views</span>}
+          <span style={{width:120,textAlign:"center"}}>{taskSort==="pageviews"?"PV bar":"Interaction bar"}</span>
+          <span style={{width:65,textAlign:"right"}}>Clicks</span>
           <span style={{width:55,textAlign:"right"}}>Done</span>
           <span style={{width:40,textAlign:"right"}}>Avg Time</span>
         </div>
-        {sorted2.map((t,i)=>{const cc={universal:C.accent,shared:C.cyan,unique:C.red,uncategorized:C.muted}[t.category]||C.muted;return(
+        {sorted2.map((t,i)=>{const cc={universal:C.accent,shared:C.cyan,unique:C.red,uncategorized:C.muted}[t.category]||C.muted;const barVal=taskSort==="pageviews"?(t.pageViews||0)/topPV*100:t.total/topTotal*100;return(
         <div key={t.task+i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",display:"flex",alignItems:"center",gap:8}}>
           <span style={{width:22,fontSize:10,color:C.muted,fontFamily:C.mono,textAlign:"right"}}>{i+1}</span>
           <span style={{width:10,height:10,borderRadius:"50%",background:cc,flexShrink:0,opacity:.9}} title={t.category+(t.isAddon?" (add-on)":"")}></span>
@@ -543,7 +551,8 @@ export default function App() {
             {t.isAddon&&<span style={{background:`${C.purple}22`,color:C.purple,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.purple}33`,fontSize:8,flexShrink:0}}>ADD-ON{t.reachCount?` · ${t.reachCount}`:""}</span>}
             {(apiSlugs.has(t.task)||apiSlugs.has(t.task.toLowerCase().replace(/ /g,"-")))&&<span style={{background:`${C.green}22`,color:C.green,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.green}33`,fontSize:8,flexShrink:0}}>API</span>}
           </div>
-          <div style={{width:120,height:8,background:C.bg,borderRadius:4,overflow:"hidden"}}><div style={{width:`${t.total/topTotal*100}%`,height:"100%",background:cc,borderRadius:4,opacity:.6}}/></div>
+          {hasGA4&&<span style={{width:70,textAlign:"right",fontFamily:C.mono,fontSize:10,color:t.pageViews>0?C.cyan:C.muted}}>{t.pageViews>0?fmt(t.pageViews):"—"}</span>}
+          <div style={{width:120,height:8,background:C.bg,borderRadius:4,overflow:"hidden"}}><div style={{width:`${barVal}%`,height:"100%",background:taskSort==="pageviews"?C.cyan:cc,borderRadius:4,opacity:.6}}/></div>
           <span style={{width:65,textAlign:"right",fontFamily:C.mono,fontSize:12,color:C.accent}}>{fmt(t.total)}</span>
           <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:10,color:C.green}}>{fmt(t.completed)}</span>
           <span style={{width:40,textAlign:"right",fontSize:9,color:taskSort==="time"?C.orange:C.muted,fontWeight:taskSort==="time"?700:400}}>{t.avgTime}</span>
@@ -732,6 +741,7 @@ export default function App() {
           isUniversal, isAddon, hasApi, industries,
           users: industries.reduce((s,iid)=>{const ind=inds.find(i=>i.id===iid);return s+(ind?ind.users:0);},0),
           interactions: t.total, completed: t.completed,
+          pageViews: t.pageViews||0, pageUsers: t.pageUsers||0,
         });
       }
       // Anytime actions
@@ -744,6 +754,7 @@ export default function App() {
           industries: reachedIds,
           users: reachedIds.reduce((s,iid)=>{const ind=inds.find(i=>i.id===iid);return s+(ind?ind.users:0);},0),
           interactions: null, completed: null,
+          pageViews: aa.pageViews||0, pageUsers: aa.pageUsers||0,
           industryIds: aa.industryIds, sectorIds: aa.sectorIds,
         });
       }
@@ -993,6 +1004,8 @@ export default function App() {
             <div style={{display:"flex",gap:16,flexWrap:"wrap",fontSize:11,color:C.muted,fontFamily:C.sans}}>
               {it.users>0&&<span><strong style={{color:C.accent}}>{fmt(it.users)}</strong> users with this on their roadmap</span>}
               {it.interactions!=null&&<span><strong style={{color:C.green}}>{fmt(it.interactions)}</strong> interactions* ({fmt(it.completed)} completed)</span>}
+              {it.interactions!=null&&it.pageViews>0&&<span><strong style={{color:C.cyan}}>{fmt(it.pageViews)}</strong> page views (GA4)</span>}
+              {it.type==="aa"&&it.pageViews>0&&<span><strong style={{color:C.cyan}}>{fmt(it.pageViews)}</strong> page views (GA4)</span>}
               {it.type==="permit"&&it.volume>0&&<span><strong style={{color:C.purple}}>{fmt(it.volume)}</strong> statewide submissions/yr</span>}
               {it.industries&&it.industries.length>0&&<span>Visible to <strong style={{color:C.cyan}}>{it.industries.length}</strong> of 64 industries</span>}
             </div>
@@ -1021,6 +1034,119 @@ export default function App() {
           <div style={{fontSize:9,color:C.muted,fontFamily:C.sans,marginTop:12,opacity:.7}}>* Interactions = users who clicked a task's status button. Users who read the content and act without clicking are not captured.</div>
         </div>);
       })()}
+    </div>);
+  };
+
+  /* ═══ TAB: SITE ANALYTICS ═══ */
+  const SiteAnalytics = () => {
+    const ga4 = DATA.ga4;
+    if(!ga4) return <div><Alert color={C.muted}>No GA4 data found. Place ga4_page_views.csv, ga4_events.csv, ga4_traffic_sources.csv, and ga4_landing_pages.csv in the data/ folder and regenerate.</Alert></div>;
+    const f = ga4.funnel;
+    const funnelSteps = [
+      {label:"First Visits",count:f.firstVisit,users:f.firstVisitUsers,color:C.accent},
+      {label:"Click to Navigator",count:f.clickToNavigator,users:f.clickToNavigatorUsers,color:C.cyan},
+      {label:"Onboarding Started",count:f.onboardingStep,users:f.onboardingStepUsers,color:C.green},
+      {label:"Guest Signups",count:f.guestSignup,users:f.guestSignupUsers,color:C.green},
+      {label:"Full Registrations",count:f.fullRegistration,users:f.fullRegistrationUsers,color:C.purple},
+      {label:"Task Status Changes",count:f.taskStatusChange,users:f.taskStatusChangeUsers,color:C.orange},
+    ];
+    const funnelMax = funnelSteps[0]?.users||1;
+    const convRate = f.fullRegistrationUsers>0&&f.firstVisitUsers>0 ? (f.fullRegistrationUsers/f.firstVisitUsers*100).toFixed(2) : "?";
+    const guestRate = f.guestSignupUsers>0&&f.firstVisitUsers>0 ? (f.guestSignupUsers/f.firstVisitUsers*100).toFixed(1) : "?";
+    return (<div>
+      <Alert color={C.cyan}>GA4 data from {ga4.dateRange.start||"?"} to {ga4.dateRange.end||"?"}. This covers all traffic to Business.NJ.gov — the public Webflow site, the Navigator app, and everything in between.</Alert>
+
+      <Sec title="Acquisition Funnel" sub="From first visit to registered user. Each bar shows unique users at that stage.">
+        <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
+          <Stat label="First Visit → Guest Signup" value={guestRate+"%"} sub={fmt(f.guestSignupUsers)+" of "+fmt(f.firstVisitUsers)+" first-time visitors"} color={C.green} small />
+          <Stat label="First Visit → Registration" value={convRate+"%"} sub={fmt(f.fullRegistrationUsers)+" of "+fmt(f.firstVisitUsers)+" first-time visitors"} color={C.purple} small />
+          <Stat label="Outbound Link Clicks" value={fmt(f.outboundClicks)} sub={fmt(f.outboundClicksUsers)+" users clicked through to external agency sites"} color={C.orange} small />
+          <Stat label="Form Submissions" value={fmt(f.formSubmits)} sub={fmt(f.formSubmitsUsers)+" users submitted forms through the Navigator"} color={C.cyan} small />
+        </div>
+        <div style={{display:"grid",gap:4}}>
+          {funnelSteps.map((step,i)=>(
+            <div key={i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"10px 14px",display:"flex",alignItems:"center",gap:12}}>
+              <div style={{width:180,fontSize:12,color:step.color,fontFamily:C.sans,fontWeight:600}}>{step.label}</div>
+              <div style={{flex:1,height:10,background:C.bg,borderRadius:5,overflow:"hidden"}}><div style={{width:`${step.users/funnelMax*100}%`,height:"100%",background:step.color,borderRadius:5,opacity:.6}}/></div>
+              <div style={{width:90,textAlign:"right",fontFamily:C.mono,fontSize:12,color:step.color}}>{fmt(step.users)}</div>
+              <div style={{width:60,textAlign:"right",fontSize:9,color:C.muted}}>{i>0?pct(step.users,funnelSteps[0].users):""}</div>
+            </div>
+          ))}
+        </div>
+      </Sec>
+
+      <Sec title="Traffic Sources" sub="How users find Business.NJ.gov, by session channel.">
+        <div style={{display:"grid",gap:3}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
+            <span style={{flex:1}}>Channel</span>
+            <span style={{width:80,textAlign:"right"}}>Sessions</span>
+            <span style={{width:80,textAlign:"right"}}>Users</span>
+            <span style={{width:60,textAlign:"right"}}>Eng. Rate</span>
+            <span style={{width:60,textAlign:"right"}}>Avg Time</span>
+            <span style={{width:70,textAlign:"right"}}>Key Events</span>
+          </div>
+          {ga4.traffic.map((t,i)=>{const maxSess=ga4.traffic[0]?.sessions||1;return(
+            <div key={i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",display:"flex",alignItems:"center",gap:10}}>
+              <div style={{flex:1,fontSize:12,color:C.text,fontFamily:C.sans}}>{t.channel}</div>
+              <span style={{width:80,textAlign:"right",fontFamily:C.mono,fontSize:11,color:C.accent}}>{fmt(t.sessions)}</span>
+              <span style={{width:80,textAlign:"right",fontFamily:C.mono,fontSize:11,color:C.cyan}}>{fmt(t.users)}</span>
+              <span style={{width:60,textAlign:"right",fontFamily:C.mono,fontSize:10,color:t.engagementRate>50?C.green:t.engagementRate>25?C.orange:C.red}}>{t.engagementRate}%</span>
+              <span style={{width:60,textAlign:"right",fontFamily:C.mono,fontSize:10,color:C.muted}}>{t.avgEngTime>60?Math.round(t.avgEngTime/60)+"m":t.avgEngTime+"s"}</span>
+              <span style={{width:70,textAlign:"right",fontFamily:C.mono,fontSize:10,color:C.green}}>{fmt(t.keyEvents)}</span>
+            </div>
+          );})}
+        </div>
+      </Sec>
+
+      <Sec title="Top Pages" sub="Most-viewed pages across the entire site.">
+        <div style={{display:"grid",gap:3}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
+            <span style={{flex:1}}>Page Path</span>
+            <span style={{width:90,textAlign:"right"}}>Views</span>
+            <span style={{width:80,textAlign:"right"}}>Users</span>
+            <span style={{width:60,textAlign:"right"}}>Avg Time</span>
+          </div>
+          {ga4.topPages.slice(0,30).map((p,i)=>{const maxV=ga4.topPages[0]?.views||1;return(
+            <div key={i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",display:"flex",alignItems:"center",gap:10}}>
+              <div style={{flex:1,fontSize:11,color:p.path.startsWith("/tasks/")?C.accent:p.path.startsWith("/actions/")?C.cyan:C.text,fontFamily:C.mono,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{p.path}</div>
+              <span style={{width:90,textAlign:"right",fontFamily:C.mono,fontSize:11,color:C.accent}}>{fmt(p.views)}</span>
+              <span style={{width:80,textAlign:"right",fontFamily:C.mono,fontSize:10,color:C.cyan}}>{fmt(p.users)}</span>
+              <span style={{width:60,textAlign:"right",fontFamily:C.mono,fontSize:10,color:C.muted}}>{p.avgEngTime>60?Math.round(p.avgEngTime/60)+"m":Math.round(p.avgEngTime)+"s"}</span>
+            </div>
+          );})}
+        </div>
+      </Sec>
+
+      <Sec title="Site Sections" sub="Page views grouped by URL path prefix.">
+        <div style={{display:"grid",gap:3}}>
+          {ga4.pageCategories.map((cat,i)=>{const maxV=ga4.pageCategories[0]?.views||1;return(
+            <div key={i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",display:"flex",alignItems:"center",gap:10}}>
+              <div style={{width:140,fontSize:12,color:C.text,fontFamily:C.mono}}>{cat.prefix}</div>
+              <div style={{flex:1,height:8,background:C.bg,borderRadius:4,overflow:"hidden"}}><div style={{width:`${cat.views/maxV*100}%`,height:"100%",background:C.accent,borderRadius:4,opacity:.5}}/></div>
+              <span style={{width:50,textAlign:"right",fontSize:9,color:C.muted}}>{cat.pages} pg</span>
+              <span style={{width:90,textAlign:"right",fontFamily:C.mono,fontSize:11,color:C.accent}}>{fmt(cat.views)}</span>
+              <span style={{width:80,textAlign:"right",fontFamily:C.mono,fontSize:10,color:C.cyan}}>{fmt(cat.users)}</span>
+            </div>
+          );})}
+        </div>
+      </Sec>
+
+      <Sec title="All Events" sub="GA4 events ordered by count. Navigator-specific events reveal user behavior beyond page views.">
+        <div style={{display:"grid",gap:3}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
+            <span style={{flex:1}}>Event Name</span>
+            <span style={{width:100,textAlign:"right"}}>Count</span>
+            <span style={{width:80,textAlign:"right"}}>Users</span>
+          </div>
+          {ga4.events.map((e,i)=>{const isNav=["onboarding_step","analytics_event","user_update","navigation_clicks","form_submits","click_to_navigator","task_tab_continue_button_clicks","task_tab_clicked","license_certification_guide_clicks","task_manual_status_change","navigator_phase_change","SignUp_Success_Guest","SignUp_Success_Registration","graduation_phase_interactions","outbound_link_clicks","call_to_action_clicks"].includes(e.event);return(
+            <div key={i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"6px 14px",display:"flex",alignItems:"center",gap:10}}>
+              <div style={{flex:1,fontSize:11,color:isNav?C.accent:C.text,fontFamily:C.mono,fontWeight:isNav?600:400}}>{e.event}</div>
+              <span style={{width:100,textAlign:"right",fontFamily:C.mono,fontSize:11,color:C.accent}}>{fmt(e.count)}</span>
+              <span style={{width:80,textAlign:"right",fontFamily:C.mono,fontSize:10,color:C.cyan}}>{fmt(e.users)}</span>
+            </div>
+          );})}
+        </div>
+      </Sec>
     </div>);
   };
 
@@ -1094,9 +1220,9 @@ export default function App() {
           Source: {DATA.meta.xlsxFile} · {fmt(DATA.meta.totalBusinesses)} businesses · {inds.length} industries · {DATA.totalDiffTasks} diff. tasks · {DATA.anytimeActions.length} AAs · {sectors.length} sectors{DATA.permitCoverage&&` · ${fmt(DATA.permitCoverage.coverage.total)} state permits`}
         </div>
         <div style={{display:"flex",gap:5,marginBottom:20,flexWrap:"wrap"}}>
-          {nav("contentgap","Content Gap")}{nav("roadmap","Roadmap Analysis")}{nav("sectorhealth","Sector Health")}{nav("journey","User Journey")}{nav("industries","Industries")}{nav("detail","Industry Detail")}{nav("tasks","Task Reuse")}{nav("engagement","Task Engagement")}{nav("permits","Permit Coverage")}{nav("finder","Content Finder")}{nav("profile","Profile Questions")}
+          {nav("contentgap","Content Gap")}{nav("roadmap","Roadmap Analysis")}{nav("sectorhealth","Sector Health")}{nav("journey","User Journey")}{nav("industries","Industries")}{nav("detail","Industry Detail")}{nav("tasks","Task Reuse")}{nav("engagement","Task Engagement")}{nav("permits","Permit Coverage")}{nav("finder","Content Finder")}{DATA.ga4&&nav("siteanalytics","Site Analytics")}{nav("profile","Profile Questions")}
         </div>
-        {view==="contentgap"&&<ContentGap/>}{view==="roadmap"&&<RoadmapAnalysis/>}{view==="sectorhealth"&&<SectorHealth/>}{view==="journey"&&<UserJourney/>}{view==="industries"&&<Industries/>}{view==="detail"&&<Detail/>}{view==="tasks"&&<TaskReuse/>}{view==="engagement"&&<TaskEngagement/>}{view==="permits"&&<PermitCoverage/>}{view==="finder"&&<ContentFinder/>}{view==="profile"&&<ProfileQuestions/>}
+        {view==="contentgap"&&<ContentGap/>}{view==="roadmap"&&<RoadmapAnalysis/>}{view==="sectorhealth"&&<SectorHealth/>}{view==="journey"&&<UserJourney/>}{view==="industries"&&<Industries/>}{view==="detail"&&<Detail/>}{view==="tasks"&&<TaskReuse/>}{view==="engagement"&&<TaskEngagement/>}{view==="permits"&&<PermitCoverage/>}{view==="finder"&&<ContentFinder/>}{view==="siteanalytics"&&<SiteAnalytics/>}{view==="profile"&&<ProfileQuestions/>}
       </div>
     </div>
   );
