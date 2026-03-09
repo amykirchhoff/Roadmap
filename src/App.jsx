@@ -864,14 +864,15 @@ export default function App() {
             }
           } else if(isAddonTask){
             // Add-on task — determine industries from trigger data
-            const neqTrigsForInd = taskTrigs.filter(t=>t.type==="neq" && t.industries?.length>0);
-            if(neqTrigsForInd.length > 0){
-              const neqInds = [...new Set(neqTrigsForInd.flatMap(t=>t.industries))];
-              const indNames = neqInds.map(iid=>{const ind=inds.find(i=>i.id===iid);return ind?ind.name:iid;});
+            const trigsWithInds = taskTrigs.filter(t=>(t.type==="neq"||t.type==="profile") && t.industries?.length>0);
+            if(trigsWithInds.length > 0){
+              const trigInds = [...new Set(trigsWithInds.flatMap(t=>t.industries))];
+              const indNames = trigInds.map(iid=>{const ind=inds.find(i=>i.id===iid);return ind?ind.name:iid;});
+              const trigType = trigsWithInds[0].type==="neq"?"This non-essential question":"This profile question";
               if(indNames.length<=5){
-                steps.push({step:"Select one of these industries during onboarding:",detail:indNames.join(", ")+". This question is only shown to these industries.",color:C.accent});
+                steps.push({step:"Select one of these industries during onboarding:",detail:indNames.join(", ")+". "+trigType+" is only shown for these industries.",color:C.accent});
               } else {
-                steps.push({step:"Select one of "+indNames.length+" industries during onboarding",detail:indNames.slice(0,5).join(", ")+" and "+(indNames.length-5)+" more. This question is only shown to these industries.",color:C.accent});
+                steps.push({step:"Select one of "+indNames.length+" industries during onboarding",detail:indNames.slice(0,8).join(", ")+" and "+(indNames.length-8)+" more. "+trigType+" is only shown for these industries.",color:C.accent});
               }
             } else {
               const hasLegalTrig = taskTrigs.some(t=>t.type==="legalStructure"||t.type==="legalStructure+profile");
@@ -893,7 +894,7 @@ export default function App() {
           // Show the profile question part
           const profilePart = legalProfileTrigs.map(t=>{const parts=t.detail.split(", then ");return parts.length>1?parts.slice(1).join(", then "):null;}).filter(Boolean);
           if(profilePart.length>0){
-            steps.push({step:"Answer a follow-up question in your Profile",detail:profilePart.join("; "),color:C.purple});
+            steps.push({step:"Answer a follow-up question in your Profile page",detail:profilePart.join("; "),color:C.purple});
           }
         }
 
@@ -903,12 +904,12 @@ export default function App() {
 
         if(neqTrigs.length > 0){
           for(const nt of neqTrigs){
-            steps.push({step:"Answer a profile question",detail:nt.detail,color:C.purple});
+            steps.push({step:"Answer a question in your Profile under 'Discover Industry Licenses and Permits'",detail:nt.detail,color:C.purple});
           }
         }
         if(profileTrigs.length > 0){
           for(const pt of profileTrigs){
-            steps.push({step:"Answer a profile question during or after onboarding",detail:pt.detail,color:C.purple});
+            steps.push({step:"Answer a question in your Profile page",detail:pt.detail,color:C.purple});
           }
         }
 
