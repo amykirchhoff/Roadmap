@@ -514,6 +514,7 @@ export default function App() {
     const apiSlugs = DATA.permitCoverage ? new Set([...(DATA.permitCoverage.apiTaskSlugs||[]),...(DATA.permitCoverage.apiTaskNames||[])]) : new Set();
     const top5Total=tp.slice(0,5).reduce((s,t)=>s+t.total,0);const allTotal=tp.reduce((s,t)=>s+t.total,0);const under10=tp.filter(t=>t.total<10);const under100=tp.filter(t=>t.total<100);
     const totalPV = tp.reduce((s,t)=>s+(t.pageViews||0),0);
+    const staleTasks = hasGA4 ? tp.filter(t=>t.stale) : [];
     return (<div>
       <Alert color={C.orange}>The top 5 tasks account for <strong>{pct(top5Total,allTotal)}</strong> of all roadmap appearances.{hasGA4?" GA4 page views are now overlaid — these show actual readership, which is 2–10x higher than roadmap counts for most tasks.":""}</Alert>
       <SrcLegend items={[["XLSX","Task Progress sheet — total = roadmaps containing this task; completed = users who marked it done"],["GA4","Page views from Google Analytics (Jan 2023–Mar 2026)"],["NAV","Navigator codebase — roadmap definitions, task metadata"]]} />
@@ -523,6 +524,7 @@ export default function App() {
         {hasGA4&&<Stat label="Page Views (GA4)" value={fmt(totalPV)} sub={(totalPV/Math.max(allTotal,1)).toFixed(1)+"x the roadmap count"} color={C.cyan} small />}
         <Stat label="Top 5 Tasks =" value={pct(top5Total,allTotal)} sub="of total roadmap appearances" color={C.green} small />
         <Stat label="Tasks on <10 Roadmaps" value={under10.length} sub={pct(under10.length,tp.length)+" of "+tp.length+" tracked tasks"} color={C.red} small />
+        {staleTasks.length>0&&<Stat label="Likely Stale Tasks" value={staleTasks.length} sub="Completed exceeds GA4 page views — probably renamed or retired task IDs persisting in the database" color={C.red} small />}
       </div>
       <div style={{display:"grid",gap:3}}>
         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
@@ -538,6 +540,7 @@ export default function App() {
           <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.red,marginRight:4,verticalAlign:"middle"}}/>Unique (1)</span>
           <span style={{marginLeft:8,borderLeft:`1px solid ${C.border}`,paddingLeft:8}}><span style={{background:`${C.purple}22`,color:C.purple,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.purple}33`,fontSize:9,marginRight:4}}>ADD-ON</span>Profile/legal triggered</span>
           <span><span style={{background:`${C.green}22`,color:C.green,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.green}33`,fontSize:9,marginRight:4}}>API</span>Live DB connection</span>
+          {hasGA4&&<span><span style={{background:`${C.red}22`,color:C.red,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.red}33`,fontSize:9,marginRight:4}}>STALE?</span>Completed {">"} page views — likely a renamed or retired task ID</span>}
         </div>
         <div style={{display:"flex",alignItems:"center",gap:8,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
           <span style={{width:22,textAlign:"right"}}>#</span>
@@ -557,6 +560,7 @@ export default function App() {
             <div style={{fontSize:12,color:cc,fontFamily:C.sans,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{t.task}</div>
             {t.isAddon&&<span style={{background:`${C.purple}22`,color:C.purple,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.purple}33`,fontSize:8,flexShrink:0}}>ADD-ON{t.reachCount?` · ${t.reachCount}`:""}</span>}
             {(apiSlugs.has(t.task)||apiSlugs.has(t.task.toLowerCase().replace(/ /g,"-")))&&<span style={{background:`${C.green}22`,color:C.green,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.green}33`,fontSize:8,flexShrink:0}}>API</span>}
+            {hasGA4&&t.stale&&<span style={{background:`${C.red}22`,color:C.red,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.red}33`,fontSize:8,flexShrink:0}} title="Completed exceeds page views — likely a renamed or retired task ID in the XLSX">STALE?</span>}
           </div>
           {hasGA4&&<span style={{width:70,textAlign:"right",fontFamily:C.mono,fontSize:10,color:t.pageViews>0?C.cyan:C.muted}}>{t.pageViews>0?fmt(t.pageViews):"—"}</span>}
           <div style={{width:120,height:8,background:C.bg,borderRadius:4,overflow:"hidden"}}><div style={{width:`${barVal}%`,height:"100%",background:taskSort==="pageviews"?C.cyan:cc,borderRadius:4,opacity:.6}}/></div>
@@ -750,6 +754,7 @@ export default function App() {
           users: industries.reduce((s,iid)=>{const ind=inds.find(i=>i.id===iid);return s+(ind?ind.users:0);},0),
           interactions: t.total, completed: t.completed,
           pageViews: t.pageViews||0, pageUsers: t.pageUsers||0,
+          stale: t.stale||false,
         });
       }
       // Anytime actions
@@ -1012,8 +1017,12 @@ export default function App() {
               {it.isUniversal&&<Tag color={C.accent}>Universal</Tag>}
               {it.isAddon&&<Tag color={C.purple}>Add-on</Tag>}
               {it.type==="permit"&&it.priority==="high"&&<Tag color={C.red}>High Priority</Tag>}
+              {it.stale&&<Tag color={C.red}>Stale?</Tag>}
             </div>
             <h3 style={{fontSize:18,fontWeight:700,color:C.text,margin:"0 0 8px",fontFamily:C.sans}}>{it.name}</h3>
+            {it.stale&&<div style={{background:`${C.red}11`,border:`1px solid ${C.red}33`,borderRadius:6,padding:"8px 12px",marginBottom:10,fontSize:11,color:C.red,fontFamily:C.sans}}>
+              <strong>Data quality flag:</strong> This task has {fmt(it.completed)} completions but only {fmt(it.pageViews)} GA4 page views. Since users must open a task page to mark it complete, this likely means the task ID was renamed or retired in the codebase while old accounts retain the historical ID. The XLSX numbers may reflect a task that no longer exists under this name.
+            </div>}
             <div style={{display:"flex",gap:16,flexWrap:"wrap",fontSize:11,color:C.muted,fontFamily:C.sans}}>
               {it.users>0&&<span><strong style={{color:C.accent}}>{fmt(it.users)}</strong> users on roadmap (XLSX)</span>}
               {it.interactions!=null&&<span><strong style={{color:C.green}}>{fmt(it.interactions)}</strong> on roadmaps (XLSX) ({fmt(it.completed)} completed)</span>}
