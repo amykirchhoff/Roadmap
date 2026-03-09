@@ -726,6 +726,18 @@ if os.path.isdir(addon_source):
                 clean_q = _re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', raw_q).strip()
                 neq_addon_map[nq["addOnWhenNo"]] = {"neqId":nq["id"],"q":clean_q,"answer":"No"}
 
+    # Build NEQ id -> list of industry IDs that show this question
+    neq_ind_map = {}  # neqId -> [industryId, ...]
+    ind_source = addon_source.replace("add-ons", "industries")
+    if os.path.isdir(ind_source):
+        for f in _glob.glob(os.path.join(ind_source, "*.json")):
+            idata = json.load(open(f))
+            if not idata.get("isEnabled"): continue
+            for neq_id in idata.get("nonEssentialQuestionsIds", []):
+                if neq_id not in neq_ind_map:
+                    neq_ind_map[neq_id] = []
+                neq_ind_map[neq_id].append(idata["id"])
+
     # Profile/legal structure triggers (from buildUserRoadmap.ts analysis)
     hardcoded_triggers = {
         "permanent-location-business":{"t":"profile","d":"Answer 'No' to 'Is this a home-based business?'"},
@@ -798,6 +810,7 @@ if os.path.isdir(addon_source):
                 trigger["question"] = ni["q"]
                 trigger["answer"] = ni["answer"]
                 trigger["detail"] = f"Answer '{ni['answer']}' to: \"{ni['q'][:120]}\""
+                trigger["industries"] = neq_ind_map.get(ni["neqId"], [])
             elif addon_name in hardcoded_triggers:
                 ht = hardcoded_triggers[addon_name]
                 trigger["type"] = ht["t"]
