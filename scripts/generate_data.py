@@ -786,6 +786,61 @@ if os.path.isdir(addon_source):
         "oos-pharmacy":{"t":"persona+industry","d":"Foreign nexus business in Pharmacy industry"},
     }
 
+    # Dynamically resolve which industries show each profile question
+    # by reading industryOnboardingQuestions from industry JSON files
+    ioq_industries = {}  # ioq_field -> [industry_ids]
+    can_have_perm = []   # industries with canHavePermanentLocation
+    can_be_home = []     # industries with canBeHomeBased
+    if os.path.isdir(ind_source):
+        for f in _glob.glob(os.path.join(ind_source, "*.json")):
+            idata = json.load(open(f))
+            if not idata.get("isEnabled"): continue
+            if idata.get("canHavePermanentLocation"):
+                can_have_perm.append(idata["id"])
+            ioq = idata.get("industryOnboardingQuestions", {})
+            for field, val in ioq.items():
+                if val:
+                    if field not in ioq_industries:
+                        ioq_industries[field] = []
+                    ioq_industries[field].append(idata["id"])
+            if ioq.get("canBeHomeBased"):
+                can_be_home.append(idata["id"])
+
+    # Map add-on names to their applicable industry lists
+    addon_industry_map = {
+        "permanent-location-business": [i for i in can_have_perm if i in can_be_home],
+        "planned-renovation": [i for i in can_have_perm if i in can_be_home],
+        "home-based-transportation": ioq_industries.get("isTransportation", []),
+        "elevator-owning-business": can_have_perm,
+        "liquor-license": ioq_industries.get("isLiquorLicenseApplicable", []),
+        "cpa": ioq_industries.get("isCpaRequiredApplicable", []),
+        "petcare-license": ioq_industries.get("isPetCareHousingApplicable", []),
+        "will-sell-pet-care-items": ioq_industries.get("willSellPetCareItems", []),
+        "daycare": ioq_industries.get("isChildcareForSixOrMore", []),
+        "family-daycare": ioq_industries.get("isChildcareForSixOrMore", []),
+        "cannabis-annual": ioq_industries.get("isCannabisLicenseTypeApplicable", []),
+        "cannabis-conditional": ioq_industries.get("isCannabisLicenseTypeApplicable", []),
+        "real-estate-appraisal-management": ioq_industries.get("isRealEstateAppraisalManagementApplicable", []),
+        "real-estate-appraiser": ioq_industries.get("isRealEstateAppraisalManagementApplicable", []),
+        "car-service-standard": ioq_industries.get("isCarServiceApplicable", []),
+        "car-service-high-capacity": ioq_industries.get("isCarServiceApplicable", []),
+        "employment-agency-job-seekers": ioq_industries.get("isEmploymentAndPersonnelTypeApplicable", []),
+        "employment-agency-employers-temporary": ioq_industries.get("isEmploymentAndPersonnelTypeApplicable", []),
+        "employment-agency-employers-permanent": ioq_industries.get("isEmploymentAndPersonnelTypeApplicable", []),
+        "employment-agency-employers-both": ioq_industries.get("isEmploymentAndPersonnelTypeApplicable", []),
+        "interstate-logistics": ioq_industries.get("isInterstateLogisticsApplicable", []),
+        "interstate-moving": ioq_industries.get("isInterstateMovingApplicable", []),
+        "construction-home-renovation": ioq_industries.get("isConstructionTypeApplicable", []),
+        "construction-new-home-construction": ioq_industries.get("isConstructionTypeApplicable", []),
+        "public-works-contractor": can_have_perm,  # shown to all permanent location industries
+        "residential-landlord-long-term-many-units": ioq_industries.get("canHaveThreeOrMoreRentalUnits", []),
+        "residential-landlord-long-term-few-units": ioq_industries.get("canHaveThreeOrMoreRentalUnits", []),
+        "short-term-rental-registration": ioq_industries.get("whatIsPropertyLeaseType", []),
+        "env-requirements": ["generic"],
+        "logistics-modification": ["logistics"],
+        "permanent-location-business-landlord": ["residential-landlord"],
+    }
+
     # Step names for display
     step_names = {1:"Plan Your Business",2:"Register Your Business",3:"After Registering Your Business",4:"Before Opening Your Site"}
 
@@ -815,14 +870,9 @@ if os.path.isdir(addon_source):
                 ht = hardcoded_triggers[addon_name]
                 trigger["type"] = ht["t"]
                 trigger["detail"] = ht["d"]
-                # Add applicable industries for profile triggers
-                if addon_name == "permanent-location-business":
-                    trigger["industries"] = [idata["id"] for idata in (json.load(open(os.path.join(ind_source, f"{iid}.json"))) for iid in [os.path.basename(f).replace(".json","") for f in _glob.glob(os.path.join(ind_source,"*.json"))]) if idata.get("isEnabled") and idata.get("canHavePermanentLocation") and idata.get("industryOnboardingQuestions",{}).get("canBeHomeBased")]
-                elif addon_name == "planned-renovation":
-                    trigger["industries"] = [idata["id"] for idata in (json.load(open(os.path.join(ind_source, f"{iid}.json"))) for iid in [os.path.basename(f).replace(".json","") for f in _glob.glob(os.path.join(ind_source,"*.json"))]) if idata.get("isEnabled") and idata.get("canHavePermanentLocation") and idata.get("industryOnboardingQuestions",{}).get("canBeHomeBased")]
-                elif addon_name == "elevator-owning-business":
-                    # Elevator question shown when displayElevatorQuestion returns true - tied to canHavePermanentLocation and not home-based
-                    trigger["industries"] = [idata["id"] for idata in (json.load(open(os.path.join(ind_source, f"{iid}.json"))) for iid in [os.path.basename(f).replace(".json","") for f in _glob.glob(os.path.join(ind_source,"*.json"))]) if idata.get("isEnabled") and idata.get("canHavePermanentLocation")]
+                # Add applicable industries from the dynamic map
+                if addon_name in addon_industry_map:
+                    trigger["industries"] = addon_industry_map[addon_name]
             else:
                 trigger["type"] = "unknown"
                 trigger["detail"] = f"Triggered by add-on '{addon_name}'"
