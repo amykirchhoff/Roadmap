@@ -852,32 +852,35 @@ export default function App() {
           const pt = taskTrigs.find(t=>t.type==="persona" || t.type==="persona+industry");
           steps.push({step:"During onboarding, select your business persona",detail:pt.detail,color:C.accent});
         } else {
-          // Industry selection
+          // Merge base industries with trigger industries
+          const baseInds = new Set(u.industries||[]);
+          const trigIndsSet = new Set();
+          const trigsWithInds = taskTrigs.filter(t=>(t.type==="neq"||t.type==="profile") && t.industries?.length>0);
+          trigsWithInds.forEach(t=>t.industries.forEach(iid=>trigIndsSet.add(iid)));
+          const allInds = [...new Set([...baseInds,...trigIndsSet])];
+          const hasBaseInds = baseInds.size > 0;
+          const hasTrigInds = trigIndsSet.size > 0;
+
           if(u.isUniversal){
             steps.push({step:"Select any industry during onboarding",detail:"This is a universal task — it appears on all 64 industry roadmaps",color:C.accent});
-          } else if(u.industries.length>0){
-            const indNames = u.industries.map(iid=>{const ind=inds.find(i=>i.id===iid);return ind?ind.name:iid;});
+          } else if(allInds.length>0){
+            const indNames = allInds.map(iid=>{const ind=inds.find(i=>i.id===iid);return ind?ind.name:iid;});
+            let detail = "";
+            if(hasBaseInds && hasTrigInds){
+              const baseNames = [...baseInds].map(iid=>{const ind=inds.find(i=>i.id===iid);return ind?ind.name:iid;});
+              detail = "Always on the roadmap for: "+baseNames.join(", ")+". Available via profile question for "+(allInds.length-baseInds.size)+" additional industries.";
+            } else if(hasTrigInds){
+              const trigType = trigsWithInds[0].type==="neq"?"non-essential question":"profile question";
+              detail = "Available when you answer a "+trigType+" shown to these industries.";
+            }
             if(indNames.length<=5){
-              steps.push({step:"Select one of these industries during onboarding:",detail:indNames.join(", "),color:C.accent});
+              steps.push({step:"Select one of these industries during onboarding:",detail:indNames.join(", ")+(detail?". "+detail:""),color:C.accent});
             } else {
-              steps.push({step:"Select one of "+indNames.length+" industries during onboarding",detail:indNames.slice(0,5).join(", ")+" and "+(indNames.length-5)+" more",color:C.accent});
+              steps.push({step:"Select one of "+indNames.length+" industries during onboarding",detail:indNames.slice(0,8).join(", ")+" and "+(indNames.length-8)+" more"+(detail?". "+detail:""),color:C.accent});
             }
           } else if(isAddonTask){
-            // Add-on task — determine industries from trigger data
-            const trigsWithInds = taskTrigs.filter(t=>(t.type==="neq"||t.type==="profile") && t.industries?.length>0);
-            if(trigsWithInds.length > 0){
-              const trigInds = [...new Set(trigsWithInds.flatMap(t=>t.industries))];
-              const indNames = trigInds.map(iid=>{const ind=inds.find(i=>i.id===iid);return ind?ind.name:iid;});
-              const trigType = trigsWithInds[0].type==="neq"?"This non-essential question":"This profile question";
-              if(indNames.length<=5){
-                steps.push({step:"Select one of these industries during onboarding:",detail:indNames.join(", ")+". "+trigType+" is only shown for these industries.",color:C.accent});
-              } else {
-                steps.push({step:"Select one of "+indNames.length+" industries during onboarding",detail:indNames.slice(0,8).join(", ")+" and "+(indNames.length-8)+" more. "+trigType+" is only shown for these industries.",color:C.accent});
-              }
-            } else {
-              const hasLegalTrig = taskTrigs.some(t=>t.type==="legalStructure"||t.type==="legalStructure+profile");
-              steps.push({step:"Select any industry during onboarding",detail:hasLegalTrig?"This task is triggered by your business structure choice, not your industry — it can appear on any industry's roadmap.":"This is an add-on task triggered by profile choices.",color:C.accent});
-            }
+            const hasLegalTrig = taskTrigs.some(t=>t.type==="legalStructure"||t.type==="legalStructure+profile");
+            steps.push({step:"Select any industry during onboarding",detail:hasLegalTrig?"This task is triggered by your business structure choice, not your industry — it can appear on any industry's roadmap.":"This is an add-on task triggered by profile choices.",color:C.accent});
           }
         }
 
@@ -1017,7 +1020,13 @@ export default function App() {
               {it.interactions!=null&&it.pageViews>0&&<span><strong style={{color:C.cyan}}>{fmt(it.pageViews)}</strong> page views (GA4)</span>}
               {it.type==="aa"&&it.pageViews>0&&<span><strong style={{color:C.cyan}}>{fmt(it.pageViews)}</strong> page views (GA4)</span>}
               {it.type==="permit"&&it.volume>0&&<span><strong style={{color:C.purple}}>{fmt(it.volume)}</strong> statewide submissions/yr (PLUR)</span>}
-              {it.industries&&it.industries.length>0&&<span>Visible to <strong style={{color:C.cyan}}>{it.industries.length}</strong> of 64 industries</span>}
+              {it.industries&&it.industries.length>0&&(()=>{
+                const trigIndsSet = new Set();
+                const trigs = (DATA.taskTriggers||{})[it.slug]||[];
+                trigs.forEach(t=>(t.industries||[]).forEach(iid=>trigIndsSet.add(iid)));
+                const allInds = [...new Set([...it.industries,...trigIndsSet])];
+                return <span>Visible to <strong style={{color:C.cyan}}>{allInds.length}</strong> of 64 industries{trigIndsSet.size>0&&it.industries.length>0?" ("+it.industries.length+" base + "+trigIndsSet.size+" via profile question)":""}</span>;
+              })()}
             </div>
           </div>
 
@@ -1035,11 +1044,17 @@ export default function App() {
             </div>
           </Sec>
 
-          {it.industries && it.industries.length>0 && it.industries.length<=20 && <Sec title={"Industries ("+it.industries.length+")"} sub="Click to view industry detail.">
-            <div style={{display:"flex",flexWrap:"wrap",gap:3}}>
-              {it.industries.map(iid=>{const ind=inds.find(i=>i.id===iid);return ind?<Tag key={iid} color={C.accent} onClick={()=>{setSelInd(ind);setView("detail");}}>{ind.name} ({fmt(ind.users)})</Tag>:null;})}
-            </div>
-          </Sec>}
+          {it.industries && (()=>{
+            const trigIndsSet = new Set();
+            const trigs = (DATA.taskTriggers||{})[it.slug]||[];
+            trigs.forEach(t=>(t.industries||[]).forEach(iid=>trigIndsSet.add(iid)));
+            const allInds = [...new Set([...it.industries,...trigIndsSet])];
+            return allInds.length>0 && allInds.length<=30 ? <Sec title={"Industries ("+allInds.length+")"} sub="Click to view industry detail.">
+              <div style={{display:"flex",flexWrap:"wrap",gap:3}}>
+                {allInds.map(iid=>{const ind=inds.find(i=>i.id===iid);return ind?<Tag key={iid} color={it.industries.includes(iid)?C.accent:C.purple} onClick={()=>{setSelInd(ind);setView("detail");}}>{ind.name} ({fmt(ind.users)}){!it.industries.includes(iid)?" ·NEQ":""}</Tag>:null;})}
+              </div>
+            </Sec> : allInds.length>30 ? <Sec title={"Industries ("+allInds.length+")"} sub="Too many to list individually." /> : null;
+          })()}
 
           <div style={{fontSize:9,color:C.muted,fontFamily:C.sans,marginTop:12,opacity:.7}}>On roadmaps (XLSX) = number of user roadmaps containing this task. Completed = users who marked it done. Page views (GA4) = actual page loads in Google Analytics.</div>
         </div>);
