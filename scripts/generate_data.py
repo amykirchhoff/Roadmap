@@ -740,12 +740,12 @@ if os.path.isdir(addon_source):
 
     # Profile/legal structure triggers (from buildUserRoadmap.ts analysis)
     hardcoded_triggers = {
-        "permanent-location-business":{"t":"profile","d":"Answer 'No' to 'Is this a home-based business?'"},
-        "liquor-license":{"t":"profile","d":"Answer 'Yes' to 'Will you need a liquor license?'"},
-        "cpa":{"t":"profile","d":"Answer 'Yes' to 'Does your business require a CPA?'"},
-        "petcare-license":{"t":"profile","d":"Answer 'Yes' to 'Will you house animals?'"},
-        "home-based-transportation":{"t":"profile","d":"Answer 'Yes' to home-based (transportation industries only)"},
-        "planned-renovation":{"t":"profile","d":"Answer 'No' to home-based, then 'Yes' to 'Are you planning renovations?'"},
+        "permanent-location-business":{"t":"profile","d":"In your Profile under 'Location-Based Requirements', answer 'No' to 'Is this a home-based business?' (only shown for 47 industries where canBeHomeBased is true)"},
+        "liquor-license":{"t":"profile","d":"In your Profile, answer 'Yes' to 'Will you need a liquor license?' (only shown for industries with liquor license question)"},
+        "cpa":{"t":"profile","d":"In your Profile, answer 'Yes' to 'Does your business require a CPA?' (accounting industry)"},
+        "petcare-license":{"t":"profile","d":"In your Profile, answer 'Yes' to 'Will you house animals?' (pet care industry)"},
+        "home-based-transportation":{"t":"profile","d":"In your Profile, answer 'Yes' to 'Is this a home-based business?' (transportation industries only)"},
+        "planned-renovation":{"t":"profile","d":"In your Profile, answer 'No' to home-based, then 'Yes' to 'Are you planning renovations?' (only for non-home-based businesses)"},
         "cannabis-annual":{"t":"profile","d":"Select 'Annual' cannabis license type"},
         "cannabis-conditional":{"t":"profile","d":"Select 'Conditional' cannabis license type"},
         "real-estate-appraisal-management":{"t":"profile","d":"Answer 'Yes' — is this an appraisal management company?"},
@@ -815,6 +815,14 @@ if os.path.isdir(addon_source):
                 ht = hardcoded_triggers[addon_name]
                 trigger["type"] = ht["t"]
                 trigger["detail"] = ht["d"]
+                # Add applicable industries for profile triggers
+                if addon_name == "permanent-location-business":
+                    trigger["industries"] = [idata["id"] for idata in (json.load(open(os.path.join(ind_source, f"{iid}.json"))) for iid in [os.path.basename(f).replace(".json","") for f in _glob.glob(os.path.join(ind_source,"*.json"))]) if idata.get("isEnabled") and idata.get("canHavePermanentLocation") and idata.get("industryOnboardingQuestions",{}).get("canBeHomeBased")]
+                elif addon_name == "planned-renovation":
+                    trigger["industries"] = [idata["id"] for idata in (json.load(open(os.path.join(ind_source, f"{iid}.json"))) for iid in [os.path.basename(f).replace(".json","") for f in _glob.glob(os.path.join(ind_source,"*.json"))]) if idata.get("isEnabled") and idata.get("canHavePermanentLocation") and idata.get("industryOnboardingQuestions",{}).get("canBeHomeBased")]
+                elif addon_name == "elevator-owning-business":
+                    # Elevator question shown when displayElevatorQuestion returns true - tied to canHavePermanentLocation and not home-based
+                    trigger["industries"] = [idata["id"] for idata in (json.load(open(os.path.join(ind_source, f"{iid}.json"))) for iid in [os.path.basename(f).replace(".json","") for f in _glob.glob(os.path.join(ind_source,"*.json"))]) if idata.get("isEnabled") and idata.get("canHavePermanentLocation")]
             else:
                 trigger["type"] = "unknown"
                 trigger["detail"] = f"Triggered by add-on '{addon_name}'"
