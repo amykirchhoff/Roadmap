@@ -1243,6 +1243,27 @@ if os.path.isfile(ga4_pages_file):
             tp_row["pageUsers"] = 0
             tp_row["avgEngTime"] = 0
 
+    # --- Flag likely stale/renamed tasks ---
+    # Tasks where completed > pageViews shouldn't be possible (you must view to complete),
+    # so these are likely tasks whose ID was renamed in the codebase but the old ID persists
+    # in historical account data in the XLSX.
+    stale_tasks = []
+    for tp_row in task_progress:
+        pv = tp_row.get("pageViews", 0)
+        comp = tp_row.get("completed", 0)
+        if comp > pv and comp > 10:
+            tp_row["stale"] = True
+            stale_tasks.append({
+                "task": tp_row["task"],
+                "completed": comp,
+                "pageViews": pv,
+                "total": tp_row["total"],
+            })
+        else:
+            tp_row["stale"] = False
+    if stale_tasks:
+        print(f"  Likely stale/renamed tasks: {len(stale_tasks)} (completed > page views)")
+
     # --- Enrich anytime actions with page views ---
     for aa in aa_reach:
         aa_id = aa["id"]
