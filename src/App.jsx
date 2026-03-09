@@ -164,13 +164,13 @@ export default function App() {
     const oneTasks = inds.filter(i=>i.totalDiffTasks===1).sort((a,b)=>b.users-a.users);
     return (<div>
       <Alert color={C.orange}>7 universal tasks excluded (business plan, structure, NAICS, EIN, taxes, bank account, vehicles). Showing only the tasks that differentiate one industry's roadmap from another.</Alert>
-      <SrcLegend items={[["NAV","Task definitions and industry roadmaps from codebase"],["XLSX","Status changes and user counts from analytics"]]} />
+      <SrcLegend items={[["NAV","Task definitions and industry roadmaps from codebase"],["XLSX","Roadmap counts and user assignments from analytics"]]} />
       <Insight>
         <strong>Key findings:</strong><br/>
         <strong>No middle layer.</strong> Of {DATA.totalDiffTasks} differentiating tasks, {uniqueOnly.length} appear in only one roadmap. Tasks are either universal (shared by all) or bespoke (built for a single industry). Only {DATA.totalDiffTasks - uniqueOnly.length} tasks sit in between.<br/>
         <strong>23 industries have zero unique content.</strong> Their roadmaps are assembled entirely from tasks shared with other industries — there is nothing a user sees that they wouldn't also see in a different industry.<br/>
-        <strong>The top 10 tasks account for {pct(tp.slice(0,10).reduce((s,t)=>s+t.total,0), tp.reduce((s,t)=>s+t.total,0))} of all status changes (XLSX).</strong> Across all {tp.length} tracked tasks (7 universal + {DATA.totalDiffTasks} differentiating + ~{tp.length - 7 - DATA.totalDiffTasks} add-ons and legacy), the bottom half ({Math.floor(tp.length/2)}) account for {pct(tp.slice(Math.floor(tp.length/2)).reduce((s,t)=>s+t.total,0), tp.reduce((s,t)=>s+t.total,0))}. {tp.filter(t=>t.total<10).length} tasks have fewer than 10 status changes ever, and {tp.filter(t=>t.total<100).length} have fewer than 100.<br/>
-        <strong>97% drop-off by task #10.</strong> "Select Your Business Structure" has {fmt(tp[0]?.total)} status changes (XLSX); by the 10th-ranked task, that drops to {fmt(tp[9]?.total)} — before most users ever reach the differentiating content.<br/>
+        <strong>The top 10 tasks account for {pct(tp.slice(0,10).reduce((s,t)=>s+t.total,0), tp.reduce((s,t)=>s+t.total,0))} of total roadmap appearances (XLSX).</strong> Across all {tp.length} tracked tasks (7 universal + {DATA.totalDiffTasks} differentiating + ~{tp.length - 7 - DATA.totalDiffTasks} add-ons and legacy), the bottom half ({Math.floor(tp.length/2)}) account for {pct(tp.slice(Math.floor(tp.length/2)).reduce((s,t)=>s+t.total,0), tp.reduce((s,t)=>s+t.total,0))}. {tp.filter(t=>t.total<10).length} tasks appear on fewer than 10 roadmaps, and {tp.filter(t=>t.total<100).length} on fewer than 100.<br/>
+        <strong>97% drop-off by task #10.</strong> "Select Your Business Structure" appears on {fmt(tp[0]?.total)} roadmaps (XLSX); by the 10th-ranked task, that drops to {fmt(tp[9]?.total)} — before most users ever reach the differentiating content.<br/>
         <strong>{fmt(DATA.totalDistinctPaths||0)} distinct roadmaps.</strong> Factoring in industry × legal structure × non-essential questions × home-based status, the system can produce {fmt(DATA.totalDistinctPaths||0)} unique task-set combinations. Healthcare alone accounts for 512 variants. The simplest industries still produce 4-8 variants each.
       </Insight>
       <Insight><strong>The differentiation problem:</strong> {diffStats.zeroDiff.length} industries have <strong>zero differentiating tasks</strong> (Courier Service and Remediation &amp; Waste) — their {fmt(diffStats.zeroDiffUsers)} users get an identical-to-generic roadmap. Another {diffStats.noUnique.length} industries have tasks but <strong>none unique to them</strong> — including some of the largest: Online Business (21K users), Real Estate Investing (13K), Management Consulting (7K), and Cleaning &amp; Janitorial (6K). Only {diffStats.hasUnique.length} industries have truly unique content, led by Retail, Home Improvement Contractor, Healthcare, and Trucking. Meanwhile, {uniqueOnly.length} of {DATA.totalDiffTasks} differentiating tasks appear in just one industry — purpose-built content like the Food Truck License, Cosmetology Shop License, and Trucking USDOT registration that serves a single audience.</Insight>
@@ -515,19 +515,19 @@ export default function App() {
     const top5Total=tp.slice(0,5).reduce((s,t)=>s+t.total,0);const allTotal=tp.reduce((s,t)=>s+t.total,0);const under10=tp.filter(t=>t.total<10);const under100=tp.filter(t=>t.total<100);
     const totalPV = tp.reduce((s,t)=>s+(t.pageViews||0),0);
     return (<div>
-      <Alert color={C.orange}>The top 5 tasks account for <strong>{pct(top5Total,allTotal)}</strong> of all status changes.{hasGA4?" GA4 page views are now overlaid — these show actual readership, which is 2–10x higher than status changes for most tasks.":""}</Alert>
-      <SrcLegend items={[["XLSX","Task Progress sheet — status button clicks (mark complete/to-do)"],["GA4","Page views from Google Analytics (Jan 2023–Mar 2026)"],["NAV","Navigator codebase — roadmap definitions, task metadata"]]} />
-      {hasGA4&&<Insight><strong>The readership gap:</strong> GA4 recorded <strong>{fmt(totalPV)} page views</strong> vs. <strong>{fmt(allTotal)} status changes</strong> in the XLSX — a <strong>{(totalPV/Math.max(allTotal,1)).toFixed(1)}x</strong> ratio. Some tasks show extreme gaps: Mercantile License has {fmt(tp.find(t=>t.task.includes("Mercantile"))?.pageViews||0)} page views (GA4) but only {fmt(tp.find(t=>t.task.includes("Mercantile"))?.total||0)} status changes (XLSX) — {((tp.find(t=>t.task.includes("Mercantile"))?.pageViews||1)/(Math.max(tp.find(t=>t.task.includes("Mercantile"))?.total||1,1))).toFixed(0)}x. Others like "Select Your Business Structure" show a low ratio ({((tp.find(t=>t.task.includes("Structure"))?.pageViews||1)/(Math.max(tp.find(t=>t.task.includes("Structure"))?.total||1,1))).toFixed(1)}x) because users are forced to interact with it to progress. Page views are a better signal for content actually read.</Insight>}
+      <Alert color={C.orange}>The top 5 tasks account for <strong>{pct(top5Total,allTotal)}</strong> of all roadmap appearances.{hasGA4?" GA4 page views are now overlaid — these show actual readership, which is 2–10x higher than roadmap counts for most tasks.":""}</Alert>
+      <SrcLegend items={[["XLSX","Task Progress sheet — total = roadmaps containing this task; completed = users who marked it done"],["GA4","Page views from Google Analytics (Jan 2023–Mar 2026)"],["NAV","Navigator codebase — roadmap definitions, task metadata"]]} />
+      {hasGA4&&<Insight><strong>The readership gap:</strong> GA4 recorded <strong>{fmt(totalPV)} page views</strong> across task pages, while <strong>{fmt(allTotal)} roadmaps</strong> include these tasks (XLSX). Some tasks are viewed far more than their roadmap count suggests: Mercantile License appears on {fmt(tp.find(t=>t.task.includes("Mercantile"))?.total||0)} roadmaps but has {fmt(tp.find(t=>t.task.includes("Mercantile"))?.pageViews||0)} page views ({((tp.find(t=>t.task.includes("Mercantile"))?.pageViews||1)/(Math.max(tp.find(t=>t.task.includes("Mercantile"))?.total||1,1))).toFixed(0)}x) — indicating repeat visits or non-account traffic. Others like "Select Your Business Structure" ({((tp.find(t=>t.task.includes("Structure"))?.pageViews||1)/(Math.max(tp.find(t=>t.task.includes("Structure"))?.total||1,1))).toFixed(1)}x) show roughly 1:1 because most users view it exactly once.</Insight>}
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
-        <Stat label="Status Changes (XLSX)" value={fmt(allTotal)} small />
-        {hasGA4&&<Stat label="Page Views (GA4)" value={fmt(totalPV)} sub={(totalPV/Math.max(allTotal,1)).toFixed(1)+"x more than status changes"} color={C.cyan} small />}
-        <Stat label="Top 5 Tasks =" value={pct(top5Total,allTotal)} sub="of all status changes" color={C.green} small />
-        <Stat label="Tasks With <10 Status Changes" value={under10.length} sub={pct(under10.length,tp.length)+" of "+tp.length+" tracked tasks"} color={C.red} small />
+        <Stat label="On Roadmaps (XLSX)" value={fmt(allTotal)} small />
+        {hasGA4&&<Stat label="Page Views (GA4)" value={fmt(totalPV)} sub={(totalPV/Math.max(allTotal,1)).toFixed(1)+"x the roadmap count"} color={C.cyan} small />}
+        <Stat label="Top 5 Tasks =" value={pct(top5Total,allTotal)} sub="of total roadmap appearances" color={C.green} small />
+        <Stat label="Tasks on <10 Roadmaps" value={under10.length} sub={pct(under10.length,tp.length)+" of "+tp.length+" tracked tasks"} color={C.red} small />
       </div>
       <div style={{display:"grid",gap:3}}>
         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
           <span style={{fontSize:10,color:C.muted,fontFamily:C.sans}}>Sort by:</span>
-          <button onClick={()=>setTaskSort("total")} style={{padding:"4px 10px",background:taskSort==="total"?C.accentDim:"transparent",color:taskSort==="total"?C.text:C.muted,border:`1px solid ${C.border}`,borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:C.sans}}>Most Interactions</button>
+          <button onClick={()=>setTaskSort("total")} style={{padding:"4px 10px",background:taskSort==="total"?C.accentDim:"transparent",color:taskSort==="total"?C.text:C.muted,border:`1px solid ${C.border}`,borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:C.sans}}>Most Roadmaps</button>
           {hasGA4&&<button onClick={()=>setTaskSort("pageviews")} style={{padding:"4px 10px",background:taskSort==="pageviews"?C.accentDim:"transparent",color:taskSort==="pageviews"?C.text:C.muted,border:`1px solid ${C.border}`,borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:C.sans}}>Most Page Views</button>}
           <button onClick={()=>setTaskSort("time")} style={{padding:"4px 10px",background:taskSort==="time"?C.accentDim:"transparent",color:taskSort==="time"?C.text:C.muted,border:`1px solid ${C.border}`,borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:C.sans}}>Longest Avg Time</button>
         </div>
@@ -544,8 +544,8 @@ export default function App() {
           <span style={{width:10}}></span>
           <span style={{flex:1}}>Task</span>
           {hasGA4&&<span style={{width:70,textAlign:"right"}}>Views (GA4)</span>}
-          <span style={{width:120,textAlign:"center"}}>{taskSort==="pageviews"?"PV bar":"Status bar"}</span>
-          <span style={{width:65,textAlign:"right"}}>Status (XLSX)</span>
+          <span style={{width:120,textAlign:"center"}}>{taskSort==="pageviews"?"PV bar":"Roadmap bar"}</span>
+          <span style={{width:65,textAlign:"right"}}>Roadmaps (XLSX)</span>
           <span style={{width:55,textAlign:"right"}}>Done</span>
           <span style={{width:40,textAlign:"right"}}>Avg Time</span>
         </div>
@@ -600,10 +600,10 @@ export default function App() {
 
     return (<div>
       <Alert color={C.accent}>Cross-referencing the <strong>Plurmits inventory</strong> ({fmt(cov.total)} permits across {depts.length} NJ agencies) with the Navigator codebase to show which state permits are integrated with live database connections, mentioned as informational content, or completely absent.</Alert>
-      <SrcLegend items={[["PLUR","Permit names, departments, volumes from Plurmits spreadsheet"],["NAV","API integrations, task-to-permit mappings from codebase"],["XLSX","User counts and status changes from analytics"]]} />
+      <SrcLegend items={[["PLUR","Permit names, departments, volumes from Plurmits spreadsheet"],["NAV","API integrations, task-to-permit mappings from codebase"],["XLSX","Roadmap counts and user assignments from analytics"]]} />
       <Insight>
         <strong>Theoretical vs. actual:</strong> NJ businesses submit roughly <strong>{fmt(cov.bizVolume)}</strong> permit applications per year. If every one came through Business.NJ.gov, existing coverage could handle <strong>{pct(cov.bizVolume - cov.bizNoneVol,cov.bizVolume)}</strong> of them — the remaining {pct(cov.bizNoneVol,cov.bizVolume)} ({fmt(cov.bizNoneVol)}/yr) are permits with no Navigator presence at all.<br/><br/>
-        <strong>A note on measuring usage:</strong> "Status changes" below reflect users who clicked a task's complete/to-do button in the XLSX analytics. This undercounts actual engagement — users who read a task's content and act on it externally without clicking are invisible. Roadmap reach (how many of the 64 industry roadmaps include a given task) is a more reliable measure of who <em>encounters</em> the content.
+        <strong>A note on measuring usage:</strong> "On roadmaps" below counts user roadmaps that include tasks mapped to these permits. "Completed" counts users who marked those tasks done. Both undercount actual engagement — users who read a task's content and act on it externally are invisible here. Roadmap reach (how many of the 64 industry roadmaps include a given task) is a more reliable measure of who <em>encounters</em> the content.
       </Insight>
 
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:10}}>
@@ -613,17 +613,17 @@ export default function App() {
       <div style={{fontSize:10,color:C.muted,fontFamily:C.sans,marginBottom:6,paddingLeft:2}}>If every NJ business used Business.NJ.gov, each tier below would handle this share of the {fmt(cov.bizVolume)} annual business submissions:</div>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:20}}>
         <Stat label="Live API Integration" value={hasApiCount+" permits"} color={C.green}
-          sub={apis.length+" agency integrations → "+(pc.apiTaskSlugs.length+(pc.apiAASlugs||[]).length)+" connected tasks/AAs → "+hasApiCount+" state permits\n"+fmt(cov.bizApiVol)+"/yr statewide ("+pct(cov.bizApiVol,cov.bizVolume)+" of biz volume)\n"+fmt(cov.bizApiUsers)+" users on roadmap (XLSX) · "+fmt(cov.bizApiEng)+" status changes (XLSX)*"} />
+          sub={apis.length+" agency integrations → "+(pc.apiTaskSlugs.length+(pc.apiAASlugs||[]).length)+" connected tasks/AAs → "+hasApiCount+" state permits\n"+fmt(cov.bizApiVol)+"/yr statewide ("+pct(cov.bizApiVol,cov.bizVolume)+" of biz volume)\n"+fmt(cov.bizApiUsers)+" users on roadmap (XLSX) · "+fmt(cov.bizApiEng)+" on roadmaps (XLSX)*"} />
         <Stat label="Data Read (no task match)" value={cov.bizRead} color={C.cyan}
           sub={fmt(cov.bizReadVol)+"/yr statewide ("+pct(cov.bizReadVol,cov.bizVolume)+" of biz volume)\nNot linked to specific tasks — reach not measurable"} />
         <Stat label="Informational in Navigator" value={infoOnly} color={C.cyan}
-          sub={fmt(cov.bizInfoVol)+"/yr statewide ("+pct(cov.bizInfoVol,cov.bizVolume)+" of biz volume)\n"+fmt(cov.bizInfoUsers)+" users on roadmap (XLSX) · "+fmt(cov.bizInfoEng)+" status changes (XLSX)*"} />
+          sub={fmt(cov.bizInfoVol)+"/yr statewide ("+pct(cov.bizInfoVol,cov.bizVolume)+" of biz volume)\n"+fmt(cov.bizInfoUsers)+" users on roadmap (XLSX) · "+fmt(cov.bizInfoEng)+" on roadmaps (XLSX)*"} />
         <Stat label="Mentioned Only" value={bizInteg - hasApiCount - infoOnly - cov.bizRead} color={C.orange}
           sub={fmt(cov.bizMentionedVol)+"/yr statewide ("+pct(cov.bizMentionedVol,cov.bizVolume)+" of biz volume)\nReferenced in content, not linked to specific tasks"} />
         <Stat label="Not in Navigator" value={fmt(cov.bizNone)} color={C.red}
           sub={fmt(cov.bizNoneVol)+"/yr statewide ("+pct(cov.bizNoneVol,cov.bizVolume)+" of biz volume)\nZero coverage — these permits have nowhere to go"} />
       </div>
-      <div style={{fontSize:9,color:C.muted,fontFamily:C.sans,marginTop:-14,marginBottom:18,paddingLeft:2,opacity:.7}}>* Status changes (XLSX) = users who clicked a task's complete/to-do button. Users who read the content and act without clicking are not captured. "Users with these on their roadmap" (XLSX) is a more reliable reach measure.</div>
+      <div style={{fontSize:9,color:C.muted,fontFamily:C.sans,marginTop:-14,marginBottom:18,paddingLeft:2,opacity:.7}}>* "On roadmaps" (XLSX) = number of user roadmaps that include tasks mapped to these permits. "Completed" = users who marked the task done. Users who read the content without clicking are not captured here — see GA4 page views on the Task Engagement tab for actual readership.</div>
 
       <Sec title="Agency Database Integrations" sub="Live connections between the Navigator and NJ agency systems. These are the permits where users can query status, submit applications, or receive real-time data — not just read about them.">
         <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:14}}>
@@ -958,7 +958,7 @@ export default function App() {
 
     return (<div>
       <Alert color={C.accent}>Search or browse any roadmap task, anytime action, or state permit to see a step-by-step guide for how a Business.NJ.gov user would encounter it.</Alert>
-      <SrcLegend items={[["NAV","Task definitions, triggers, and industry roadmaps from codebase"],["XLSX","Status changes and user counts from analytics"],["GA4","Page views from Google Analytics"],["PLUR","Permit inventory from Plurmits spreadsheet"]]} />
+      <SrcLegend items={[["NAV","Task definitions, triggers, and industry roadmaps from codebase"],["XLSX","Roadmap counts and completion from analytics"],["GA4","Page views from Google Analytics"],["PLUR","Permit inventory from Plurmits spreadsheet"]]} />
       <div style={{display:"flex",gap:6,marginBottom:8,flexWrap:"wrap",alignItems:"center"}}>
         <span style={{fontSize:10,color:C.muted}}>Show:</span>
         {[["all","All ("+items.length+")"],["task","Tasks ("+items.filter(i=>i.type==="task").length+")"],["aa","Anytime Actions ("+items.filter(i=>i.type==="aa").length+")"],["permit","Permits ("+items.filter(i=>i.type==="permit").length+")"]].map(([k,l])=>(
@@ -1012,7 +1012,7 @@ export default function App() {
             <h3 style={{fontSize:18,fontWeight:700,color:C.text,margin:"0 0 8px",fontFamily:C.sans}}>{it.name}</h3>
             <div style={{display:"flex",gap:16,flexWrap:"wrap",fontSize:11,color:C.muted,fontFamily:C.sans}}>
               {it.users>0&&<span><strong style={{color:C.accent}}>{fmt(it.users)}</strong> users on roadmap (XLSX)</span>}
-              {it.interactions!=null&&<span><strong style={{color:C.green}}>{fmt(it.interactions)}</strong> status changes (XLSX) ({fmt(it.completed)} completed)</span>}
+              {it.interactions!=null&&<span><strong style={{color:C.green}}>{fmt(it.interactions)}</strong> on roadmaps (XLSX) ({fmt(it.completed)} completed)</span>}
               {it.interactions!=null&&it.pageViews>0&&<span><strong style={{color:C.cyan}}>{fmt(it.pageViews)}</strong> page views (GA4)</span>}
               {it.type==="aa"&&it.pageViews>0&&<span><strong style={{color:C.cyan}}>{fmt(it.pageViews)}</strong> page views (GA4)</span>}
               {it.type==="permit"&&it.volume>0&&<span><strong style={{color:C.purple}}>{fmt(it.volume)}</strong> statewide submissions/yr (PLUR)</span>}
@@ -1040,7 +1040,7 @@ export default function App() {
             </div>
           </Sec>}
 
-          <div style={{fontSize:9,color:C.muted,fontFamily:C.sans,marginTop:12,opacity:.7}}>Status changes (XLSX) = users who clicked a task's complete/to-do button. Page views (GA4) = actual page loads in Google Analytics.</div>
+          <div style={{fontSize:9,color:C.muted,fontFamily:C.sans,marginTop:12,opacity:.7}}>On roadmaps (XLSX) = number of user roadmaps containing this task. Completed = users who marked it done. Page views (GA4) = actual page loads in Google Analytics.</div>
         </div>);
       })()}
     </div>);
@@ -1168,10 +1168,10 @@ export default function App() {
     const inertQs = sorted3.filter(q=>!q.downstream?.taskCount);
     return (<div>
     <Alert color={C.muted}>Profile questions drive roadmap personalization. Each question gates specific add-on tasks — click any row to see the downstream content pipeline it controls.</Alert>
-    <SrcLegend items={[["XLSX","Response counts (yes/no/unknown) and status changes from analytics"],["NAV","Question-to-addon-to-task mapping from codebase"]]} />
+    <SrcLegend items={[["XLSX","Response counts (yes/no/unknown) and roadmap counts from analytics"],["NAV","Question-to-addon-to-task mapping from codebase"]]} />
     <Insight>
-      <strong>The pipeline:</strong> Of {sorted3.length} profile questions, <strong>{activeQs.length} trigger roadmap add-ons</strong> that produce a combined {activeQs.reduce((s,q)=>s+q.downstream.taskCount,0)} tasks with {fmt(totalQEng)} total status changes (XLSX). The remaining {inertQs.length} either trigger anytime actions only, change the entire roadmap (like Provides Staffing Service overriding the industry), or appear unused.<br/><br/>
-      <strong>Home-Based Business</strong> dominates: it's the only question answered by most users ({fmt(neq.find(q=>q.question==="Home-Based Business")?.yes||0)} yes, {fmt(neq.find(q=>q.question==="Home-Based Business")?.no||0)} no) and its "No" path gates {neq.find(q=>q.question==="Home-Based Business")?.downstream?.taskCount||0} tasks with {fmt(neq.find(q=>q.question==="Home-Based Business")?.downstream?.engagement||0)} status changes — more than all other questions combined. Most other questions have &lt;1% response rates by design (they're only asked of specific industries), and their downstream tasks get minimal engagement.
+      <strong>The pipeline:</strong> Of {sorted3.length} profile questions, <strong>{activeQs.length} trigger roadmap add-ons</strong> that produce a combined {activeQs.reduce((s,q)=>s+q.downstream.taskCount,0)} tasks appearing on {fmt(totalQEng)} roadmaps (XLSX). The remaining {inertQs.length} either trigger anytime actions only, change the entire roadmap (like Provides Staffing Service overriding the industry), or appear unused.<br/><br/>
+      <strong>Home-Based Business</strong> dominates: it's the only question answered by most users ({fmt(neq.find(q=>q.question==="Home-Based Business")?.yes||0)} yes, {fmt(neq.find(q=>q.question==="Home-Based Business")?.no||0)} no) and its "No" path gates {neq.find(q=>q.question==="Home-Based Business")?.downstream?.taskCount||0} tasks appearing on {fmt(neq.find(q=>q.question==="Home-Based Business")?.downstream?.engagement||0)} roadmaps — more than all other questions combined. Most other questions have &lt;1% response rates by design (they're only asked of specific industries), and their downstream tasks get minimal engagement.
     </Insight>
     <div style={{display:"flex",gap:16,marginBottom:8,fontSize:10,color:C.muted,fontFamily:C.sans,alignItems:"center",flexWrap:"wrap"}}>
       <span>Row color = response rate:</span>
@@ -1186,7 +1186,7 @@ export default function App() {
         <span style={{width:22,textAlign:"right"}}>#</span>
         <span style={{flex:1}}>Question</span>
         <span style={{width:40,textAlign:"right"}}>Tasks</span>
-        <span style={{width:55,textAlign:"right"}}>Status (XLSX)</span>
+        <span style={{width:55,textAlign:"right"}}>Roadmaps (XLSX)</span>
         <span style={{width:55,textAlign:"right"}}>Rate</span>
         <span style={{width:100,textAlign:"center"}}>Yes / No</span>
         <span style={{width:55,textAlign:"right"}}>Yes</span>
@@ -1210,7 +1210,7 @@ export default function App() {
             {ds.taskCount>0?<div>
               <div style={{fontSize:10,color:C.purple,fontWeight:600,marginBottom:4}}>Downstream tasks ({ds.taskCount}):</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:3}}>{ds.tasks.map(t=><Tag key={t} color={C.purple} onClick={()=>{setFinderSearch(taskFmt(t));setSelItem(null);setFinderOpen(true);setView("finder");}}>{taskFmt(t)}</Tag>)}</div>
-              <div style={{fontSize:10,color:C.muted,marginTop:6}}>Combined status changes (XLSX): <strong style={{color:C.accent}}>{fmt(ds.engagement)}</strong></div>
+              <div style={{fontSize:10,color:C.muted,marginTop:6}}>Total roadmaps containing these tasks (XLSX): <strong style={{color:C.accent}}>{fmt(ds.engagement)}</strong></div>
             </div>:<div style={{fontSize:10,color:C.muted}}>No roadmap tasks gated. {ds.note.includes("anytime action")?"Triggers anytime actions instead.":ds.note.includes("overrides")?"Changes the entire roadmap path.":"No downstream content impact found."}</div>}
           </div>:<div style={{fontSize:10,color:C.muted}}>No downstream mapping available for this question.</div>}
         </div>}
