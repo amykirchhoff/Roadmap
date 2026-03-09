@@ -1001,36 +1001,88 @@ if os.path.isfile(ga4_pages_file):
     # --- Page Views ---
     page_rows = parse_ga4_csv(ga4_pages_file)
 
-    # Match task pages: /tasks/{slug}
-    task_page_views = {}  # slug -> {views, users, avgEngTime}
+    # --- Build urlSlug → taskId mapping from task markdown files ---
+    url_to_id = {}
+    task_content_dirs = [
+        os.path.join(addon_source.replace("add-ons",""), "tasks"),
+        os.path.join(addon_source.replace("add-ons",""), "license-tasks"),
+        os.path.join(addon_source.replace("add-ons",""), "env-tasks"),
+    ]
+    for tcd in task_content_dirs:
+        if not os.path.isdir(tcd): continue
+        for f in _glob.glob(os.path.join(tcd, "*.md")):
+            content = open(f).read()
+            parts = content.split("---")
+            if len(parts) < 3: continue
+            fm = parts[1]
+            task_id = None
+            url_slug = None
+            for line in fm.split("\n"):
+                line = line.strip()
+                if line.startswith("id:"):
+                    val = line[3:].strip().strip('"').strip("'")
+                    if val: task_id = val
+                elif line.startswith("urlSlug:"):
+                    val = line[8:].strip().strip('"').strip("'")
+                    if val: url_slug = val
+            if task_id and url_slug:
+                url_to_id[url_slug] = task_id
+    if url_to_id:
+        print(f"  URL slug → task ID mappings: {len(url_to_id)} ({sum(1 for u,i in url_to_id.items() if u!=i)} differ)")
+
+    # --- Page Views: match using urlSlug → taskId ---
+    task_page_views = {}  # task_id -> {views, users, avgEngTime}
     for r in page_rows:
         path = r.get("Page path and screen class", "")
         if path.startswith("/tasks/"):
-            slug = path.replace("/tasks/", "").strip("/").split("?")[0]
-            if not slug or slug == "undefined": continue
+            url_slug = path.replace("/tasks/", "").strip("/").split("?")[0]
+            if not url_slug or url_slug == "undefined": continue
+            # Resolve URL slug to task ID
+            task_id = url_to_id.get(url_slug, url_slug)
             views = safe_int(r.get("Views"))
             users = safe_int(r.get("Active users"))
             avg_time = safe_float(r.get("Average engagement time per active user"))
-            if slug not in task_page_views:
-                task_page_views[slug] = {"views": 0, "users": 0, "avgEngTime": 0}
-            task_page_views[slug]["views"] += views
-            task_page_views[slug]["users"] += users
-            if avg_time > task_page_views[slug]["avgEngTime"]:
-                task_page_views[slug]["avgEngTime"] = round(avg_time, 1)
+            if task_id not in task_page_views:
+                task_page_views[task_id] = {"views": 0, "users": 0, "avgEngTime": 0}
+            task_page_views[task_id]["views"] += views
+            task_page_views[task_id]["users"] += users
+            if avg_time > task_page_views[task_id]["avgEngTime"]:
+                task_page_views[task_id]["avgEngTime"] = round(avg_time, 1)
 
     # Match anytime action pages: /actions/{slug}
+    # Build AA urlSlug → id mapping
+    aa_url_to_id = {}
+    aa_content_dir = os.path.join(addon_source.replace("add-ons","").replace("roadmaps/",""), "anytime-action-tasks")
+    if os.path.isdir(aa_content_dir):
+        for f in _glob.glob(os.path.join(aa_content_dir, "*.md")):
+            content = open(f).read()
+            parts = content.split("---")
+            if len(parts) < 3: continue
+            fm = parts[1]
+            aa_id = None
+            aa_url = None
+            for line in fm.split("\n"):
+                line = line.strip()
+                if line.startswith("id:"):
+                    aa_id = line[3:].strip().strip('"').strip("'")
+                elif line.startswith("urlSlug:"):
+                    aa_url = line[8:].strip().strip('"').strip("'")
+            if aa_id and aa_url:
+                aa_url_to_id[aa_url] = aa_id
+
     aa_page_views = {}
     for r in page_rows:
         path = r.get("Page path and screen class", "")
         if path.startswith("/actions/"):
-            slug = path.replace("/actions/", "").strip("/").split("?")[0]
-            if not slug: continue
+            url_slug = path.replace("/actions/", "").strip("/").split("?")[0]
+            if not url_slug: continue
+            aa_id = aa_url_to_id.get(url_slug, url_slug)
             views = safe_int(r.get("Views"))
             users = safe_int(r.get("Active users"))
-            if slug not in aa_page_views:
-                aa_page_views[slug] = {"views": 0, "users": 0}
-            aa_page_views[slug]["views"] += views
-            aa_page_views[slug]["users"] += users
+            if aa_id not in aa_page_views:
+                aa_page_views[aa_id] = {"views": 0, "users": 0}
+            aa_page_views[aa_id]["views"] += views
+            aa_page_views[aa_id]["users"] += users
 
     # Top pages overall
     top_pages = []
@@ -1132,15 +1184,52 @@ if os.path.isfile(ga4_pages_file):
             "keyEvents": safe_int(r.get("Key events")),
         })
 
+    # --- Build name → all possible task IDs from markdown files ---
+    name_to_all_ids = {}
+    for tcd in task_content_dirs:
+        if not os.path.isdir(tcd): continue
+        for f in _glob.glob(os.path.join(tcd, "*.md")):
+            content = open(f).read()
+            parts = content.split("---")
+            if len(parts) < 3: continue
+            fm = parts[1]
+            task_id = task_name = None
+            for line in fm.split("\n"):
+                line = line.strip()
+                if line.startswith("id:"):
+                    task_id = line[3:].strip().strip('"').strip("'")
+                elif line.startswith("name:"):
+                    task_name = line[5:].strip().strip('"').strip("'")
+            if task_id and task_name:
+                if task_name not in name_to_all_ids:
+                    name_to_all_ids[task_name] = set()
+                name_to_all_ids[task_name].add(task_id)
+
     # --- Enrich task progress with page views ---
+    id_to_url_local = {v: k for k, v in url_to_id.items()}
     for tp_row in task_progress:
         tn = tp_row["task"]
         sl = task_name_to_slug.get(tn, tn)
-        pv = task_page_views.get(sl)
-        if pv:
-            tp_row["pageViews"] = pv["views"]
-            tp_row["pageUsers"] = pv["users"]
-            tp_row["avgEngTime"] = pv["avgEngTime"]
+        
+        # Collect all candidate IDs for this task name
+        candidates = {sl}
+        candidates.add(tn)  # raw name
+        for tid in name_to_all_ids.get(tn, set()):
+            candidates.add(tid)
+        
+        # Find the best match: the candidate with the most page views
+        best_pv = None
+        best_views = 0
+        for cand in candidates:
+            pv = task_page_views.get(cand)
+            if pv and pv["views"] > best_views:
+                best_pv = pv
+                best_views = pv["views"]
+        
+        if best_pv:
+            tp_row["pageViews"] = best_pv["views"]
+            tp_row["pageUsers"] = best_pv["users"]
+            tp_row["avgEngTime"] = best_pv["avgEngTime"]
         else:
             tp_row["pageViews"] = 0
             tp_row["pageUsers"] = 0
