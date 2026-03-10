@@ -104,14 +104,17 @@ export default function App() {
   const ContentGap = () => {
     const scatter = inds.filter(i=>i.id!=="generic").map(i=>({...i,logUsers:Math.log10(Math.max(i.users,1)),aaTotal:i.starting.aaTotal}));
     return (<div>
-      <Alert color={C.red}><strong>14 industries</strong> serving <strong>{fmt(mismatchUsers)} users</strong> are assigned to the wrong sector. Content tagged to their correct sector — including anytime actions for vehicle registration, CDL, IFTA, and IRP — is invisible to them. Separately, <strong>10 of 25 sectors</strong> are completely unreachable by STARTING users.</Alert>
+      {mismatchInds.length>0?<Alert color={C.red}><strong>{mismatchInds.length} {mismatchInds.length===1?"industry":"industries"}</strong> serving <strong>{fmt(mismatchUsers)} users</strong> {mismatchInds.length===1?"is":"are"} assigned to the wrong sector. Content tagged to their correct sector is invisible to them.</Alert>
+      :<Alert color={C.green}>All industry-sector assignments are now correct. The team resolved the previously identified mismatches.</Alert>}
+      {DATA.orphanedSectors.length>0&&<Alert color={C.orange}><strong>{DATA.orphanedSectors.length} of {sectors.length} sectors</strong> have no STARTING industry pointing to them. Anytime actions and fundings tagged exclusively to these sectors are only reachable by OWNING users who self-select the sector during onboarding. Orphaned: {DATA.orphanedSectors.join(", ")}.</Alert>}
       <SrcLegend items={[["XLSX","User counts, industry assignments, sector assignments from analytics"],["NAV","Industry definitions, sector mappings, AA/funding reach from codebase"],["PLUR","Permit inventory from Plurmits spreadsheet"]]} />
-      <Insight><strong>Why this matters:</strong> The content team has built 64 anytime actions and 64 fundings, but this content only reaches users in the "operate" phases — about <strong>{fmt(phases.seesAAFunding)}</strong> users, or <strong>{pct(phases.seesAAFunding,totalBiz)}</strong> of the total base. Of those who <em>do</em> see it, the sector mismatch means {fmt(mismatchUsers)} are getting results filtered against the wrong sector. They see generic "Other Services" content instead of industry-relevant actions like IFTA registration and CDL requirements.</Insight>
+      <Insight><strong>Why this matters:</strong> The content team has built 64 anytime actions and 64 fundings, but this content only reaches users in the "operate" phases — about <strong>{fmt(phases.seesAAFunding)}</strong> users, or <strong>{pct(phases.seesAAFunding,totalBiz)}</strong> of the total base.{mismatchUsers>0?" Of those who see it, "+fmt(mismatchUsers)+" are getting results filtered against the wrong sector.":""} {fmt(otherServicesUsers)} users ({pct(otherServicesUsers,totalBiz)}) are in the "Other Services" catch-all sector, which includes {fmt(genericUsers)} who picked "All Other Businesses" plus {otherServicesUsers-genericUsers>0?fmt(otherServicesUsers-genericUsers):"0"} in {sectors.find(s=>s.id==="other-services")?.industryCount||0} specific industries not yet assigned to a dedicated sector.</Insight>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
         <Stat label="Businesses on Platform" value={fmt(totalBiz)} sub="All business accounts in the system" />
         <Stat label="Businesses That See Operate Content" value={fmt(phases.seesAAFunding)} sub={"Only "+pct(phases.seesAAFunding,totalBiz)+" of businesses are in a phase where anytime actions and fundings are displayed"} color={C.green} />
         <Stat label="Businesses in the 'Other Services' Sector" value={fmt(otherServicesUsers)} sub={pct(otherServicesUsers,totalBiz)+" of all businesses are assigned to this catch-all sector, including "+fmt(genericUsers)+" who picked 'All Other Businesses' as their industry"} color={C.orange} />
-        <Stat label="Industries With Wrong Sector" value={mismatchInds.length} sub={fmt(mismatchUsers)+" businesses in these industries are matched against the wrong sector for content filtering"} color={C.red} />
+        {mismatchInds.length>0?<Stat label="Industries With Wrong Sector" value={mismatchInds.length} sub={fmt(mismatchUsers)+" businesses in these industries are matched against the wrong sector for content filtering"} color={C.red} />
+        :<Stat label="Sector Mismatches" value="0 ✓" sub="All industry-sector assignments are correct" color={C.green} />}
         <Stat label="Orphaned Sectors" value={DATA.orphanedSectors.length+" / 25"} sub="These sectors exist in the taxonomy but no industry's defaultSectorId points to them — only OWNING users can reach them" color={C.red} />
         {DATA.permitCoverage&&<Stat label="State Permits Covered" value={fmt(DATA.permitCoverage.coverage.bizApplicable - DATA.permitCoverage.coverage.bizNone)+" / "+fmt(DATA.permitCoverage.coverage.bizApplicable)} sub={fmt(DATA.permitCoverage.coverage.bizNone)+" business permits have no presence in the Navigator. "+DATA.permitCoverage.plurmits.filter(p=>p.api).length+" have live API connections."} color={C.purple} />}
       </div>
@@ -232,32 +235,6 @@ export default function App() {
       </Sec>}
     </div>);
   };
-
-  /* ═══ TAB: SECTOR HEALTH ═══ */
-  const SectorHealth = () => (<div>
-    <Alert color={C.orange}>{DATA.orphanedSectors.length} sectors (red border) have no industry pointing to them. Content tagged exclusively to these sectors is invisible to anyone who started a business through the Navigator. They are only reachable by OWNING users who self-select during onboarding.</Alert>
-    <Insight><strong>The two-taxonomy problem:</strong> The system has 25 sectors and 64 industries operating as independent taxonomies connected only by <code style={{background:`${C.purple}22`,padding:"1px 4px",borderRadius:3}}>defaultSectorId</code>. Content authors tag content to sectors, but users get their sector assigned silently when they pick an industry. There's no build-time validation that the tags align. Content authors think "trucking is transportation" but the code says "trucking is other-services."</Insight>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:8}}>
-      {[...sectors].sort((a,b)=>b.xlsxUsers-a.xlsxUsers).map(sec=>(
-        <div key={sec.id} style={{background:C.card,border:`1px solid ${sec.orphaned?C.red+"66":C.border}`,borderRadius:8,padding:14}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",marginBottom:8}}>
-            <div style={{fontSize:13,fontWeight:700,color:sec.orphaned?C.red:C.text,fontFamily:C.sans,flex:1}}>{sec.name}</div>
-            {sec.orphaned&&<Tag color={C.red}>ORPHANED</Tag>}
-          </div>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,fontSize:11,fontFamily:C.sans}}>
-            <div><span style={{color:C.muted}}>Industries: </span><span style={{color:C.accent,fontFamily:C.mono}}>{sec.industryCount}</span></div>
-            <div><span style={{color:C.muted}}>Users: </span><span style={{color:C.accent,fontFamily:C.mono}}>{fmt(sec.xlsxUsers)}</span></div>
-            <div><span style={{color:C.muted}}>AAs tagged: </span><span style={{color:C.cyan,fontFamily:C.mono}}>{sec.aaTagged}</span></div>
-            <div><span style={{color:C.muted}}>Fundings: </span><span style={{color:C.green,fontFamily:C.mono}}>{sec.fundTagged}</span></div>
-          </div>
-          {sec.missingIndustriesNames.length>0&&<div style={{marginTop:8,paddingTop:8,borderTop:`1px solid ${C.border}`}}>
-            <div style={{fontSize:10,color:C.orange,marginBottom:4}}>Should also include:</div>
-            <div style={{display:"flex",flexWrap:"wrap",gap:3}}>{sec.missingIndustriesNames.map(n=><Tag key={n} color={C.orange}>{n}</Tag>)}</div>
-          </div>}
-        </div>
-      ))}
-    </div>
-  </div>);
 
   /* ═══ TAB: USER JOURNEY ═══ */
   const UserJourney = () => {
@@ -908,10 +885,10 @@ export default function App() {
         // Step: Legal structure (if triggered by legal structure)
         const legalTrigs = taskTrigs.filter(t=>t.type==="legalStructure");
         const legalProfileTrigs = taskTrigs.filter(t=>t.type==="legalStructure+profile");
+        const isPersona = taskTrigs.some(t=>t.type==="persona" || t.type==="persona+industry");
         if(legalTrigs.length > 0){
           steps.push({step:"Select the required business structure",detail:legalTrigs.map(t=>t.detail).join("; "),color:C.purple});
-        }
-        if(legalProfileTrigs.length > 0){
+        } else if(legalProfileTrigs.length > 0){
           // Show the legal structure part
           const legalPart = legalProfileTrigs.map(t=>t.detail.split(", then ")[0]).join("; ");
           steps.push({step:"Select the required business structure",detail:legalPart,color:C.purple});
@@ -920,6 +897,10 @@ export default function App() {
           if(profilePart.length>0){
             steps.push({step:"Answer a follow-up question in your Profile page",detail:profilePart.join("; "),color:C.purple});
           }
+        } else if(!isPersona){
+          // All STARTING users must select a business structure to progress.
+          // This isn't a trigger — it's a prerequisite for the roadmap to populate.
+          steps.push({step:"Select your business structure",detail:"Choose your legal structure (LLC, Sole Proprietorship, etc.). This is required for all STARTING users — your roadmap populates after this step.",color:C.muted});
         }
 
         // Step: Profile / NEQ questions
@@ -1328,9 +1309,9 @@ export default function App() {
           Source: codebase ({DATA.taskProgress.length} tasks) + {DATA.meta.xlsxFile} ({fmt(DATA.meta.totalBusinesses)} businesses) · {inds.length} industries · {DATA.anytimeActions.length} AAs · {sectors.length} sectors{DATA.permitCoverage&&` · ${fmt(DATA.permitCoverage.coverage.total)} state permits`}
         </div>
         <div style={{display:"flex",gap:5,marginBottom:20,flexWrap:"wrap"}}>
-          {nav("contentgap","Content Gap")}{nav("roadmap","Roadmap Analysis")}{nav("sectorhealth","Sector Health")}{nav("journey","User Journey")}{nav("industries","Industries")}{nav("detail","Industry Detail")}{nav("tasks","Task Reuse")}{nav("engagement","Task Engagement")}{nav("permits","Permit Coverage")}{nav("finder","Content Finder")}{DATA.ga4&&nav("siteanalytics","Site Analytics")}{nav("profile","Profile Questions")}
+          {nav("contentgap","Content Gap")}{nav("roadmap","Roadmap Analysis")}{nav("journey","User Journey")}{nav("industries","Industries")}{nav("detail","Industry Detail")}{nav("tasks","Task Reuse")}{nav("engagement","Task Engagement")}{nav("permits","Permit Coverage")}{nav("finder","Content Finder")}{DATA.ga4&&nav("siteanalytics","Site Analytics")}{nav("profile","Profile Questions")}
         </div>
-        {view==="contentgap"&&<ContentGap/>}{view==="roadmap"&&<RoadmapAnalysis/>}{view==="sectorhealth"&&<SectorHealth/>}{view==="journey"&&<UserJourney/>}{view==="industries"&&<Industries/>}{view==="detail"&&<Detail/>}{view==="tasks"&&<TaskReuse/>}{view==="engagement"&&<TaskEngagement/>}{view==="permits"&&<PermitCoverage/>}{view==="finder"&&<ContentFinder/>}{view==="siteanalytics"&&<SiteAnalytics/>}{view==="profile"&&<ProfileQuestions/>}
+        {view==="contentgap"&&<ContentGap/>}{view==="roadmap"&&<RoadmapAnalysis/>}{view==="journey"&&<UserJourney/>}{view==="industries"&&<Industries/>}{view==="detail"&&<Detail/>}{view==="tasks"&&<TaskReuse/>}{view==="engagement"&&<TaskEngagement/>}{view==="permits"&&<PermitCoverage/>}{view==="finder"&&<ContentFinder/>}{view==="siteanalytics"&&<SiteAnalytics/>}{view==="profile"&&<ProfileQuestions/>}
       </div>
     </div>
   );
