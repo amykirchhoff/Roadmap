@@ -141,6 +141,15 @@ for _td in _task_dirs:
 if codebase_task_inventory:
     print(f"  Codebase task inventory: {len(codebase_task_inventory)} markdown files")
 
+# Count fundings and certifications from codebase
+_funding_dir = os.path.join(ROOT, "..", "nav", "content", "src", "fundings")
+_cert_dir = os.path.join(ROOT, "..", "nav", "content", "src", "certifications")
+import glob as _g3
+codebase_funding_count = len(_g3.glob(os.path.join(_funding_dir, "*.md"))) if os.path.isdir(_funding_dir) else 0
+codebase_cert_count = len(_g3.glob(os.path.join(_cert_dir, "*.md"))) if os.path.isdir(_cert_dir) else 0
+if codebase_funding_count:
+    print(f"  Codebase fundings: {codebase_funding_count}, certifications: {codebase_cert_count}")
+
     # Build lookup: XLSX slug -> XLSX row(s)
     xlsx_by_slug = {}  # slug -> list of XLSX rows
     for tp_entry in task_progress:
@@ -1669,6 +1678,8 @@ output = {
     "totalDiffTasks": len(task_to_industries),
     "totalNeqTaskSlugs": len(set(t for n in codebase_neqs for t in n.get("allTasks", []))),
     "totalAllDiffTasks": len(set(list(task_to_industries.keys()) + [t for n in codebase_neqs for t in n.get("allTasks", [])])),
+    "fundingCount": codebase_funding_count or len(nav.get("fundings", [])),
+    "certificationCount": codebase_cert_count,
     "totalDistinctPaths": total_distinct_paths,
     "totalDistinctPathsNote": "Counts industry × legal structure variations only. NEQ combinations (56 binary questions) multiply this further.",
     "taskTriggers": task_triggers,
