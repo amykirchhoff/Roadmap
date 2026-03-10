@@ -64,6 +64,7 @@ export default function App() {
   const phases = DATA.phases;
   const tp = DATA.taskProgress;
   const tf = DATA.taskFrequency;
+  const ctf = DATA.combinedTaskFrequency || tf;  // Combined includes NEQ-triggered tasks
   const neq = DATA.nonEssentialQuestions;
 
   const totalBiz = phases.totalBusinesses;
@@ -73,6 +74,7 @@ export default function App() {
   const genericUsers = inds.find(i=>i.id==="generic")?.users||0;
 
   const tasksByFreq = useMemo(()=>Object.entries(tf).map(([n,info])=>({name:n,count:info.count,industries:info.industries})).sort((a,b)=>b.count-a.count),[tf]);
+  const combinedTasksByFreq = useMemo(()=>Object.entries(ctf).map(([n,info])=>({name:n,count:info.count,industries:info.industries,baseCount:info.baseCount||info.count,neqCount:info.neqCount||0})).sort((a,b)=>b.count-a.count),[ctf]);
   const uniqueOnly = tasksByFreq.filter(t=>t.count===1);
 
   const diffStats = useMemo(()=>{
@@ -458,24 +460,27 @@ export default function App() {
 
   /* ═══ TAB: TASK REUSE (from original Tasks view) ═══ */
   const TaskReuse = () => {
-    const sharedTasks=tasksByFreq.filter(t=>t.count>=2);
+    const sharedTasks=combinedTasksByFreq.filter(t=>t.count>=2);
+    const singleTasks=combinedTasksByFreq.filter(t=>t.count===1);
+    const neqOnlyTasks=combinedTasksByFreq.filter(t=>t.baseCount===0);
     return (<div>
-      <Alert color={C.muted}>Differentiating tasks ranked by how many industries include them. Only tasks appearing in 2 or more industries are shown here — single-industry tasks are listed separately below.</Alert>
-      <Insight><strong>"get-insurance"</strong> appears in {tf["get-insurance"]?.count||0} industries — essentially universal content. The next most-shared ({tasksByFreq.slice(1,4).map(t=>`"${taskFmt(t.name)}" (${t.count})`).join(", ")}) show real reuse clusters: environmental requirements, resale tax, and vehicle tasks spanning the transportation family.</Insight>
-      <Sec title="Shared Tasks" sub={"Tasks that appear in 2 or more industry roadmaps ("+sharedTasks.length+" tasks)."}>
+      <Alert color={C.muted}>Differentiating tasks ranked by how many industries can show them — including both base roadmap tasks and NEQ-triggered tasks. Tasks appearing in 2+ industries are shown in the chart; single-industry tasks listed below.</Alert>
+      <SrcLegend items={[["NAV","Base roadmap tasks from industry JSON files + NEQ-triggered tasks from add-on definitions"]]} />
+      <Insight><strong>{combinedTasksByFreq.length} differentiating tasks</strong> across {Object.keys(ctf).length===Object.keys(tf).length?"base roadmaps":"base roadmaps + NEQ add-ons"} (excluding 7 universal tasks). {sharedTasks.length} appear in 2+ industries, {singleTasks.length} are single-industry, and {neqOnlyTasks.length} are only reachable via NEQs (not on any base roadmap).</Insight>
+      <Sec title={"Shared Tasks ("+sharedTasks.length+")"} sub="Tasks that appear in 2 or more industry roadmaps (base or via NEQ).">
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:14}}>
           <ResponsiveContainer width="100%" height={Math.max(300,sharedTasks.length*28+40)}>
             <BarChart data={sharedTasks} layout="vertical" margin={{left:200,right:20,top:5,bottom:5}}>
               <XAxis type="number" stroke={C.muted} tick={{fontSize:10,fontFamily:C.mono}} label={{value:"Number of industries",position:"bottom",offset:0,fill:C.muted,fontSize:10}} />
               <YAxis dataKey="name" type="category" width={190} tick={{fontSize:11,fontFamily:C.sans}} tickFormatter={taskFmt} stroke={C.muted} interval={0} />
-              <Tooltip content={({payload})=>{if(!payload?.[0])return null;const d=payload[0].payload;return <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:10,fontSize:11,color:C.text,fontFamily:C.sans}}><div style={{fontWeight:700}}>{taskFmt(d.name)}</div><div>Appears in {d.count} industry roadmaps</div></div>;}} />
+              <Tooltip content={({payload})=>{if(!payload?.[0])return null;const d=payload[0].payload;return <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:10,fontSize:11,color:C.text,fontFamily:C.sans}}><div style={{fontWeight:700}}>{taskFmt(d.name)}</div><div>Appears in {d.count} industries ({d.baseCount} base{d.neqCount>0?` + ${d.neqCount} via NEQ`:""})</div></div>;}} />
               <Bar dataKey="count" fill={C.cyan} radius={[0,4,4,0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </Sec>
-      <Sec title={`Single-Industry Tasks (${uniqueOnly.length})`} sub="Built for one specific audience.">
-        <div style={{display:"flex",flexWrap:"wrap",gap:4}}>{uniqueOnly.map(t=>{const i2=inds.find(i=>i.id===t.industries[0]);return <Tag key={t.name} color={C.red} onClick={()=>{if(i2)goDetail(i2);}}>{taskFmt(t.name)} → {i2?.name||t.industries[0]}</Tag>;})}</div>
+      <Sec title={`Single-Industry Tasks (${singleTasks.length})`} sub="Built for one specific audience.">
+        <div style={{display:"flex",flexWrap:"wrap",gap:4}}>{singleTasks.map(t=>{const i2=inds.find(i=>i.id===t.industries[0]);return <Tag key={t.name} color={t.baseCount===0?C.purple:C.red} onClick={()=>{if(i2)goDetail(i2);}}>{taskFmt(t.name)} → {i2?.name||t.industries[0]}{t.baseCount===0?" (NEQ)":""}</Tag>;})}</div>
       </Sec>
     </div>);
   };
