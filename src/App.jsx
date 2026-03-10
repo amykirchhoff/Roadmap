@@ -76,10 +76,11 @@ export default function App() {
   const uniqueOnly = tasksByFreq.filter(t=>t.count===1);
 
   const diffStats = useMemo(()=>{
-    const zeroDiff=inds.filter(i=>i.totalDiffTasks===0);
+    const zeroDiff=inds.filter(i=>i.totalDiffTasks===0&&(i.neqTaskCount||0)===0);
+    const neqOnly=inds.filter(i=>i.totalDiffTasks===0&&(i.neqTaskCount||0)>0);
     const noUnique=inds.filter(i=>i.totalDiffTasks>0&&i.uniqueTasks===0);
     const hasUnique=inds.filter(i=>i.uniqueTasks>0);
-    return {zeroDiff,noUnique,hasUnique,zeroDiffUsers:zeroDiff.reduce((s,i)=>s+i.users,0),noUniqueUsers:noUnique.reduce((s,i)=>s+i.users,0)};
+    return {zeroDiff,neqOnly,noUnique,hasUnique,zeroDiffUsers:zeroDiff.reduce((s,i)=>s+i.users,0),neqOnlyUsers:neqOnly.reduce((s,i)=>s+i.users,0),noUniqueUsers:noUnique.reduce((s,i)=>s+i.users,0)};
   },[inds]);
 
   const sorted = useMemo(()=>{
@@ -168,12 +169,12 @@ export default function App() {
       <Insight>
         <strong>Key findings:</strong><br/>
         <strong>No middle layer.</strong> Of {DATA.totalDiffTasks} differentiating tasks, {uniqueOnly.length} appear in only one roadmap. Tasks are either universal (shared by all) or bespoke (built for a single industry). Only {DATA.totalDiffTasks - uniqueOnly.length} tasks sit in between.<br/>
-        <strong>23 industries have zero unique content.</strong> Their roadmaps are assembled entirely from tasks shared with other industries — there is nothing a user sees that they wouldn't also see in a different industry.<br/>
+        <strong>23 industries have zero unique content on their base roadmap</strong> — but when you factor in non-essential questions (NEQs), the picture changes. {diffStats.zeroDiff.length>0?diffStats.zeroDiff.length+" industries ("+fmt(diffStats.zeroDiffUsers)+" users) have zero differentiating content even including NEQs. ":"Only "}{diffStats.neqOnly.length} industries differentiate <strong>only</strong> through NEQs — their base roadmap is generic, but profile questions can add {diffStats.neqOnly.map(i=>i.neqTaskCount).reduce((a,b)=>a+b,0)} tasks. Some industries gain substantial depth: Healthcare goes from 6 base tasks to {inds.find(i=>i.id==="healthcare")?.totalContentTasks||"?"} when NEQ-triggered content is included; Retail from {inds.find(i=>i.id==="retail")?.totalDiffTasks||"?"} to {inds.find(i=>i.id==="retail")?.totalContentTasks||"?"}; Lodging from {inds.find(i=>i.id==="lodging")?.totalDiffTasks||"?"} to {inds.find(i=>i.id==="lodging")?.totalContentTasks||"?"}.<br/>
         <strong>The top 10 tasks account for {pct(tp.slice(0,10).reduce((s,t)=>s+t.total,0), tp.reduce((s,t)=>s+t.total,0))} of total roadmap appearances (XLSX).</strong> Across all {tp.length} tracked tasks (7 universal + {DATA.totalDiffTasks} differentiating + ~{tp.length - 7 - DATA.totalDiffTasks} add-ons and legacy), the bottom half ({Math.floor(tp.length/2)}) account for {pct(tp.slice(Math.floor(tp.length/2)).reduce((s,t)=>s+t.total,0), tp.reduce((s,t)=>s+t.total,0))}. {tp.filter(t=>t.total<10).length} tasks appear on fewer than 10 roadmaps, and {tp.filter(t=>t.total<100).length} on fewer than 100.<br/>
         <strong>97% drop-off by task #10.</strong> "Select Your Business Structure" appears on {fmt(tp[0]?.total)} roadmaps (XLSX); by the 10th-ranked task, that drops to {fmt(tp[9]?.total)} — before most users ever reach the differentiating content.<br/>
         <strong>{fmt(DATA.totalDistinctPaths||0)} distinct roadmaps.</strong> Factoring in industry × legal structure × non-essential questions × home-based status, the system can produce {fmt(DATA.totalDistinctPaths||0)} unique task-set combinations. Healthcare alone accounts for 512 variants. The simplest industries still produce 4-8 variants each.
       </Insight>
-      <Insight><strong>The differentiation problem:</strong> {diffStats.zeroDiff.length} industries have <strong>zero differentiating tasks</strong> (Courier Service and Remediation &amp; Waste) — their {fmt(diffStats.zeroDiffUsers)} users get an identical-to-generic roadmap. Another {diffStats.noUnique.length} industries have tasks but <strong>none unique to them</strong> — including some of the largest: Online Business (21K users), Real Estate Investing (13K), Management Consulting (7K), and Cleaning &amp; Janitorial (6K). Only {diffStats.hasUnique.length} industries have truly unique content, led by Retail, Home Improvement Contractor, Healthcare, and Trucking. Meanwhile, {uniqueOnly.length} of {DATA.totalDiffTasks} differentiating tasks appear in just one industry — purpose-built content like the Food Truck License, Cosmetology Shop License, and Trucking USDOT registration that serves a single audience.</Insight>
+      <Insight><strong>The differentiation picture (including NEQs):</strong> {diffStats.zeroDiff.length} industries have <strong>zero differentiating content</strong> even counting NEQ-triggered tasks — their {fmt(diffStats.zeroDiffUsers)} users get a generic roadmap. {diffStats.neqOnly.length} industries ({fmt(diffStats.neqOnlyUsers)} users) differentiate <strong>only via NEQs</strong> — their base roadmap is generic, but answering profile questions unlocks industry-specific tasks. Another {diffStats.noUnique.length} industries have base tasks but <strong>none unique to them</strong>. Only {diffStats.hasUnique.length} industries have truly unique base content. However, 56 non-essential questions can add up to {inds.reduce((s,i)=>s+(i.neqTaskCount||0),0)} additional tasks across all industries — content the team built that is mostly invisible due to 99%+ unknown response rates on most NEQs.</Insight>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
         <Stat label="Industry Roadmaps" value={inds.length} sub="Total enabled industries with a roadmap definition" />
         <Stat label="Differentiating Tasks" value={DATA.totalDiffTasks} sub="Industry-specific tasks remaining after removing 7 universal tasks every industry shares" />
@@ -191,7 +192,7 @@ export default function App() {
                 <span style={{color:C.purple,fontFamily:C.mono,fontWeight:700}}>{fmt(ind.distinctPaths)}</span>
                 <span style={{fontSize:10,color:C.muted}}>paths</span>
                 <div style={{width:100,height:8,background:C.bg,borderRadius:4,overflow:"hidden"}}><div style={{width:`${Math.log2(ind.distinctPaths)/Math.log2(maxPaths)*100}%`,height:"100%",background:C.purple,borderRadius:4,opacity:.6}}/></div>
-                <span style={{fontSize:10,color:C.muted}}>{ind.nonEssentialQs} NEQs</span>
+                <span style={{fontSize:10,color:C.muted}}>{ind.nonEssentialQs} NEQs → {ind.neqTaskCount||0} tasks</span>
               </div>
             ))}
             {byPaths.length>20&&<div style={{fontSize:10,color:C.muted,padding:"4px 14px"}}>+ {byPaths.length-20} more industries (minimum {byPaths[byPaths.length-1]?.distinctPaths} paths each)</div>}
@@ -200,8 +201,9 @@ export default function App() {
       </Sec>
 
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:20}}>
-        <Stat label="Industries w/ Zero Diff. Tasks" value={diffStats.zeroDiff.length} sub={fmt(diffStats.zeroDiffUsers)+" businesses see a roadmap identical to the generic baseline"} color={C.red} />
-        <Stat label="Industries w/ Shared Tasks Only" value={diffStats.noUnique.length} sub={fmt(diffStats.noUniqueUsers)+" businesses — every task in their roadmap also appears in other industries"} color={C.orange} />
+        <Stat label="Industries w/ Zero Content" value={diffStats.zeroDiff.length} sub={fmt(diffStats.zeroDiffUsers)+" businesses — no base tasks, no NEQ tasks, identical to generic"} color={C.red} />
+        {diffStats.neqOnly.length>0&&<Stat label="Differentiate via NEQ Only" value={diffStats.neqOnly.length} sub={fmt(diffStats.neqOnlyUsers)+" businesses — base roadmap is generic, but profile questions can add industry content"} color={C.orange} />}
+        <Stat label="Industries w/ Shared Tasks Only" value={diffStats.noUnique.length} sub={fmt(diffStats.noUniqueUsers)+" businesses — base tasks exist but all shared with other industries"} color={C.orange} />
         <Stat label="Industries w/ Unique Tasks" value={diffStats.hasUnique.length} sub="These industries have at least one task no other industry includes" color={C.green} />
       </div>
       <Sec title="Users vs. Differentiating Tasks" sub="Each dot is one industry. Color = degree of uniqueness. Click for details.">
@@ -362,6 +364,7 @@ export default function App() {
         <Stat label="Anytime Actions (Starting)" value={s.aaTotal} sub={s.aaByIndustry+" by industryId, "+s.aaBySector+" by sectorId, "+s.aaUniversal+" universal"} color={C.cyan} />
         <Stat label="Fundings Visible (Starting)" value={s.fundings} sub={"Matched via the '"+ind.sectorName+"' sector"} color={C.green} />
         <Stat label="Non-Essential Questions" value={ind.nonEssentialQs} sub="Profile questions asked of this industry that trigger add-on tasks" color={C.muted} />
+        {(ind.neqTaskCount||0)>0&&<Stat label="NEQ-Triggered Tasks" value={ind.neqTaskCount} sub={"Tasks added when users answer profile questions ("+ind.totalDiffTasks+" base + "+ind.neqTaskCount+" via NEQ = "+(ind.totalContentTasks||0)+" total)"} color={C.purple} />}
         {ind.distinctPaths>0&&<Stat label="Distinct Roadmap Paths" value={fmt(ind.distinctPaths)} sub="Unique task-set combinations from legal structure, NEQs, and home-based choices" color={C.purple} />}
       </div>
       {ind.sectorMismatch&&<Alert color={C.red}><strong>Sector mismatch:</strong> Assigned "{ind.sectorName}" but content implies "{ind.sectorMismatchName}."{fix.missedAA>0&&<span> These users are missing <strong>{fix.missedAA} anytime actions</strong> tagged to the correct sector.</span>}{fix.missedFund!==0&&<span> Funding count difference: <strong>{fix.missedFund>0?"+":""}{fix.missedFund}</strong>.</span>}</Alert>}
@@ -1211,8 +1214,10 @@ export default function App() {
     const activeQs = sorted3.filter(q=>q.downstream?.taskCount>0);
     const inertQs = sorted3.filter(q=>!q.downstream?.taskCount);
     return (<div>
-    <Alert color={C.muted}>Profile questions drive roadmap personalization. Each question gates specific add-on tasks — click any row to see the downstream content pipeline it controls.</Alert>
-    <SrcLegend items={[["XLSX","Response counts (yes/no/unknown) and roadmap counts from analytics"],["NAV","Question-to-addon-to-task mapping from codebase"]]} />
+    <Alert color={C.muted}>Two types of profile questions drive roadmap personalization. The first section shows <strong>{sorted3.length} essential/onboarding questions</strong> tracked in the analytics XLSX (with response rates). The second section shows <strong>{DATA.codebaseNEQs?.length||0} industry-specific non-essential questions</strong> from the codebase — these appear under "Discover Industry Licenses and Permits" in the Profile page and gate industry-specific licensing tasks.</Alert>
+    <SrcLegend items={[["XLSX","Response counts (yes/no/unknown) and roadmap counts for essential questions"],["NAV","All 56 NEQ definitions, add-on mappings, industry assignments, and downstream tasks from codebase"]]} />
+    <h3 style={{fontSize:14,fontWeight:700,color:C.text,margin:"20px 0 8px",fontFamily:C.sans}}>Essential / Onboarding Questions ({sorted3.length})</h3>
+    <div style={{fontSize:11,color:C.muted,marginBottom:12,fontFamily:C.sans}}>Profile fields tracked in the analytics XLSX — including onboarding, location-based, and legal structure questions. These have response rate data.</div>
     <Insight>
       <strong>The pipeline:</strong> Of {sorted3.length} profile questions, <strong>{activeQs.length} trigger roadmap add-ons</strong> that produce a combined {activeQs.reduce((s,q)=>s+q.downstream.taskCount,0)} tasks appearing on {fmt(totalQEng)} roadmaps (XLSX). The remaining {inertQs.length} either trigger anytime actions only, change the entire roadmap (like Provides Staffing Service overriding the industry), or appear unused.<br/><br/>
       <strong>Home-Based Business</strong> dominates: it's the only question answered by most users ({fmt(neq.find(q=>q.question==="Home-Based Business")?.yes||0)} yes, {fmt(neq.find(q=>q.question==="Home-Based Business")?.no||0)} no) and its "No" path gates {neq.find(q=>q.question==="Home-Based Business")?.downstream?.taskCount||0} tasks appearing on {fmt(neq.find(q=>q.question==="Home-Based Business")?.downstream?.engagement||0)} roadmaps — more than all other questions combined. Most other questions have &lt;1% response rates by design (they're only asked of specific industries), and their downstream tasks get minimal engagement.
@@ -1260,6 +1265,45 @@ export default function App() {
         </div>}
       </div>
     );})}</div>
+    {DATA.codebaseNEQs&&DATA.codebaseNEQs.length>0&&<>
+      <Sec title={"Industry Non-Essential Questions ("+DATA.codebaseNEQs.length+")"} sub="These are the 56 NEQs from the codebase — the industry-specific profile questions under 'Discover Industry Licenses and Permits'. The 22 questions above are the essential/onboarding profile fields tracked in the XLSX. These two sets are different — the codebase NEQs gate industry-specific licensing tasks.">
+        <SrcLegend items={[["NAV","Question definitions, add-on mappings, and industry assignments from codebase"]]} />
+        <div style={{display:"grid",gap:3}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
+            <span style={{flex:1}}>Question</span>
+            <span style={{width:55,textAlign:"right"}}>Industries</span>
+            <span style={{width:55,textAlign:"right"}}>Tasks</span>
+            <span style={{width:65,textAlign:"right"}}>Roadmaps</span>
+          </div>
+          {DATA.codebaseNEQs.sort((a,b)=>b.taskCount-a.taskCount).map((nq,i)=>{
+            const isExp2=expandedQ===("neq-"+nq.id);
+            return(
+            <div key={nq.id}>
+              <div onClick={()=>setExpandedQ(isExp2?null:"neq-"+nq.id)} style={{background:C.card,border:`1px solid ${isExp2?C.purple+"66":C.border}`,borderRadius:isExp2?"6px 6px 0 0":6,padding:"8px 14px",display:"flex",alignItems:"center",gap:10,cursor:"pointer"}} onMouseEnter={e=>{if(!isExp2)e.currentTarget.style.background=C.cardHover;}} onMouseLeave={e=>{if(!isExp2)e.currentTarget.style.background=C.card;}}>
+                <span style={{flex:1,fontSize:11,color:nq.taskCount>0?C.text:C.muted,fontFamily:C.sans}}>{nq.question||nq.id}</span>
+                <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:10,color:C.cyan}}>{nq.industryCount}</span>
+                <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:10,color:nq.taskCount>0?C.purple:C.muted}}>{nq.taskCount||"—"}</span>
+                <span style={{width:65,textAlign:"right",fontFamily:C.mono,fontSize:10,color:nq.engagement>0?C.accent:C.muted}}>{nq.engagement>0?fmt(nq.engagement):"—"}</span>
+              </div>
+              {isExp2&&<div style={{background:C.card,border:`1px solid ${C.purple}66`,borderTop:"none",borderRadius:"0 0 6px 6px",padding:"12px 14px 14px 20px"}}>
+                <div style={{fontSize:10,color:C.muted,marginBottom:6}}>ID: <span style={{fontFamily:C.mono}}>{nq.id}</span> · Yes add-on: <span style={{fontFamily:C.mono}}>{nq.yesAddon||"none"}</span> · No add-on: <span style={{fontFamily:C.mono}}>{nq.noAddon||"none"}</span></div>
+                {nq.industries.length>0&&<div style={{marginBottom:8}}>
+                  <div style={{fontSize:10,color:C.cyan,fontWeight:600,marginBottom:4}}>Shown to {nq.industryCount} industries:</div>
+                  <div style={{display:"flex",flexWrap:"wrap",gap:3}}>{nq.industries.map(iid=>{const ind2=inds.find(ii=>ii.id===iid);return <Tag key={iid} color={C.cyan} onClick={()=>{setSelInd(ind2);setView("detail");}}>{ind2?.name||iid}</Tag>;})}</div>
+                </div>}
+                {nq.allTasks.length>0&&<div>
+                  <div style={{fontSize:10,color:C.purple,fontWeight:600,marginBottom:4}}>Triggers {nq.taskCount} tasks:</div>
+                  <div style={{display:"flex",flexWrap:"wrap",gap:3}}>
+                    {nq.yesTasks.length>0&&nq.yesTasks.map(t=><Tag key={"y-"+t} color={C.green} onClick={()=>{setFinderSearch(taskFmt(t));setSelItem(null);setFinderOpen(true);setView("finder");}}>{taskFmt(t)} (Yes)</Tag>)}
+                    {nq.noTasks.length>0&&nq.noTasks.map(t=><Tag key={"n-"+t} color={C.red} onClick={()=>{setFinderSearch(taskFmt(t));setSelItem(null);setFinderOpen(true);setView("finder");}}>{taskFmt(t)} (No)</Tag>)}
+                  </div>
+                </div>}
+              </div>}
+            </div>
+          );})}
+        </div>
+      </Sec>
+    </>}
   </div>);
   };
 
