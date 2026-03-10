@@ -104,6 +104,141 @@ task_progress.sort(key=lambda x: -x["total"])
 # Build task name -> slug mapping from navigator analysis
 task_name_to_slug = nav.get("taskNameToSlug", {})
 
+# ============================================================
+# CODEBASE-FIRST: Build master task inventory from markdown files
+# ============================================================
+# The codebase is the source of truth for what tasks exist.
+# XLSX analytics are overlaid where available.
+nav_task_content_root = os.path.join(ROOT, "..", "nav", "content", "src", "roadmaps")
+_task_dirs = [
+    os.path.join(nav_task_content_root, "tasks"),
+    os.path.join(nav_task_content_root, "license-tasks"),
+    os.path.join(nav_task_content_root, "env-tasks"),
+]
+
+codebase_task_inventory = {}  # task_id -> {name, urlSlug, dir}
+for _td in _task_dirs:
+    if not os.path.isdir(_td): continue
+    import glob as _g
+    for _f in _g.glob(os.path.join(_td, "*.md")):
+        _content = open(_f).read()
+        _parts = _content.split("---")
+        if len(_parts) < 3: continue
+        _fm = _parts[1]
+        _tid = _tname = _turl = None
+        for _line in _fm.split("\n"):
+            _line = _line.strip()
+            if _line.startswith("id:"): _tid = _line[3:].strip().strip('"').strip("'")
+            elif _line.startswith("name:"): _tname = _line[5:].strip().strip('"').strip("'")
+            elif _line.startswith("urlSlug:"): _turl = _line[8:].strip().strip('"').strip("'")
+        if _tid:
+            codebase_task_inventory[_tid] = {
+                "name": _tname or _tid,
+                "urlSlug": _turl or _tid,
+                "dir": os.path.basename(_td),
+            }
+
+if codebase_task_inventory:
+    print(f"  Codebase task inventory: {len(codebase_task_inventory)} markdown files")
+
+    # Build lookup: XLSX slug -> XLSX row(s)
+    xlsx_by_slug = {}  # slug -> list of XLSX rows
+    for tp_entry in task_progress:
+        slug = task_name_to_slug.get(tp_entry["task"], tp_entry["task"])
+        if slug not in xlsx_by_slug:
+            xlsx_by_slug[slug] = []
+        xlsx_by_slug[slug].append(tp_entry)
+
+    # Also build by display name -> list of possible task IDs from codebase
+    name_to_codebase_ids = {}
+    for tid, info in codebase_task_inventory.items():
+        n = info["name"]
+        if n not in name_to_codebase_ids:
+            name_to_codebase_ids[n] = []
+        name_to_codebase_ids[n].append(tid)
+
+    # Build merged task_progress: start from codebase, overlay XLSX
+    merged_tasks = []
+    matched_xlsx_slugs = set()
+
+    for tid, info in codebase_task_inventory.items():
+        # Try to find matching XLSX data
+        xlsx_match = None
+        # 1. Direct slug match
+        if tid in xlsx_by_slug:
+            xlsx_match = xlsx_by_slug[tid]
+            matched_xlsx_slugs.add(tid)
+        else:
+            # 2. Try matching via display name
+            for tp_entry in task_progress:
+                entry_slug = task_name_to_slug.get(tp_entry["task"], tp_entry["task"])
+                if entry_slug == tid:
+                    xlsx_match = [tp_entry]
+                    matched_xlsx_slugs.add(entry_slug)
+                    break
+            # 3. Try matching by name -> all possible IDs
+            if not xlsx_match:
+                for tp_entry in task_progress:
+                    possible_ids = name_to_codebase_ids.get(tp_entry["task"], [])
+                    if tid in possible_ids:
+                        entry_slug = task_name_to_slug.get(tp_entry["task"], tp_entry["task"])
+                        if entry_slug not in matched_xlsx_slugs:
+                            xlsx_match = [tp_entry]
+                            matched_xlsx_slugs.add(entry_slug)
+                            break
+
+        if xlsx_match:
+            # Use the XLSX row with the most data
+            best = max(xlsx_match, key=lambda x: x["total"])
+            merged_tasks.append({
+                "task": info["name"],
+                "slug": tid,
+                "urlSlug": info["urlSlug"],
+                "completed": best["completed"],
+                "todo": best["todo"],
+                "last45": best["last45"],
+                "avgTime": best["avgTime"],
+                "total": best["total"],
+                "hasAnalytics": True,
+            })
+        else:
+            # Codebase task with no XLSX data
+            merged_tasks.append({
+                "task": info["name"],
+                "slug": tid,
+                "urlSlug": info["urlSlug"],
+                "completed": 0,
+                "todo": 0,
+                "last45": 0,
+                "avgTime": "",
+                "total": 0,
+                "hasAnalytics": False,
+            })
+
+    # Add XLSX-only entries (not in codebase) — these are retired/legacy
+    for tp_entry in task_progress:
+        slug = task_name_to_slug.get(tp_entry["task"], tp_entry["task"])
+        if slug not in matched_xlsx_slugs and slug not in codebase_task_inventory:
+            merged_tasks.append({
+                "task": tp_entry["task"],
+                "slug": slug,
+                "urlSlug": slug,
+                "completed": tp_entry["completed"],
+                "todo": tp_entry["todo"],
+                "last45": tp_entry["last45"],
+                "avgTime": tp_entry["avgTime"],
+                "total": tp_entry["total"],
+                "hasAnalytics": True,
+            })
+
+    merged_tasks.sort(key=lambda x: -x["total"])
+    no_analytics = sum(1 for t in merged_tasks if not t["hasAnalytics"])
+    xlsx_only = sum(1 for t in merged_tasks if t["hasAnalytics"] and t["slug"] not in codebase_task_inventory)
+    print(f"  Merged task list: {len(merged_tasks)} total ({len(merged_tasks)-no_analytics-xlsx_only} matched, {no_analytics} codebase-only, {xlsx_only} XLSX-only/legacy)")
+
+    # Replace task_progress with the merged list
+    task_progress = merged_tasks
+
 # Non-essential questions
 neq_data = []
 for row in xlsx_neq:
@@ -206,7 +341,8 @@ addon_reach = nav.get("addonTaskReach", {})
 total_enabled = len([i for i in nav_industries.values() if i.get("isEnabled")])
 for tp_entry in task_progress:
     name = tp_entry["task"]
-    slug = task_name_to_slug.get(name, name)
+    slug = tp_entry.get("slug") or task_name_to_slug.get(name, name)
+    tp_entry["slug"] = slug  # ensure it's always there
     is_addon = slug in addon_slugs
     reach = addon_reach.get(slug, 0) if is_addon else 0
     if slug in universal_tasks or name in universal_tasks:
@@ -1046,7 +1182,7 @@ question_addon_map = {
 # Build slug -> engagement lookup
 slug_eng_map = {}
 for tp_row in task_progress:
-    sl = task_name_to_slug.get(tp_row["task"], tp_row["task"])
+    sl = tp_row.get("slug") or task_name_to_slug.get(tp_row["task"], tp_row["task"])
     slug_eng_map[sl] = slug_eng_map.get(sl, 0) + tp_row["total"]
 
 for nq in neq_data:
@@ -1347,13 +1483,16 @@ if os.path.isfile(ga4_pages_file):
     id_to_url_local = {v: k for k, v in url_to_id.items()}
     for tp_row in task_progress:
         tn = tp_row["task"]
-        sl = task_name_to_slug.get(tn, tn)
+        sl = tp_row.get("slug") or task_name_to_slug.get(tn, tn)
         
         # Collect all candidate IDs for this task name
         candidates = {sl}
         candidates.add(tn)  # raw name
         for tid in name_to_all_ids.get(tn, set()):
             candidates.add(tid)
+        # Also try the urlSlug if we have it from codebase
+        if tp_row.get("urlSlug"):
+            candidates.add(tp_row["urlSlug"])
         
         # Find the best match: the candidate with the most page views
         best_pv = None
@@ -1377,28 +1516,18 @@ if os.path.isfile(ga4_pages_file):
     # Build set of all reachable task slugs
     reachable_slugs = set(task_frequency.keys()) | set(task_triggers.keys()) | set(universal_tasks)
     
-    # Build set of task IDs that exist in current markdown files
-    existing_task_ids = set()
-    for tcd in task_content_dirs:
-        if not os.path.isdir(tcd): continue
-        for f in _glob.glob(os.path.join(tcd, "*.md")):
-            content = open(f).read()
-            parts = content.split("---")
-            if len(parts) < 3: continue
-            for line in parts[1].split("\n"):
-                line = line.strip()
-                if line.startswith("id:"):
-                    tid = line[3:].strip().strip('"').strip("'")
-                    if tid: existing_task_ids.add(tid)
+    # Use the codebase_task_inventory built at startup
+    existing_task_ids = set(codebase_task_inventory.keys()) if codebase_task_inventory else set()
 
     api_task_set = set(api_task_slugs) if plurmit_data else set()
     api_aa_set = set(api_aa_slugs) if plurmit_data else set()
 
     stale_count = 0
     orphan_count = 0
+    no_analytics_count = 0
     for tp_row in task_progress:
         tn = tp_row["task"]
-        sl = task_name_to_slug.get(tn, tn)
+        sl = tp_row.get("slug") or task_name_to_slug.get(tn, tn)
         
         # Check all possible slugs via name_to_all_ids
         all_ids = {sl, tn}
@@ -1408,6 +1537,7 @@ if os.path.isfile(ga4_pages_file):
         is_reachable = any(s in reachable_slugs for s in all_ids)
         in_codebase = any(s in existing_task_ids for s in all_ids)
         in_api = any(s in api_task_set or s in api_aa_set for s in all_ids)
+        has_analytics = tp_row.get("hasAnalytics", True)
         
         # Stale: completed > page views (impossible if task page is current)
         pv = tp_row.get("pageViews", 0)
@@ -1415,16 +1545,19 @@ if os.path.isfile(ga4_pages_file):
         is_stale = comp > pv and comp > 10
         
         # Categorize
-        if is_reachable:
+        if is_reachable and has_analytics:
             tp_row["dataQuality"] = "ok"
+        elif is_reachable and not has_analytics:
+            tp_row["dataQuality"] = "noAnalytics"  # in codebase + reachable, but no XLSX data
+            no_analytics_count += 1
         elif in_api:
-            tp_row["dataQuality"] = "api_flow"  # accessed via API flow, not roadmap
+            tp_row["dataQuality"] = "api_flow"
         elif not in_codebase:
-            tp_row["dataQuality"] = "retired"    # ID no longer in codebase
-        elif pv > 100:
-            tp_row["dataQuality"] = "orphaned"   # in code, has traffic, not wired to roadmap
+            tp_row["dataQuality"] = "retired"
+        elif in_codebase and not is_reachable:
+            tp_row["dataQuality"] = "orphaned"
         else:
-            tp_row["dataQuality"] = "orphaned"   # in code, no traffic, not wired
+            tp_row["dataQuality"] = "ok"
 
         tp_row["stale"] = is_stale
         if is_stale: stale_count += 1
@@ -1434,6 +1567,8 @@ if os.path.isfile(ga4_pages_file):
         print(f"  Likely stale tasks: {stale_count} (completed > page views)")
     if orphan_count:
         print(f"  Orphaned/retired tasks: {orphan_count} (in XLSX but not in any current roadmap)")
+    if no_analytics_count:
+        print(f"  Reachable but no XLSX data: {no_analytics_count} tasks (codebase-only)")
 
     # --- Enrich anytime actions with page views ---
     for aa in aa_reach:
