@@ -225,13 +225,20 @@ export default function App() {
           </div>
         </div>
       </Sec>
-      {oneTasks.length>0&&<Sec title="One-Task Roadmaps" sub="The only differentiator is a single task. Barely different from generic.">
-        <div style={{display:"grid",gap:4}}>{oneTasks.map(ind=>(
+      {oneTasks.length>0&&<Sec title={"One Base Task Roadmaps ("+oneTasks.length+")"} sub={"Only 1 differentiating task on the base roadmap — but "+oneTasks.filter(i=>(i.neqTaskCount||0)>0).length+" of "+oneTasks.length+" gain additional tasks via NEQs. Click to view industry detail."}>
+        <div style={{display:"grid",gap:4}}>{oneTasks.map(ind=>{
+          const ntc = ind.neqTaskCount||0;
+          const ttc = ind.totalContentTasks||ind.totalDiffTasks;
+          return(
           <div key={ind.id} onClick={()=>goDetail(ind)} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:12,fontSize:12}} onMouseEnter={e=>e.currentTarget.style.background=C.cardHover} onMouseLeave={e=>e.currentTarget.style.background=C.card}>
             <span style={{flex:1,color:C.text,fontWeight:500}}>{ind.name}</span>
-            <span style={{color:C.accent,fontFamily:C.mono}}>{fmt(ind.users)}</span><span style={{color:C.muted}}>→</span><span style={{color:C.orange,fontSize:11}}>{taskFmt(ind.allDiffTasks[0])}</span>
+            <span style={{color:C.accent,fontFamily:C.mono}}>{fmt(ind.users)}</span>
+            <span style={{color:C.muted}}>→</span>
+            <span style={{color:C.orange,fontSize:11}}>{taskFmt(ind.allDiffTasks[0])}</span>
+            {ntc>0&&<span style={{color:C.purple,fontSize:10,fontFamily:C.mono}}>+{ntc} NEQ = {ttc} total</span>}
+            {ntc===0&&<span style={{color:C.muted,fontSize:10}}>no NEQs</span>}
           </div>
-        ))}</div>
+        );})}</div>
       </Sec>}
     </div>);
   };
