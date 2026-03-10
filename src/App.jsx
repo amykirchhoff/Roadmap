@@ -520,9 +520,10 @@ export default function App() {
     const staleTasks = hasGA4 ? tp.filter(t=>t.stale) : [];
     const retiredTasks = tp.filter(t=>t.dataQuality==="retired");
     const orphanedTasks = tp.filter(t=>t.dataQuality==="orphaned");
+    const noAnalyticsTasks = tp.filter(t=>t.dataQuality==="noAnalytics");
     return (<div>
       <Alert color={C.orange}>The top 5 tasks account for <strong>{pct(top5Total,allTotal)}</strong> of all roadmap appearances.{hasGA4?" GA4 page views are now overlaid — these show actual readership, which is 2–10x higher than roadmap counts for most tasks.":""}</Alert>
-      <SrcLegend items={[["XLSX","Task Progress sheet — total = roadmaps containing this task; completed = users who marked it done"],["GA4","Page views from Google Analytics (Jan 2023–Mar 2026)"],["NAV","Navigator codebase — roadmap definitions, task metadata"]]} />
+      <SrcLegend items={[["NAV","Master task inventory — 216 markdown files from codebase are the source of truth"],["XLSX","Roadmap counts and completion overlaid from analytics where available"],["GA4","Page views from Google Analytics (Jan 2023–Mar 2026)"]]} />
       {hasGA4&&<Insight><strong>The readership gap:</strong> GA4 recorded <strong>{fmt(totalPV)} page views</strong> across task pages, while <strong>{fmt(allTotal)} roadmaps</strong> include these tasks (XLSX). Some tasks are viewed far more than their roadmap count suggests: Mercantile License appears on {fmt(tp.find(t=>t.task.includes("Mercantile"))?.total||0)} roadmaps but has {fmt(tp.find(t=>t.task.includes("Mercantile"))?.pageViews||0)} page views ({((tp.find(t=>t.task.includes("Mercantile"))?.pageViews||1)/(Math.max(tp.find(t=>t.task.includes("Mercantile"))?.total||1,1))).toFixed(0)}x) — indicating repeat visits or non-account traffic. Others like "Select Your Business Structure" ({((tp.find(t=>t.task.includes("Structure"))?.pageViews||1)/(Math.max(tp.find(t=>t.task.includes("Structure"))?.total||1,1))).toFixed(1)}x) show roughly 1:1 because most users view it exactly once.</Insight>}
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
         <Stat label="On Roadmaps (XLSX)" value={fmt(allTotal)} small />
@@ -532,6 +533,7 @@ export default function App() {
         {staleTasks.length>0&&<Stat label="Likely Stale Tasks" value={staleTasks.length} sub="Completed exceeds GA4 page views — probably renamed or retired task IDs persisting in the database" color={C.red} small />}
         {retiredTasks.length>0&&<Stat label="Retired Task IDs" value={retiredTasks.length} sub="Task ID no longer exists in the codebase — XLSX shows historical data from old accounts" color={C.orange} small />}
         {orphanedTasks.length>0&&<Stat label="Orphaned Tasks" value={orphanedTasks.length} sub="Confirmed dead content — markdown exists in codebase but not referenced by any roadmap, add-on, modification, or code file" color={C.muted} small />}
+        {noAnalyticsTasks.length>0&&<Stat label="No XLSX Data" value={noAnalyticsTasks.length} sub="Reachable tasks from the codebase with no analytics data — these are invisible to XLSX-only analysis" color={C.cyan} small />}
       </div>
       <div style={{display:"grid",gap:3}}>
         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
@@ -550,6 +552,7 @@ export default function App() {
           {hasGA4&&<span><span style={{background:`${C.red}22`,color:C.red,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.red}33`,fontSize:9,marginRight:4}}>STALE?</span>Completed {">"} page views — likely a renamed or retired task ID</span>}
           <span><span style={{background:`${C.orange}22`,color:C.orange,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.orange}33`,fontSize:9,marginRight:4}}>RETIRED</span>Task ID no longer in codebase — historical XLSX data only</span>
           <span><span style={{background:`${C.muted}22`,color:C.muted,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.muted}33`,fontSize:9,marginRight:4}}>ORPHANED</span>Confirmed dead content — markdown exists but not referenced by any roadmap, add-on, or code</span>
+          <span><span style={{background:`${C.cyan}22`,color:C.cyan,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.cyan}33`,fontSize:9,marginRight:4}}>NO XLSX</span>Reachable in codebase but no analytics data — users can encounter this task</span>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:8,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
           <span style={{width:22,textAlign:"right"}}>#</span>
@@ -572,6 +575,7 @@ export default function App() {
             {hasGA4&&t.stale&&<span style={{background:`${C.red}22`,color:C.red,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.red}33`,fontSize:8,flexShrink:0}} title="Completed exceeds page views — likely a renamed or retired task ID in the XLSX">STALE?</span>}
             {t.dataQuality==="retired"&&<span style={{background:`${C.orange}22`,color:C.orange,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.orange}33`,fontSize:8,flexShrink:0}} title="Task ID no longer exists in the current codebase">RETIRED</span>}
             {t.dataQuality==="orphaned"&&<span style={{background:`${C.muted}22`,color:C.muted,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.muted}33`,fontSize:8,flexShrink:0}} title="Confirmed dead content — markdown exists but not referenced by any roadmap, add-on, or code file">ORPHANED</span>}
+            {t.dataQuality==="noAnalytics"&&<span style={{background:`${C.cyan}22`,color:C.cyan,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.cyan}33`,fontSize:8,flexShrink:0}} title="Reachable in codebase but no analytics data in XLSX">NO XLSX</span>}
           </div>
           {hasGA4&&<span style={{width:70,textAlign:"right",fontFamily:C.mono,fontSize:10,color:t.pageViews>0?C.cyan:C.muted}}>{t.pageViews>0?fmt(t.pageViews):"—"}</span>}
           <div style={{width:120,height:8,background:C.bg,borderRadius:4,overflow:"hidden"}}><div style={{width:`${barVal}%`,height:"100%",background:taskSort==="pageviews"?C.cyan:cc,borderRadius:4,opacity:.6}}/></div>
@@ -1011,6 +1015,7 @@ export default function App() {
               {it.hasApi&&<Tag color={C.green}>API</Tag>}
               {it.dataQuality==="retired"&&<Tag color={C.orange}>RETIRED</Tag>}
               {it.dataQuality==="orphaned"&&<Tag color={C.muted}>ORPHANED</Tag>}
+              {it.dataQuality==="noAnalytics"&&<Tag color={C.cyan}>NO XLSX</Tag>}
               {it.users>0&&<span style={{fontSize:10,color:C.muted,fontFamily:C.mono,flexShrink:0}}>{fmt(it.users)} users</span>}
             </div>);
           })}
@@ -1034,6 +1039,7 @@ export default function App() {
               {it.stale&&<Tag color={C.red}>Stale?</Tag>}
               {it.dataQuality==="retired"&&<Tag color={C.orange}>Retired</Tag>}
               {it.dataQuality==="orphaned"&&<Tag color={C.muted}>Orphaned</Tag>}
+              {it.dataQuality==="noAnalytics"&&<Tag color={C.cyan}>No XLSX Data</Tag>}
             </div>
             <h3 style={{fontSize:18,fontWeight:700,color:C.text,margin:"0 0 8px",fontFamily:C.sans}}>{it.name}</h3>
             {it.stale&&<div style={{background:`${C.red}11`,border:`1px solid ${C.red}33`,borderRadius:6,padding:"8px 12px",marginBottom:10,fontSize:11,color:C.red,fontFamily:C.sans}}>
@@ -1044,6 +1050,9 @@ export default function App() {
             </div>}
             {it.dataQuality==="orphaned"&&<div style={{background:`${C.orange}11`,border:`1px solid ${C.orange}33`,borderRadius:6,padding:"8px 12px",marginBottom:10,fontSize:11,color:C.orange,fontFamily:C.sans}}>
               <strong>Confirmed orphaned:</strong> This task's markdown file exists in the codebase, but it is not referenced by any industry roadmap, add-on, modification, or code file. It is unreachable dead content — likely replaced by a different task under a new ID. The XLSX data reflects historical accounts that still carry the old task assignment.
+            </div>}
+            {it.dataQuality==="noAnalytics"&&<div style={{background:`${C.cyan}11`,border:`1px solid ${C.cyan}33`,borderRadius:6,padding:"8px 12px",marginBottom:10,fontSize:11,color:C.cyan,fontFamily:C.sans}}>
+              <strong>Codebase-only:</strong> This task exists in the codebase and is reachable via a roadmap or add-on, but has no corresponding entry in the analytics XLSX. It was invisible to XLSX-only analysis. GA4 page views may still be available if users have visited the page.
             </div>}
             <div style={{display:"flex",gap:16,flexWrap:"wrap",fontSize:11,color:C.muted,fontFamily:C.sans}}>
               {it.users>0&&<span><strong style={{color:C.accent}}>{fmt(it.users)}</strong> users on roadmap (XLSX)</span>}
@@ -1316,7 +1325,7 @@ export default function App() {
           <span style={{fontSize:11,color:C.muted}}>Business.NJ.gov Analysis</span>
         </div>
         <div style={{fontSize:10,color:C.muted,marginBottom:14}}>
-          Source: {DATA.meta.xlsxFile} · {fmt(DATA.meta.totalBusinesses)} businesses · {inds.length} industries · {DATA.totalDiffTasks} diff. tasks · {DATA.anytimeActions.length} AAs · {sectors.length} sectors{DATA.permitCoverage&&` · ${fmt(DATA.permitCoverage.coverage.total)} state permits`}
+          Source: codebase ({DATA.taskProgress.length} tasks) + {DATA.meta.xlsxFile} ({fmt(DATA.meta.totalBusinesses)} businesses) · {inds.length} industries · {DATA.anytimeActions.length} AAs · {sectors.length} sectors{DATA.permitCoverage&&` · ${fmt(DATA.permitCoverage.coverage.total)} state permits`}
         </div>
         <div style={{display:"flex",gap:5,marginBottom:20,flexWrap:"wrap"}}>
           {nav("contentgap","Content Gap")}{nav("roadmap","Roadmap Analysis")}{nav("sectorhealth","Sector Health")}{nav("journey","User Journey")}{nav("industries","Industries")}{nav("detail","Industry Detail")}{nav("tasks","Task Reuse")}{nav("engagement","Task Engagement")}{nav("permits","Permit Coverage")}{nav("finder","Content Finder")}{DATA.ga4&&nav("siteanalytics","Site Analytics")}{nav("profile","Profile Questions")}
