@@ -272,6 +272,44 @@ nav_aa = nav["anytimeActions"]
 nav_fundings = nav["fundings"]
 nav_mismatches = nav["sectorMismatches"]
 
+# Patch nav_industries with live sector data from industry JSON files if available
+_live_ind_dir = os.path.join(ROOT, "..", "nav", "content", "src", "roadmaps", "industries")
+if os.path.isdir(_live_ind_dir):
+    _sector_updates = 0
+    _mismatch_updates = []
+    import glob as _g2
+    for _f in _g2.glob(os.path.join(_live_ind_dir, "*.json")):
+        _idata = json.load(open(_f))
+        _iid = _idata.get("id")
+        if not _iid or not _idata.get("isEnabled"): continue
+        if _iid in nav_industries:
+            old_sector = nav_industries[_iid].get("defaultSectorId", "")
+            new_sector = _idata.get("defaultSectorId", "")
+            if old_sector != new_sector and new_sector:
+                nav_industries[_iid]["defaultSectorId"] = new_sector
+                _sector_updates += 1
+            # Also refresh other fields that might have changed
+            nav_industries[_iid]["nonEssentialQuestionsIds"] = _idata.get("nonEssentialQuestionsIds", [])
+            nav_industries[_iid]["industryOnboardingQuestions"] = _idata.get("industryOnboardingQuestions", {})
+    if _sector_updates:
+        print(f"  Patched {_sector_updates} industry sector assignments from live codebase")
+    # Recompute mismatches from original nav data (sectors may have changed)
+    _original_mismatches = nav["sectorMismatches"]  # dict: ind_id -> suggested_sector
+    # Intentional sector assignments (confirmed by team, not mismatches)
+    _intentional = {"petcare"}  # Pet Care intentionally assigned to other-services
+    _new_mismatches = {}
+    for _iid, _ind in nav_industries.items():
+        if not _ind.get("isEnabled"): continue
+        if _iid in _intentional: continue
+        if _iid in _original_mismatches:
+            assigned = _ind.get("defaultSectorId", "")
+            suggested = _original_mismatches[_iid]
+            if assigned != suggested:
+                _new_mismatches[_iid] = suggested
+    nav_mismatches = _new_mismatches
+    if len(nav_mismatches) != len(_original_mismatches):
+        print(f"  Sector mismatches updated: {len(_original_mismatches)} → {len(nav_mismatches)} (sectors corrected in codebase)")
+
 reachable_sectors = set(i["defaultSectorId"] for i in nav_industries.values() if i.get("isEnabled"))
 orphaned_sectors = set(nav_sectors.keys()) - reachable_sectors
 
