@@ -126,12 +126,37 @@ for _td in _task_dirs:
         if len(_parts) < 3: continue
         _fm = _parts[1]
         _tid = _tname = _turl = None
-        for _line in _fm.split("\n"):
-            _line = _line.strip()
-            if _line.startswith("id:"): _tid = _line[3:].strip().strip('"').strip("'")
-            elif _line.startswith("name:"): _tname = _line[5:].strip().strip('"').strip("'")
-            elif _line.startswith("urlSlug:"): _turl = _line[8:].strip().strip('"').strip("'")
+        _lines = _fm.split("\n")
+        _i = 0
+        while _i < len(_lines):
+            _line = _lines[_i].strip()
+            if _line.startswith("id:"):
+                _tid = _line[3:].strip().strip('"').strip("'")
+            elif _line.startswith("urlSlug:"):
+                _val = _line[8:].strip().strip('"').strip("'")
+                if _val and _val not in (">-", ">", "|", "|-"):
+                    _turl = _val
+            elif _line.startswith("name:"):
+                _val = _line[5:].strip().strip('"').strip("'")
+                if _val in (">-", ">", "|", "|-", ""):
+                    # YAML multiline: collect indented continuation lines
+                    _ml_parts = []
+                    _i += 1
+                    while _i < len(_lines) and (_lines[_i].startswith("  ") or _lines[_i].startswith("\t")):
+                        _ml_parts.append(_lines[_i].strip())
+                        _i += 1
+                    _tname = " ".join(_ml_parts)
+                    continue  # skip _i increment
+                else:
+                    _tname = _val
+            _i += 1
         if _tid:
+            # If name is still empty, use displayname field
+            if not _tname:
+                for _line in _lines:
+                    if _line.strip().startswith("displayname:"):
+                        _tname = _line.strip()[12:].strip().strip('"').strip("'")
+                        break
             codebase_task_inventory[_tid] = {
                 "name": _tname or _tid,
                 "urlSlug": _turl or _tid,
