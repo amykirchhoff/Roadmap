@@ -467,16 +467,21 @@ export default function App() {
       <Alert color={C.muted}>Differentiating tasks ranked by how many industries can show them — including both base roadmap tasks and NEQ-triggered tasks. Tasks appearing in 2+ industries are shown in the chart; single-industry tasks listed below.</Alert>
       <SrcLegend items={[["NAV","Base roadmap tasks from industry JSON files + NEQ-triggered tasks from add-on definitions"]]} />
       <Insight><strong>{combinedTasksByFreq.length} differentiating tasks</strong> across {Object.keys(ctf).length===Object.keys(tf).length?"base roadmaps":"base roadmaps + NEQ add-ons"} (excluding 7 universal tasks). {sharedTasks.length} appear in 2+ industries, {singleTasks.length} are single-industry, and {neqOnlyTasks.length} are only reachable via NEQs (not on any base roadmap).</Insight>
-      <Sec title={"Shared Tasks ("+sharedTasks.length+")"} sub="Tasks that appear in 2 or more industry roadmaps (base or via NEQ).">
+      <Sec title={"Shared Tasks ("+sharedTasks.length+")"} sub="Tasks that appear in 2 or more industry roadmaps (base or via NEQ). Cyan = base roadmap, purple = additional industries via NEQ.">
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:14}}>
           <ResponsiveContainer width="100%" height={Math.max(300,sharedTasks.length*28+40)}>
             <BarChart data={sharedTasks} layout="vertical" margin={{left:200,right:20,top:5,bottom:5}}>
               <XAxis type="number" stroke={C.muted} tick={{fontSize:10,fontFamily:C.mono}} label={{value:"Number of industries",position:"bottom",offset:0,fill:C.muted,fontSize:10}} />
               <YAxis dataKey="name" type="category" width={190} tick={{fontSize:11,fontFamily:C.sans}} tickFormatter={taskFmt} stroke={C.muted} interval={0} />
-              <Tooltip content={({payload})=>{if(!payload?.[0])return null;const d=payload[0].payload;return <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:10,fontSize:11,color:C.text,fontFamily:C.sans}}><div style={{fontWeight:700}}>{taskFmt(d.name)}</div><div>Appears in {d.count} industries ({d.baseCount} base{d.neqCount>0?` + ${d.neqCount} via NEQ`:""})</div></div>;}} />
-              <Bar dataKey="count" fill={C.cyan} radius={[0,4,4,0]} />
+              <Tooltip content={({payload})=>{if(!payload?.[0])return null;const d=payload[0].payload;return <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:10,fontSize:11,color:C.text,fontFamily:C.sans}}><div style={{fontWeight:700}}>{taskFmt(d.name)}</div><div>Total: {d.count} industries ({d.baseCount} base{d.neqCount>0?`, ${d.neqCount} via NEQ`:""})</div></div>;}} />
+              <Bar dataKey="baseCount" stackId="a" fill={C.cyan} radius={[0,0,0,0]} name="Base" />
+              <Bar dataKey="neqCount" stackId="a" fill={C.purple} radius={[0,4,4,0]} name="NEQ" />
             </BarChart>
           </ResponsiveContainer>
+          <div style={{display:"flex",gap:16,justifyContent:"center",marginTop:8,fontSize:10,color:C.muted}}>
+            <span><span style={{display:"inline-block",width:10,height:10,background:C.cyan,borderRadius:2,marginRight:4,verticalAlign:"middle"}}/>Base roadmap</span>
+            <span><span style={{display:"inline-block",width:10,height:10,background:C.purple,borderRadius:2,marginRight:4,verticalAlign:"middle"}}/>Additional via NEQ</span>
+          </div>
         </div>
       </Sec>
       <Sec title={`Single-Industry Tasks (${singleTasks.length})`} sub="Built for one specific audience.">
@@ -537,6 +542,7 @@ export default function App() {
           <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.cyan,marginRight:4,verticalAlign:"middle"}}/>Shared (2+)</span>
           <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:C.red,marginRight:4,verticalAlign:"middle"}}/>Unique (1)</span>
           <span style={{marginLeft:8,borderLeft:`1px solid ${C.border}`,paddingLeft:8}}><span style={{background:`${C.purple}22`,color:C.purple,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.purple}33`,fontSize:9,marginRight:4}}>ADD-ON</span>Profile/legal triggered</span>
+          <span><span style={{background:`${C.purple}22`,color:C.purple,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.purple}33`,fontSize:9,marginRight:4}}>NEQ</span>Only via non-essential question</span>
           <span><span style={{background:`${C.green}22`,color:C.green,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.green}33`,fontSize:9,marginRight:4}}>API</span>Live DB connection</span>
           {hasGA4&&<span><span style={{background:`${C.red}22`,color:C.red,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.red}33`,fontSize:9,marginRight:4}}>STALE?</span>Completed {">"} page views — likely a renamed or retired task ID</span>}
           <span><span style={{background:`${C.orange}22`,color:C.orange,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.orange}33`,fontSize:9,marginRight:4}}>RETIRED</span>Task ID no longer in codebase — historical XLSX data only</span>
@@ -546,21 +552,22 @@ export default function App() {
         <div style={{display:"flex",alignItems:"center",gap:8,padding:"4px 14px",fontSize:9,color:C.muted,fontFamily:C.sans}}>
           <span style={{width:22,textAlign:"right"}}>#</span>
           <span style={{width:10}}></span>
-          <span style={{flex:1}}>Task</span>
+          <span style={{flex:1}}>Task <span style={{color:C.muted,fontSize:8,fontWeight:400}}>(click to open in Content Finder)</span></span>
           {hasGA4&&<span style={{width:70,textAlign:"right"}}>Views (GA4)</span>}
           <span style={{width:120,textAlign:"center"}}>{taskSort==="pageviews"?"PV bar":"Roadmap bar"}</span>
           <span style={{width:65,textAlign:"right"}}>Roadmaps (XLSX)</span>
           <span style={{width:55,textAlign:"right"}}>Done</span>
           <span style={{width:40,textAlign:"right"}}>Avg Time</span>
         </div>
-        {sorted2.map((t,i)=>{const cc={universal:C.accent,shared:C.cyan,unique:C.red,uncategorized:C.muted}[t.category]||C.muted;const barVal=taskSort==="pageviews"?(t.pageViews||0)/topPV*100:t.total/topTotal*100;return(
-        <div key={t.task+i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",display:"flex",alignItems:"center",gap:8}}>
+        {sorted2.map((t,i)=>{const cc={universal:C.accent,shared:C.cyan,unique:C.red,uncategorized:C.muted}[t.category]||C.muted;const barVal=taskSort==="pageviews"?(t.pageViews||0)/topPV*100:t.total/topTotal*100;const isDupe=tp.filter(x=>x.task===t.task).length>1;const ctfInfo=ctf[t.slug];const isNeqOnly=ctfInfo&&ctfInfo.baseCount===0;return(
+        <div key={(t.slug||t.task)+i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",display:"flex",alignItems:"center",gap:8}}>
           <span style={{width:22,fontSize:10,color:C.muted,fontFamily:C.mono,textAlign:"right"}}>{i+1}</span>
           <span style={{width:10,height:10,borderRadius:"50%",background:cc,flexShrink:0,opacity:.9}} title={t.category+(t.isAddon?" (add-on)":"")}></span>
           <div style={{flex:1,minWidth:0,display:"flex",alignItems:"center",gap:6}}>
-            <div style={{fontSize:12,color:cc,fontFamily:C.sans,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{t.task}</div>
+            <div style={{fontSize:12,color:cc,fontFamily:C.sans,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",cursor:"pointer",textDecoration:"underline",textDecorationColor:`${cc}44`,textUnderlineOffset:2}} onClick={()=>{setFinderSearch(t.task);setSelItem(null);setFinderOpen(true);setView("finder");}} title={"Open in Content Finder: "+t.task}>{t.task}{isDupe&&<span style={{color:C.muted,fontSize:9,fontFamily:C.mono,marginLeft:4}}>({t.slug?.split("-").slice(0,2).join("-")||"?"})</span>}</div>
             {t.isAddon&&<span style={{background:`${C.purple}22`,color:C.purple,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.purple}33`,fontSize:8,flexShrink:0}}>ADD-ON{t.reachCount?` · ${t.reachCount}`:""}</span>}
-            {(apiSlugs.has(t.task)||apiSlugs.has(t.task.toLowerCase().replace(/ /g,"-")))&&<span style={{background:`${C.green}22`,color:C.green,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.green}33`,fontSize:8,flexShrink:0}}>API</span>}
+            {isNeqOnly&&!t.isAddon&&<span style={{background:`${C.purple}22`,color:C.purple,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.purple}33`,fontSize:8,flexShrink:0}}>NEQ</span>}
+            {(apiSlugs.has(t.task)||apiSlugs.has(t.slug||"")||apiSlugs.has(t.task.toLowerCase().replace(/ /g,"-")))&&<span style={{background:`${C.green}22`,color:C.green,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.green}33`,fontSize:8,flexShrink:0}}>API</span>}
             {hasGA4&&t.stale&&<span style={{background:`${C.red}22`,color:C.red,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.red}33`,fontSize:8,flexShrink:0}} title="Completed exceeds page views — likely a renamed or retired task ID in the XLSX">STALE?</span>}
             {t.dataQuality==="retired"&&<span style={{background:`${C.orange}22`,color:C.orange,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.orange}33`,fontSize:8,flexShrink:0}} title="Task ID no longer exists in the current codebase">RETIRED</span>}
             {t.dataQuality==="orphaned"&&<span style={{background:`${C.muted}22`,color:C.muted,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.muted}33`,fontSize:8,flexShrink:0}} title="Confirmed dead content — markdown exists but not referenced by any roadmap, add-on, or code file">ORPHANED</span>}
