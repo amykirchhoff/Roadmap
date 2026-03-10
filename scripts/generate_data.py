@@ -696,6 +696,8 @@ addon_source = nav_content_addons if os.path.isdir(nav_content_addons) else ADDO
 neq_source = nav_content_neq if os.path.isfile(nav_content_neq) else NEQ_FILE
 
 task_triggers = {}
+codebase_neqs = []
+industry_neq_tasks = {}
 
 if os.path.isdir(addon_source):
     # Load add-on -> task mapping
@@ -887,6 +889,80 @@ if os.path.isdir(addon_source):
 
     print(f"  Task triggers: {len(task_triggers)} add-on tasks mapped")
 
+    # ================================================================
+    # Build complete NEQ data from codebase (all 56, not just XLSX 22)
+    # ================================================================
+    codebase_neqs = []
+    if os.path.isfile(neq_source):
+        neq_list = json.load(open(neq_source)).get("nonEssentialQuestionsArray", [])
+        for nq in neq_list:
+            raw_q = nq.get("questionText", "")
+            # Clean markdown from question text
+            clean_q = raw_q.replace("`", "").split("|")[0] if "`" in raw_q else raw_q
+            clean_q = clean_q.replace("[", "").replace("](", " ").split(")")[0] if "[" in clean_q else clean_q
+            clean_q = clean_q.strip().strip('"').strip()
+            
+            neq_id = nq["id"]
+            yes_addon = nq.get("addOnWhenYes", "")
+            no_addon = nq.get("addOnWhenNo", "")
+            
+            # Find downstream tasks for each answer path
+            yes_tasks = []
+            no_tasks = []
+            for addon_name, task_list in [(yes_addon, yes_tasks), (no_addon, no_tasks)]:
+                if not addon_name: continue
+                for tslug, trigs in task_triggers.items():
+                    if any(t.get("addon") == addon_name for t in trigs):
+                        task_list.append(tslug)
+            
+            # Which industries show this NEQ?
+            industries = neq_ind_map.get(neq_id, [])
+            
+            # Calculate downstream engagement
+            all_tasks = sorted(set(yes_tasks + no_tasks))
+            total_eng = sum(slug_eng_map.get(ts, 0) for ts in all_tasks) if 'slug_eng_map' in dir() else 0
+            
+            codebase_neqs.append({
+                "id": neq_id,
+                "question": clean_q[:200],
+                "industries": industries,
+                "industryCount": len(industries),
+                "yesAddon": yes_addon,
+                "noAddon": no_addon,
+                "yesTasks": yes_tasks,
+                "noTasks": no_tasks,
+                "allTasks": all_tasks,
+                "taskCount": len(all_tasks),
+            })
+        print(f"  Codebase NEQs: {len(codebase_neqs)} (triggering tasks for {sum(1 for n in codebase_neqs if n['taskCount']>0)} of them)")
+
+    # Build per-industry NEQ-triggered tasks
+    industry_neq_tasks = {}  # ind_id -> set of task slugs reachable via NEQs
+    if os.path.isdir(ind_source):
+        for f in _glob.glob(os.path.join(ind_source, "*.json")):
+            idata = json.load(open(f))
+            if not idata.get("isEnabled"): continue
+            ind_id = idata["id"]
+            neq_ids = idata.get("nonEssentialQuestionsIds", [])
+            neq_task_set = set()
+            for nq_id in neq_ids:
+                # Find this NEQ in our codebase list
+                nq_entry = next((n for n in codebase_neqs if n["id"] == nq_id), None)
+                if nq_entry:
+                    neq_task_set.update(nq_entry["allTasks"])
+            industry_neq_tasks[ind_id] = neq_task_set
+
+    # Patch combined_industries with NEQ task data
+    for ci in combined_industries:
+        ind_id = ci["id"]
+        neq_tasks = industry_neq_tasks.get(ind_id, set())
+        ci["neqTaskCount"] = len(neq_tasks)
+        ci["neqTasks"] = sorted(neq_tasks)
+        # "Truly unique content" = base diff tasks + NEQ-triggered tasks
+        ci["totalContentTasks"] = ci["totalDiffTasks"] + len(neq_tasks)
+        # NEQ-only industries: zero base diff tasks but have NEQ tasks
+        ci["uniqueViaNeqOnly"] = ci["totalDiffTasks"] == 0 and len(neq_tasks) > 0
+
     # Also add step numbers for base industry tasks (not add-ons)
     ind_dir = os.path.join(addon_source.replace("add-ons",""), "industries")
     if os.path.isdir(ind_dir):
@@ -998,6 +1074,10 @@ for nq in neq_data:
     }
 
 # Track XLSX industries that didn't match any navigator industry
+# First, enrich codebase NEQs with engagement data (slug_eng_map now exists)
+for cnq in codebase_neqs:
+    cnq["engagement"] = sum(slug_eng_map.get(ts, 0) for ts in cnq["allTasks"])
+
 matched_names = set(ind["name"].strip() for ind in nav_industries.values() if ind.get("isEnabled"))
 unmatched_xlsx = []
 for name, cnt in industry_users.items():
@@ -1406,6 +1486,7 @@ output = {
     "phases": phase_summary,
     "taskProgress": task_progress,
     "nonEssentialQuestions": neq_data,
+    "codebaseNEQs": codebase_neqs if nav else [],
     "legalStructures": legal_data,
     "orphanedSectors": sorted(orphaned_sectors),
     "sectorMismatches": nav_mismatches,
