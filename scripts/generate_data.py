@@ -881,6 +881,7 @@ neq_source = nav_content_neq if os.path.isfile(nav_content_neq) else NEQ_FILE
 task_triggers = {}
 codebase_neqs = []
 industry_neq_tasks = {}
+combined_task_frequency = {}
 
 if os.path.isdir(addon_source):
     # Load add-on -> task mapping
@@ -1145,6 +1146,38 @@ if os.path.isdir(addon_source):
         ci["totalContentTasks"] = ci["totalDiffTasks"] + len(neq_tasks)
         # NEQ-only industries: zero base diff tasks but have NEQ tasks
         ci["uniqueViaNeqOnly"] = ci["totalDiffTasks"] == 0 and len(neq_tasks) > 0
+
+    # Build combined task frequency (base + NEQ) for Task Reuse tab
+    neq_task_to_industries = {}  # task_slug -> set of industry_ids (via NEQ)
+    for ind_id, neq_tasks in industry_neq_tasks.items():
+        for tslug in neq_tasks:
+            if tslug in universal_tasks: continue
+            if tslug not in neq_task_to_industries:
+                neq_task_to_industries[tslug] = set()
+            neq_task_to_industries[tslug].add(ind_id)
+
+    # Merge base + NEQ
+    all_task_to_industries = {}
+    for task, ind_list in task_to_industries.items():
+        all_task_to_industries[task] = set(ind_list)
+    for task, ind_set in neq_task_to_industries.items():
+        if task not in all_task_to_industries:
+            all_task_to_industries[task] = set()
+        all_task_to_industries[task].update(ind_set)
+
+    combined_task_frequency = {}
+    for task, ind_set in sorted(all_task_to_industries.items()):
+        base_count = len(task_to_industries.get(task, []))
+        neq_count = len(neq_task_to_industries.get(task, set()) - set(task_to_industries.get(task, [])))
+        combined_task_frequency[task] = {
+            "count": len(ind_set),
+            "industries": sorted(ind_set),
+            "baseCount": base_count,
+            "neqCount": neq_count,
+        }
+
+    neq_only_tasks = [t for t, info in combined_task_frequency.items() if info["baseCount"] == 0]
+    print(f"  Combined task frequency: {len(combined_task_frequency)} tasks ({len(task_to_industries)} base + {len(neq_only_tasks)} NEQ-only)")
 
     # Also add step numbers for base industry tasks (not add-ons)
     ind_dir = os.path.join(addon_source.replace("add-ons",""), "industries")
@@ -1673,6 +1706,7 @@ output = {
     "orphanedSectors": sorted(orphaned_sectors),
     "sectorMismatches": nav_mismatches,
     "taskFrequency": task_frequency,
+    "combinedTaskFrequency": combined_task_frequency,
     "taskNameToSlug": task_name_to_slug,
     "universalTasks": universal_tasks,
     "totalDiffTasks": len(task_to_industries),
