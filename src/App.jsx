@@ -245,29 +245,55 @@ export default function App() {
     </div>);
   };
 
-  /* ═══ TAB: USER JOURNEY ═══ */
-  const UserJourney = () => {
+  /* ═══ TAB: TWO EXPERIENCES ═══ */
+  const TwoExperiences = () => {
     const po=[{id:"GUEST_MODE",label:"Guest Mode",g:"s",exp:"roadmap"},{id:"GUEST_MODE_WITH_BUSINESS_STRUCTURE",label:"Guest + Structure",g:"s",exp:"roadmap"},{id:"NEEDS_BUSINESS_STRUCTURE",label:"Needs Structure",g:"s",exp:"roadmap"},{id:"NEEDS_TO_FORM",label:"Needs to Form",g:"s",exp:"roadmap"},{id:"FORMED",label:"Formed",g:"s",exp:"roadmap"},{id:"UP_AND_RUNNING",label:"Up & Running",g:"o",exp:"operate"},{id:"GUEST_MODE_OWNING",label:"Guest Owning",g:"w",exp:"operate"},{id:"UP_AND_RUNNING_OWNING",label:"Up & Running Owning",g:"w",exp:"operate"},{id:"REMOTE_SELLER_WORKER",label:"Remote Seller/Worker",g:"x",exp:"roadmap"},{id:"DOMESTIC_EMPLOYER",label:"Domestic Employer",g:"x",exp:"roadmap"}];
-    const pm={};for(const p of phases.phases)pm[p.phase]=p.count;const mx=Math.max(...Object.values(pm));
+    const pm={};for(const p of phases.phases)pm[p.phase]=p.count;
     const ft={GUEST_MODE:{r:1,a:0,f:0,c:"none"},GUEST_MODE_WITH_BUSINESS_STRUCTURE:{r:1,a:0,f:0,c:"none"},NEEDS_BUSINESS_STRUCTURE:{r:1,a:0,f:0,c:"none"},NEEDS_TO_FORM:{r:1,a:0,f:0,c:"none"},FORMED:{r:1,a:0,f:0,c:"list"},UP_AND_RUNNING:{r:0,a:1,f:1,c:"full"},GUEST_MODE_OWNING:{r:0,a:1,f:1,c:"full"},UP_AND_RUNNING_OWNING:{r:0,a:1,f:1,c:"full"},REMOTE_SELLER_WORKER:{r:1,a:0,f:0,c:"none"},DOMESTIC_EMPLOYER:{r:1,a:0,f:0,c:"none"}};
     const gc={s:C.accent,o:C.green,w:C.purple,x:C.muted};
     const roadmapExp = po.filter(p=>p.exp==="roadmap").reduce((s,p)=>s+(pm[p.id]||0),0);
     const operateExp = po.filter(p=>p.exp==="operate").reduce((s,p)=>s+(pm[p.id]||0),0);
     const formed=pm["FORMED"]||0,upR=pm["UP_AND_RUNNING"]||0;
+
+    // Build step map for tasks
+    const triggers = DATA.taskTriggers||{};
+    const stepMap={};
+    for(const [slug,trigs] of Object.entries(triggers)){for(const t of trigs){if(t.step){stepMap[slug]=t.step;break;}}}
+    const uSteps={"business-plan":1,"determine-naics-code":1,"business-structure":1,"register-for-ein":2,"register-for-taxes":2,"form-business-entity":2,"bank-account":3,"manage-business-vehicles":3};
+    const stepBuckets={1:[],2:[],3:[],4:[]};
+    for(const t of tp){const step=stepMap[t.slug]||uSteps[t.slug];if(step&&stepBuckets[step])stepBuckets[step].push(t);}
+    const stepNames={1:"Plan Your Business",2:"Register Your Business",3:"After Registering",4:"Before Opening"};
+    const formPV=stepBuckets[1].concat(stepBuckets[2]).reduce((s,t)=>s+(t.pageViews||0),0);
+    const postPV=stepBuckets[3].concat(stepBuckets[4]).reduce((s,t)=>s+(t.pageViews||0),0);
+    const aaPV=DATA.anytimeActions.reduce((s,a)=>s+(a.pageViews||0),0);
+    const hasGA4=tp.some(t=>t.pageViews>0);
+
+    // Build engagement bar chart data
+    const engData=[
+      {name:"Formation (Steps 1–2)",pv:formPV,audience:roadmapExp,perUser:+(formPV/Math.max(roadmapExp,1)).toFixed(1),color:C.accent},
+      {name:"Post-formation (Steps 3–4)",pv:postPV,audience:roadmapExp,perUser:+(postPV/Math.max(roadmapExp,1)).toFixed(1),color:C.accent},
+      {name:"Anytime Actions",pv:aaPV,audience:operateExp,perUser:+(aaPV/Math.max(operateExp,1)).toFixed(1),color:C.green},
+    ];
+
+    // Top content from each experience
+    const postTasks=[...stepBuckets[3],...stepBuckets[4]].sort((a,b)=>(b.pageViews||0)-(a.pageViews||0)).slice(0,8);
+    const topAAs=[...DATA.anytimeActions].sort((a,b)=>(b.pageViews||0)-(a.pageViews||0)).slice(0,8);
+
     return (<div>
       <Alert color={C.orange}><strong>Two experiences, one platform:</strong> {fmt(roadmapExp)} users ({pct(roadmapExp,totalBiz)}) are in the <strong>roadmap experience</strong> — they see a step-by-step checklist but no AAs or fundings. {fmt(operateExp)} users ({pct(operateExp,totalBiz)}) are in the <strong>operate experience</strong> — they see AAs, fundings, and the full calendar but the roadmap is hidden. Only {fmt(upR)} users graduated from roadmap → operate via FORMED.</Alert>
-      <Insight><strong>Two products in one:</strong> The roadmap experience serves {fmt(roadmapExp)} users — formation tasks dominate (8.9 page views/user in Steps 1–2) but engagement drops to 0.9 views/user in Steps 3–4. The operate experience serves {fmt(operateExp)} users with 1.8 views/user on AAs and filings — <strong>2x the per-user engagement</strong> of post-formation roadmap content. The operate dashboard model ("here's what you need") outperforms the linear checklist model for post-formation content.</Insight>
-      <Insight><strong>Where users stall:</strong> {fmt(pm["GUEST_MODE"]||0)} in Guest Mode + {fmt(pm["GUEST_MODE_WITH_BUSINESS_STRUCTURE"]||0)} picked a structure but stopped = ~{fmt((pm["GUEST_MODE"]||0)+(pm["GUEST_MODE_WITH_BUSINESS_STRUCTURE"]||0))} stalled early. Another {fmt(pm["NEEDS_TO_FORM"]||0)} know they need to form but haven't. {fmt(formed)} completed formation but are stuck in FORMED — they see their roadmap Steps 3–4 but have no access to AAs, fundings, or the full calendar.</Insight>
+      <SrcLegend items={[["GA4","Page views — primary engagement metric (Jan 2023–Mar 2026)"],["NAV","Phase definitions, content flags, and task/AA inventory from codebase"],["XLSX","Account counts by phase and roadmap appearances"]]} />
+
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
         <Stat label="Total Businesses" value={fmt(totalBiz)} small />
-        <Stat label="Roadmap Experience" value={fmt(roadmapExp)} sub={pct(roadmapExp,totalBiz)+" — see step-by-step roadmap, no AAs or fundings"} color={C.accent} small />
-        <Stat label="Operate Experience" value={fmt(operateExp)} sub={pct(operateExp,totalBiz)+" — see AAs, fundings, full calendar (roadmap hidden)"} color={C.green} small />
-        <Stat label="FORMED→Up&Running" value={pct(upR,formed)} sub={fmt(formed)+"→"+fmt(upR)} color={C.red} small />
+        <Stat label="Roadmap Experience" value={fmt(roadmapExp)} sub={pct(roadmapExp,totalBiz)+" — step-by-step roadmap, no AAs/fundings"} color={C.accent} small />
+        <Stat label="Operate Experience" value={fmt(operateExp)} sub={pct(operateExp,totalBiz)+" — AAs, fundings, full calendar, roadmap hidden"} color={C.green} small />
+        <Stat label="FORMED→Up&Running" value={pct(upR,formed)} sub={fmt(formed)+" → "+fmt(upR)+" — only path from roadmap to operate"} color={C.red} small />
       </div>
+
       <Sec title="Operating Phase Distribution">
-        <div style={{display:"flex",gap:16,marginBottom:8,fontSize:10,color:C.muted,fontFamily:C.sans}}>
-          <span><span style={{background:`${C.accent}22`,color:C.accent,padding:"1px 6px",borderRadius:3,border:`1px solid ${C.accent}33`,fontSize:9,marginRight:4,fontWeight:600}}>ROADMAP</span>{fmt(roadmapExp)} users ({pct(roadmapExp,totalBiz)}) — step-by-step roadmap visible</span>
-          <span><span style={{background:`${C.green}22`,color:C.green,padding:"1px 6px",borderRadius:3,border:`1px solid ${C.green}33`,fontSize:9,marginRight:4,fontWeight:600}}>OPERATE</span>{fmt(operateExp)} users ({pct(operateExp,totalBiz)}) — AAs, fundings, full calendar</span>
+        <div style={{display:"flex",gap:16,marginBottom:8,fontSize:10,color:C.muted,fontFamily:C.sans,flexWrap:"wrap"}}>
+          <span><span style={{background:`${C.accent}22`,color:C.accent,padding:"1px 6px",borderRadius:3,border:`1px solid ${C.accent}33`,fontSize:9,marginRight:4,fontWeight:600}}>ROADMAP</span>{fmt(roadmapExp)} users — step-by-step roadmap visible</span>
+          <span><span style={{background:`${C.green}22`,color:C.green,padding:"1px 6px",borderRadius:3,border:`1px solid ${C.green}33`,fontSize:9,marginRight:4,fontWeight:600}}>OPERATE</span>{fmt(operateExp)} users — AAs, fundings, full calendar</span>
         </div>
         <div style={{display:"grid",gap:4}}>{po.map((p,pi)=>{const c=pm[p.id]||0;const f=ft[p.id]||{};const prevExp=pi>0?po[pi-1].exp:null;const showDivider=prevExp&&prevExp!==p.exp;return(
           <React.Fragment key={p.id}>
@@ -294,14 +320,75 @@ export default function App() {
           </React.Fragment>
         );})}</div>
       </Sec>
-      <Sec title="Two Experiences Compared">
-        <Insight><strong>The platform serves two distinct user experiences.</strong> The <span style={{color:C.accent}}>Roadmap Experience</span> ({fmt(roadmapExp)} users, {pct(roadmapExp,totalBiz)}) shows a step-by-step checklist for starting a business — roadmap tasks are visible, but AAs, fundings, and the full calendar are hidden. The <span style={{color:C.green}}>Operate Experience</span> ({fmt(operateExp)} users, {pct(operateExp,totalBiz)}) hides the roadmap and shows anytime actions, fundings, certifications, and the full filings calendar. These are completely different interfaces serving different needs. UP_AND_RUNNING users see the operate experience — the roadmap is hidden by default (toggleable) and replaced by the operate dashboard.</Insight>
+
+      {hasGA4&&<Sec title="Engagement Comparison (GA4 Page Views)">
+        <Insight><strong>Per-user engagement by content bucket.</strong> Formation content dominates at {(formPV/Math.max(roadmapExp,1)).toFixed(1)} page views per user. After formation, users engage at just {(postPV/Math.max(roadmapExp,1)).toFixed(1)} views/user with Steps 3–4 content. Operate users engage at {(aaPV/Math.max(operateExp,1)).toFixed(1)} views/user with anytime actions — <strong>{((aaPV/Math.max(operateExp,1))/(postPV/Math.max(roadmapExp,1))).toFixed(1)}x the rate</strong> of post-formation roadmap content. The operate dashboard model outperforms the linear checklist for post-formation needs.</Insight>
+
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:14,marginBottom:16}}>
+          <div style={{fontSize:11,color:C.muted,fontFamily:C.sans,marginBottom:12,textAlign:"center"}}>Page views per user in each audience</div>
+          <ResponsiveContainer width="100%" height={160}>
+            <BarChart data={engData} margin={{left:10,right:30,top:5,bottom:5}}>
+              <XAxis dataKey="name" stroke={C.muted} tick={{fontSize:10,fontFamily:C.sans}} />
+              <YAxis stroke={C.muted} tick={{fontSize:10,fontFamily:C.mono}} />
+              <Tooltip content={({payload})=>{if(!payload?.[0])return null;const d=payload[0].payload;return <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:10,fontSize:11,color:C.text,fontFamily:C.sans}}><div style={{fontWeight:700}}>{d.name}</div><div>{fmt(d.pv)} page views ÷ {fmt(d.audience)} users = <strong>{d.perUser} PV/user</strong></div></div>;}} />
+              <Bar dataKey="perUser" radius={[4,4,0,0]}>
+                {engData.map((e,i)=><Cell key={i} fill={e.color} opacity={0.7}/>)}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
+          {[1,2,3,4].map(s=>{const pv=stepBuckets[s].reduce((a,t)=>a+(t.pageViews||0),0);return(
+            <Stat key={s} label={"Step "+s+": "+stepNames[s]} value={fmt(pv)} sub={(pv/Math.max(roadmapExp,1)).toFixed(1)+" PV/user · "+stepBuckets[s].length+" tasks"} color={s<=2?C.accent:C.orange} small />
+          );})}
+          <Stat label="Anytime Actions" value={fmt(aaPV)} sub={(aaPV/Math.max(operateExp,1)).toFixed(1)+" PV/user · "+DATA.anytimeActions.length+" AAs"} color={C.green} small />
+        </div>
+      </Sec>}
+
+      {hasGA4&&<Sec title="Top Content: Roadmap Post-Formation vs. Operate" sub="The apples-to-apples comparison — both serve users who have finished (or skipped) formation. Which content model drives more engagement?">
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+          <div>
+            <div style={{fontSize:12,fontWeight:700,color:C.accent,marginBottom:8,fontFamily:C.sans}}>Post-Formation Roadmap (Steps 3–4)</div>
+            <div style={{fontSize:10,color:C.muted,marginBottom:8}}>{fmt(roadmapExp)} users · {stepBuckets[3].length+stepBuckets[4].length} tasks · {fmt(postPV)} total PV</div>
+            <div style={{display:"grid",gap:3}}>
+              {postTasks.map((t,i)=>{const pv=t.pageViews||0;const pu=t.pageUsers||0;const reach=pu/Math.max(roadmapExp,1)*100;return(
+                <div key={t.slug||i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:5,padding:"6px 10px",display:"flex",alignItems:"center",gap:8,cursor:"pointer"}} onClick={()=>{setFinderSearch(t.task);setSelItem(null);setFinderOpen(true);setView("finder");}} onMouseEnter={e=>e.currentTarget.style.background=C.cardHover} onMouseLeave={e=>e.currentTarget.style.background=C.card}>
+                  <span style={{width:16,fontSize:9,color:C.muted,fontFamily:C.mono}}>{i+1}</span>
+                  <span style={{flex:1,fontSize:11,color:C.accent,fontFamily:C.sans,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{t.task}</span>
+                  <span style={{fontSize:10,fontFamily:C.mono,color:C.cyan,flexShrink:0}}>{fmt(pv)}</span>
+                  <span style={{fontSize:9,color:C.muted,flexShrink:0,width:45,textAlign:"right"}}>{reach.toFixed(1)}%</span>
+                </div>
+              );})}
+            </div>
+          </div>
+          <div>
+            <div style={{fontSize:12,fontWeight:700,color:C.green,marginBottom:8,fontFamily:C.sans}}>Anytime Actions (Operate)</div>
+            <div style={{fontSize:10,color:C.muted,marginBottom:8}}>{fmt(operateExp)} users · {DATA.anytimeActions.length} AAs · {fmt(aaPV)} total PV</div>
+            <div style={{display:"grid",gap:3}}>
+              {topAAs.map((a,i)=>{const pv=a.pageViews||0;const pu=a.pageUsers||0;const reach=pu/Math.max(operateExp,1)*100;return(
+                <div key={a.id||i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:5,padding:"6px 10px",display:"flex",alignItems:"center",gap:8,cursor:"pointer"}} onClick={()=>{setFinderSearch(a.name);setSelItem(null);setFinderOpen(true);setView("finder");}} onMouseEnter={e=>e.currentTarget.style.background=C.cardHover} onMouseLeave={e=>e.currentTarget.style.background=C.card}>
+                  <span style={{width:16,fontSize:9,color:C.muted,fontFamily:C.mono}}>{i+1}</span>
+                  <span style={{flex:1,fontSize:11,color:C.green,fontFamily:C.sans,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{a.name}</span>
+                  <span style={{fontSize:10,fontFamily:C.mono,color:C.cyan,flexShrink:0}}>{fmt(pv)}</span>
+                  <span style={{fontSize:9,color:C.muted,flexShrink:0,width:45,textAlign:"right"}}>{reach.toFixed(1)}%</span>
+                </div>
+              );})}
+            </div>
+          </div>
+        </div>
+        <Insight><strong>Concentration:</strong> On the operate side, 2 AAs (Registry Update and Tax Clearance) account for ~91% of all AA page views — only 8 of 64 AAs exceed 100 views. Post-formation roadmap content is more evenly distributed: the top 15 tasks account for 80% of views, and 99 of 162 tasks exceed 100 views. The operate model drives higher per-user engagement, but most of that comes from two high-demand items. The roadmap has more content actually getting used.</Insight>
+      </Sec>}
+
+      <Sec title="Where Users Stall">
+        <Insight><strong>The funnel:</strong> {fmt(pm["GUEST_MODE"]||0)} in Guest Mode + {fmt(pm["GUEST_MODE_WITH_BUSINESS_STRUCTURE"]||0)} picked a structure but stopped = ~{fmt((pm["GUEST_MODE"]||0)+(pm["GUEST_MODE_WITH_BUSINESS_STRUCTURE"]||0))} stalled early. Another {fmt(pm["NEEDS_TO_FORM"]||0)} know they need to form but haven't. {fmt(formed)} completed formation but are stuck in FORMED — they can see Steps 3–4 on their roadmap but have no access to AAs, fundings, or the full calendar. Only {fmt(upR)} ({pct(upR,formed)} of FORMED) graduated to the operate experience.</Insight>
         <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-          <Stat label="Roadmap Experience" value={fmt(roadmapExp)} sub={pct(roadmapExp,totalBiz)+" of accounts. Content: "+tp.length+" roadmap tasks across 4 steps. Users see a linear formation checklist."} color={C.accent} />
-          <Stat label="Operate Experience" value={fmt(operateExp)} sub={pct(operateExp,totalBiz)+" of accounts. Content: "+DATA.anytimeActions.length+" AAs + "+(DATA.fundingCount||71)+" fundings + "+(DATA.certificationCount||9)+" certs + full calendar."} color={C.green} />
-          <Stat label="Transition Rate" value={pct(upR,formed)} sub={"FORMED ("+fmt(formed)+") → UP_AND_RUNNING ("+fmt(upR)+"). This is the only path from roadmap to operate for STARTING users."} color={C.red} />
+          <Stat label="Pre-formation stall" value={fmt((pm["GUEST_MODE"]||0)+(pm["GUEST_MODE_WITH_BUSINESS_STRUCTURE"]||0)+(pm["NEEDS_TO_FORM"]||0))} sub="Guest + Guest w/Structure + Needs to Form — haven't completed formation" color={C.orange} />
+          <Stat label="Post-formation stall" value={fmt(formed)} sub="FORMED — completed formation but stuck, can't see operate content" color={C.red} />
+          <Stat label="Reached operate" value={fmt(operateExp)} sub={pct(operateExp,totalBiz)+" of all accounts — the only users seeing AAs and fundings"} color={C.green} />
         </div>
       </Sec>
+
       {DATA.unknowns && <div style={{fontSize:11,color:C.muted,fontFamily:C.sans,background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 14px"}}>
         <strong style={{color:C.orange}}>Note:</strong> The phase distribution above accounts for {fmt(totalBiz)} businesses. An additional {fmt(DATA.unknowns.industry)} businesses have no industry set (abandoned onboarding) and {fmt(DATA.unknowns.legalStructure)} have no legal structure selected. These populations overlap significantly and are detailed on the Content Gap tab.
       </div>}
@@ -1365,9 +1452,9 @@ export default function App() {
           Source: codebase ({DATA.taskProgress.length} tasks) + {DATA.meta.xlsxFile} ({fmt(DATA.meta.totalBusinesses)} businesses) · {inds.length} industries · {DATA.anytimeActions.length} AAs · {sectors.length} sectors{DATA.permitCoverage&&` · ${fmt(DATA.permitCoverage.coverage.total)} state permits`}
         </div>
         <div style={{display:"flex",gap:5,marginBottom:20,flexWrap:"wrap"}}>
-          {nav("contentgap","Content Gap")}{nav("roadmap","Roadmap Analysis")}{nav("journey","User Journey")}{nav("industries","Industries")}{nav("detail","Industry Detail")}{nav("tasks","Task Reuse")}{nav("engagement","Task Engagement")}{nav("permits","Permit Coverage")}{nav("finder","Content Finder")}{DATA.ga4&&nav("siteanalytics","Site Analytics")}{nav("profile","Profile Questions")}
+          {nav("contentgap","Content Gap")}{nav("roadmap","Roadmap Analysis")}{nav("experiences","Two Experiences")}{nav("industries","Industries")}{nav("detail","Industry Detail")}{nav("tasks","Task Reuse")}{nav("engagement","Task Engagement")}{nav("permits","Permit Coverage")}{nav("finder","Content Finder")}{DATA.ga4&&nav("siteanalytics","Site Analytics")}{nav("profile","Profile Questions")}
         </div>
-        {view==="contentgap"&&<ContentGap/>}{view==="roadmap"&&<RoadmapAnalysis/>}{view==="journey"&&<UserJourney/>}{view==="industries"&&<Industries/>}{view==="detail"&&<Detail/>}{view==="tasks"&&<TaskReuse/>}{view==="engagement"&&<TaskEngagement/>}{view==="permits"&&<PermitCoverage/>}{view==="finder"&&<ContentFinder/>}{view==="siteanalytics"&&<SiteAnalytics/>}{view==="profile"&&<ProfileQuestions/>}
+        {view==="contentgap"&&<ContentGap/>}{view==="roadmap"&&<RoadmapAnalysis/>}{view==="experiences"&&<TwoExperiences/>}{view==="industries"&&<Industries/>}{view==="detail"&&<Detail/>}{view==="tasks"&&<TaskReuse/>}{view==="engagement"&&<TaskEngagement/>}{view==="permits"&&<PermitCoverage/>}{view==="finder"&&<ContentFinder/>}{view==="siteanalytics"&&<SiteAnalytics/>}{view==="profile"&&<ProfileQuestions/>}
       </div>
     </div>
   );
