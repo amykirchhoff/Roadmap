@@ -729,6 +729,108 @@ export default function App() {
     </div>);
   };
 
+  /* ═══ TAB: PUBLIC VS ACCOUNT ═══ */
+  const PublicVsAccount = () => {
+    const pva = DATA.publicVsAccount;
+    if(!pva) return <div style={{color:C.muted,textAlign:"center",padding:40}}>No public vs account data. Regenerate data.json.</div>;
+    const pairs = pva.pairs;
+    const formPairs = pairs.filter(p=>p.type==="formation");
+    const opPairs = pairs.filter(p=>p.type==="operate");
+    const maxPV = Math.max(...pairs.map(p=>Math.max(p.publicViews,p.accountViews)));
+
+    const PairRow = ({p,i}) => {
+      const pubW = p.publicViews/maxPV*100;
+      const acctW = p.accountViews/maxPV*100;
+      const ratio = p.publicViews>0&&p.accountViews>0?(p.publicViews/p.accountViews).toFixed(1)+"x":p.publicViews>0?"public only":p.accountViews>0?"account only":"—";
+      const winner = p.publicViews>p.accountViews?"public":"account";
+      return(
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"10px 14px",display:"grid",gridTemplateColumns:"140px 1fr 70px 1fr 70px 55px",alignItems:"center",gap:8}}>
+          <span style={{fontSize:12,fontWeight:600,color:C.text,fontFamily:C.sans}}>{p.topic}</span>
+          <div style={{height:10,background:C.bg,borderRadius:5,overflow:"hidden",direction:"rtl"}}>
+            <div style={{width:`${pubW}%`,height:"100%",background:C.orange,borderRadius:5,opacity:.7}}/>
+          </div>
+          <span style={{fontSize:10,fontFamily:C.mono,color:p.publicViews>0?C.orange:C.muted,textAlign:"right"}}>{p.publicViews>0?fmt(p.publicViews):"—"}</span>
+          <div style={{height:10,background:C.bg,borderRadius:5,overflow:"hidden"}}>
+            <div style={{width:`${acctW}%`,height:"100%",background:C.accent,borderRadius:5,opacity:.7}}/>
+          </div>
+          <span style={{fontSize:10,fontFamily:C.mono,color:p.accountViews>0?C.accent:C.muted}}>{p.accountViews>0?fmt(p.accountViews):"—"}</span>
+          <span style={{fontSize:9,fontFamily:C.mono,color:winner==="public"?C.orange:C.green,textAlign:"right"}}>{ratio}</span>
+        </div>
+      );
+    };
+
+    // Summary chart data
+    const chartData = pairs.filter(p=>p.publicViews>0&&p.accountViews>0).map(p=>({
+      topic: p.topic,
+      public: p.publicViews,
+      account: p.accountViews,
+      ratio: +(p.publicViews/Math.max(p.accountViews,1)).toFixed(1),
+      type: p.type,
+    })).sort((a,b)=>b.ratio-a.ratio);
+
+    return (<div>
+      <Alert color={C.orange}><strong>Many topics exist on both the public site and inside accounts.</strong> For formation topics, the account holds its own — users sign up and use the Navigator. For post-formation topics, the public Webflow site outperforms the account by 7x to 150x. Users are finding operate content — just not through the account.</Alert>
+      <SrcLegend items={[["GA4","Page views for both public (business.nj.gov) and account (Navigator) pages, Jan 2023–Mar 2026"]]} />
+
+      <Insight><strong>The split:</strong> The public site gets <strong>{fmt(pva.publicTotal)}</strong> page views on content pages (pages/, starter-kits/, licensing guide, funding, etc.), while account task pages get <strong>{fmt(pva.taskTotal)}</strong>. But the account task traffic is almost entirely formation — Steps 1 and 2. Post-formation account content (AAs + filings) gets just <strong>{fmt(pva.actionTotal+pva.filingTotal)}</strong> views, while their public-page equivalents get millions. The content people need after formation exists and is being consumed — on the public site, not inside accounts.</Insight>
+
+      <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
+        <Stat label="Public Content Pages" value={fmt(pva.publicTotal)} sub="Pages, starter kits, licensing guide, funding, etc." color={C.orange} small />
+        <Stat label="Account Task Pages" value={fmt(pva.taskTotal)} sub="Navigator roadmap tasks (mostly formation)" color={C.accent} small />
+        <Stat label="Account Operate Pages" value={fmt(pva.actionTotal+pva.filingTotal)} sub={"AAs ("+fmt(pva.actionTotal)+") + filings ("+fmt(pva.filingTotal)+")"} color={C.green} small />
+      </div>
+
+      <Sec title="Formation Topics — Account holds its own" sub="For starting and registering a business, the Navigator account gets comparable or higher traffic than the public site.">
+        <div style={{display:"grid",gridTemplateColumns:"140px 1fr 70px 1fr 70px 55px",gap:8,padding:"0 14px",marginBottom:4,fontSize:8,color:C.muted,fontFamily:C.sans}}>
+          <span>Topic</span><span style={{textAlign:"right"}}>← Public site</span><span style={{textAlign:"right"}}>Views</span><span>Account →</span><span>Views</span><span style={{textAlign:"right"}}>Ratio</span>
+        </div>
+        <div style={{display:"grid",gap:3}}>
+          {formPairs.map((p,i)=><PairRow key={i} p={p} i={i}/>)}
+        </div>
+        <div style={{fontSize:10,color:C.muted,fontFamily:C.sans,padding:"8px 14px"}}>
+          Business Structure and Business Plan get <em>more</em> views inside the account than on the public page. The account adds real value for formation — progress tracking, form pre-fill, NJ FAST integration.
+        </div>
+      </Sec>
+
+      <Sec title="Post-Formation Topics — Public site dominates" sub="For licensing, contracting, permits, and compliance, the public Webflow pages far outpace their account equivalents.">
+        <div style={{display:"grid",gridTemplateColumns:"140px 1fr 70px 1fr 70px 55px",gap:8,padding:"0 14px",marginBottom:4,fontSize:8,color:C.muted,fontFamily:C.sans}}>
+          <span>Topic</span><span style={{textAlign:"right"}}>← Public site</span><span style={{textAlign:"right"}}>Views</span><span>Account →</span><span>Views</span><span style={{textAlign:"right"}}>Ratio</span>
+        </div>
+        <div style={{display:"grid",gap:3}}>
+          {opPairs.map((p,i)=><PairRow key={i} p={p} i={i}/>)}
+        </div>
+        <div style={{fontSize:10,color:C.muted,fontFamily:C.sans,padding:"8px 14px"}}>
+          The licensing guide alone (513K views) exceeds the <em>entire</em> operate account experience (77K). Government contracting: 150x. Closing your business: 423x. The information exists — the delivery mechanism is the gap.
+        </div>
+      </Sec>
+
+      {chartData.length>0&&<Sec title="Public-to-Account Ratio by Topic" sub="How many times more traffic the public page gets vs. the account equivalent. Values below 1.0 mean the account wins.">
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:14}}>
+          <ResponsiveContainer width="100%" height={Math.max(250,chartData.length*32+40)}>
+            <BarChart data={chartData} layout="vertical" margin={{left:140,right:40,top:5,bottom:5}}>
+              <XAxis type="number" stroke={C.muted} tick={{fontSize:10,fontFamily:C.mono}} label={{value:"Public ÷ Account (page views)",position:"bottom",offset:0,fill:C.muted,fontSize:10}} />
+              <YAxis dataKey="topic" type="category" width={130} tick={{fontSize:11,fontFamily:C.sans}} stroke={C.muted} interval={0} />
+              <Tooltip content={({payload})=>{if(!payload?.[0])return null;const d=payload[0].payload;return <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:10,fontSize:11,color:C.text,fontFamily:C.sans}}><div style={{fontWeight:700}}>{d.topic}</div><div style={{color:C.orange}}>Public: {fmt(d.public)} views</div><div style={{color:C.accent}}>Account: {fmt(d.account)} views</div><div>Ratio: <strong>{d.ratio}x</strong> ({d.type})</div></div>;}} />
+              <Bar dataKey="ratio" radius={[0,4,4,0]}>
+                {chartData.map((e,i)=><Cell key={i} fill={e.ratio>1?C.orange:C.green} opacity={0.7}/>)}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <div style={{display:"flex",gap:16,justifyContent:"center",marginTop:8,fontSize:10,color:C.muted}}>
+            <span><span style={{display:"inline-block",width:10,height:10,background:C.orange,borderRadius:2,marginRight:4,verticalAlign:"middle"}}/>Public site wins (ratio {'>'} 1)</span>
+            <span><span style={{display:"inline-block",width:10,height:10,background:C.green,borderRadius:2,marginRight:4,verticalAlign:"middle"}}/>Account wins (ratio {'<'} 1)</span>
+          </div>
+        </div>
+      </Sec>}
+
+      <Sec title="What This Means">
+        <Insight><strong>The account wall helps formation, hurts operate.</strong> For formation, the account adds real functionality — progress tracking, form pre-fill, NJ FAST integration. Users sign up because the account provides value the public site can't. For operate content, the account adds minimal value — an AA page contains roughly the same information as its public equivalent, plus a login requirement. Users searching "NJ food truck license" land on the starter kit (35K views), not the account task (1.4K views).</Insight>
+        <Insight><strong>The content isn't missing — it's in the wrong place.</strong> The team has built extensive post-formation content inside accounts: {DATA.anytimeActions.length} AAs, {DATA.fundingCount||71} fundings, 162 post-formation roadmap tasks. But users seeking this information are consuming it on the public Webflow site instead. The licensing guide serves {fmt(pva.pairs.find(p=>p.topic==="Licensing Guide")?.publicUsers||0)} unique users — most of whom never create an account.</Insight>
+        <Insight><strong>Two audiences, two entry points.</strong> Starting a business → sign up, use Navigator, formation tasks outperform public pages. Operating a business → Google search, land on public Webflow page, get the answer, leave. The question isn't how to drive more users to sign up — it's whether post-formation content should require sign-up at all.</Insight>
+      </Sec>
+    </div>);
+  };
+
   /* ═══ TAB: PERMIT COVERAGE ═══ */
   const PermitCoverage = () => {
     const pc = DATA.permitCoverage;
@@ -1474,9 +1576,9 @@ export default function App() {
           Source: codebase ({DATA.taskProgress.length} tasks) + {DATA.meta.xlsxFile} ({fmt(DATA.meta.totalBusinesses)} businesses) · {inds.length} industries · {DATA.anytimeActions.length} AAs · {sectors.length} sectors{DATA.permitCoverage&&` · ${fmt(DATA.permitCoverage.coverage.total)} state permits`}
         </div>
         <div style={{display:"flex",gap:5,marginBottom:20,flexWrap:"wrap"}}>
-          {nav("contentgap","Content Gap")}{nav("roadmap","Roadmap Analysis")}{nav("experiences","Two Experiences")}{nav("industries","Industries")}{nav("detail","Industry Detail")}{nav("tasks","Task Reuse")}{nav("engagement","Task Engagement")}{nav("permits","Permit Coverage")}{nav("finder","Content Finder")}{DATA.ga4&&nav("siteanalytics","Site Analytics")}{nav("profile","Profile Questions")}
+          {nav("contentgap","Content Gap")}{nav("roadmap","Roadmap Analysis")}{nav("experiences","Two Experiences")}{DATA.publicVsAccount&&nav("publicaccount","Public vs Account")}{nav("industries","Industries")}{nav("detail","Industry Detail")}{nav("tasks","Task Reuse")}{nav("engagement","Task Engagement")}{nav("permits","Permit Coverage")}{nav("finder","Content Finder")}{DATA.ga4&&nav("siteanalytics","Site Analytics")}{nav("profile","Profile Questions")}
         </div>
-        {view==="contentgap"&&<ContentGap/>}{view==="roadmap"&&<RoadmapAnalysis/>}{view==="experiences"&&<TwoExperiences/>}{view==="industries"&&<Industries/>}{view==="detail"&&<Detail/>}{view==="tasks"&&<TaskReuse/>}{view==="engagement"&&<TaskEngagement/>}{view==="permits"&&<PermitCoverage/>}{view==="finder"&&<ContentFinder/>}{view==="siteanalytics"&&<SiteAnalytics/>}{view==="profile"&&<ProfileQuestions/>}
+        {view==="contentgap"&&<ContentGap/>}{view==="roadmap"&&<RoadmapAnalysis/>}{view==="experiences"&&<TwoExperiences/>}{view==="publicaccount"&&<PublicVsAccount/>}{view==="industries"&&<Industries/>}{view==="detail"&&<Detail/>}{view==="tasks"&&<TaskReuse/>}{view==="engagement"&&<TaskEngagement/>}{view==="permits"&&<PermitCoverage/>}{view==="finder"&&<ContentFinder/>}{view==="siteanalytics"&&<SiteAnalytics/>}{view==="profile"&&<ProfileQuestions/>}
       </div>
     </div>
   );
