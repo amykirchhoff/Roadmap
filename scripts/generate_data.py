@@ -1744,6 +1744,7 @@ output = {
     "taskTriggers": task_triggers,
     "permitCoverage": plurmit_data,
     "ga4": ga4_data,
+    "publicVsAccount": None,  # populated below if GA4 data exists
     "unknowns": {
         "industry": unknown_industry,
         "sector": unknown_sector,
@@ -1756,6 +1757,60 @@ output = {
 }
 
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
+
+# Build public vs account comparison from GA4 page views
+if ga4_data and os.path.isfile(ga4_pages_file):
+    ga4_pv_map = {}
+    for r in parse_ga4_csv(ga4_pages_file):
+        path = r.get("Page path and screen class", "")
+        views = safe_int(r.get("Views"))
+        users = safe_int(r.get("Active users"))
+        if path not in ga4_pv_map:
+            ga4_pv_map[path] = {"views": 0, "users": 0}
+        ga4_pv_map[path]["views"] += views
+        ga4_pv_map[path]["users"] += users
+
+    topic_pairs = [
+        {"topic":"Business Structure","public":"/pages/choose-a-business-structure","account":"/tasks/business-structure","type":"formation"},
+        {"topic":"Register Business","public":"/pages/register-your-business","account":"/tasks/form-business-entity","type":"formation"},
+        {"topic":"Business Plan","public":"/pages/create-a-business-plan","account":"/tasks/business-plan","type":"formation"},
+        {"topic":"Register for Taxes","public":"/pages/register-for-taxes","account":"/tasks/register-for-taxes","type":"formation"},
+        {"topic":"Insurance","public":None,"account":"/tasks/insurance-policy","type":"formation"},
+        {"topic":"Bank Account","public":None,"account":"/tasks/open-bank-account","type":"formation"},
+        {"topic":"Licensing Guide","public":"/licensing-and-certification-guide","account":"/tasks/search-licenses","type":"operate"},
+        {"topic":"Government Contracting","public":"/pages/government-contracting","account":"/actions/state-contracting","type":"operate"},
+        {"topic":"Food Truck","public":"/starter-kits/food-truck","account":"/tasks/food-truck-license","type":"operate"},
+        {"topic":"Permits & Inspections","public":"/pages/building-permits-and-inspections","account":"/tasks/zoning-permit-approval","type":"operate"},
+        {"topic":"Closing Business","public":"/pages/closing-your-business","account":"/actions/close-your-business","type":"operate"},
+        {"topic":"Certifications (MWBE)","public":"/pages/mwbe","account":"/pages/certifications","type":"operate"},
+        {"topic":"Filings & Accounting","public":"/pages/filings-and-accounting","account":"/filings/annual-report","type":"operate"},
+        {"topic":"Cannabis","public":"/starter-kits/recreational-cannabis","account":"/tasks/cannabis-evaluate-location","type":"operate"},
+        {"topic":"HI Contractor","public":"/starter-kits/home-improvement-contractor","account":"/tasks/hic-license","type":"operate"},
+        {"topic":"Employer Requirements","public":"/pages/employer-requirements","account":None,"type":"operate"},
+    ]
+
+    pva_out = []
+    for tp_pair in topic_pairs:
+        pub = ga4_pv_map.get(tp_pair["public"], {}) if tp_pair["public"] else {}
+        acct = ga4_pv_map.get(tp_pair["account"], {}) if tp_pair["account"] else {}
+        pva_out.append({
+            "topic": tp_pair["topic"], "type": tp_pair["type"],
+            "publicPath": tp_pair["public"] or "", "publicViews": pub.get("views", 0), "publicUsers": pub.get("users", 0),
+            "accountPath": tp_pair["account"] or "", "accountViews": acct.get("views", 0), "accountUsers": acct.get("users", 0),
+        })
+
+    pub_total = sum(v["views"] for k, v in ga4_pv_map.items()
+        if any(k.startswith(p) for p in ["/pages/", "/starter-kits", "/licensing", "/funding", "/start", "/operate", "/plan", "/category"]))
+    task_total = sum(v["views"] for k, v in ga4_pv_map.items() if k.startswith("/tasks/"))
+    action_total = sum(v["views"] for k, v in ga4_pv_map.items() if k.startswith("/actions/"))
+    filing_total = sum(v["views"] for k, v in ga4_pv_map.items() if k.startswith("/filings/"))
+
+    output["publicVsAccount"] = {
+        "pairs": pva_out,
+        "publicTotal": pub_total, "taskTotal": task_total,
+        "actionTotal": action_total, "filingTotal": filing_total,
+    }
+    print(f"  Public vs Account: {len(pva_out)} topic pairs")
 with open(OUT, "w") as fh:
     json.dump(output, fh)
 
