@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ScatterChart, Scatter, Cell, CartesianGrid } from "recharts";
 import DATA from "./data.json";
 
@@ -50,7 +50,7 @@ export default function App() {
   const [selTask,setSelTask] = useState(null);
   const [sortBy,setSortBy] = useState("users");
   const [search,setSearch] = useState("");
-  const [taskSort,setTaskSort] = useState("total");
+  const [taskSort,setTaskSort] = useState("pageviews");
   const [pFilter,setPFilter] = useState("all");
   const [pDept,setPDept] = useState("all");
   const [finderSearch,setFinderSearch] = useState("");
@@ -516,13 +516,14 @@ export default function App() {
     const orphanedTasks = tp.filter(t=>t.dataQuality==="orphaned");
     const noAnalyticsTasks = tp.filter(t=>t.dataQuality==="noAnalytics");
     return (<div>
-      <Alert color={C.orange}>The top 5 tasks account for <strong>{pct(top5Total,allTotal)}</strong> of all roadmap appearances.{hasGA4?" GA4 page views are now overlaid — these show actual readership, which is 2–10x higher than roadmap counts for most tasks.":""}</Alert>
-      <SrcLegend items={[["NAV","Master task inventory — 216 markdown files from codebase are the source of truth"],["XLSX","Roadmap counts and completion overlaid from analytics where available"],["GA4","Page views from Google Analytics (Jan 2023–Mar 2026)"]]} />
-      {hasGA4&&<Insight><strong>The readership gap:</strong> GA4 recorded <strong>{fmt(totalPV)} page views</strong> across task pages, while <strong>{fmt(allTotal)} roadmaps</strong> include these tasks (XLSX). Some tasks are viewed far more than their roadmap count suggests: Mercantile License appears on {fmt(tp.find(t=>t.task.includes("Mercantile"))?.total||0)} roadmaps but has {fmt(tp.find(t=>t.task.includes("Mercantile"))?.pageViews||0)} page views ({((tp.find(t=>t.task.includes("Mercantile"))?.pageViews||1)/(Math.max(tp.find(t=>t.task.includes("Mercantile"))?.total||1,1))).toFixed(0)}x) — indicating repeat visits or non-account traffic. Others like "Select Your Business Structure" ({((tp.find(t=>t.task.includes("Structure"))?.pageViews||1)/(Math.max(tp.find(t=>t.task.includes("Structure"))?.total||1,1))).toFixed(1)}x) show roughly 1:1 because most users view it exactly once.</Insight>}
+      {hasGA4?<Alert color={C.cyan}><strong>{fmt(totalPV)} page views</strong> across {tp.filter(t=>t.pageViews>0).length} task pages (GA4). Page views are the best measure of actual content engagement — XLSX "completed" counts only track users who found and clicked the task's checkbox, which most users don't.</Alert>
+      :<Alert color={C.orange}>No GA4 data available. Showing XLSX roadmap appearances only.</Alert>}
+      <SrcLegend items={[["GA4","Page views from Google Analytics (Jan 2023–Mar 2026) — primary engagement metric"],["NAV","Master task inventory — 217 markdown files from codebase"],["XLSX","Roadmap appearances and checkbox completions (undercounts actual engagement)"]]} />
+      {hasGA4&&<Insight><strong>XLSX completions undercount real engagement.</strong> Post-formation tasks (Steps 3–4) show just {fmt(tp.filter(t=>{const s=tt[t.slug];return s&&s[0]&&(s[0].step===3||s[0].step===4);}).reduce((s,t)=>s+t.completed,0))} XLSX completions but <strong>{fmt(tp.filter(t=>{const s=tt[t.slug];return s&&s[0]&&(s[0].step===3||s[0].step===4);}).reduce((s,t)=>s+(t.pageViews||0),0))}</strong> GA4 page views — users are opening and reading these tasks but not checking them off. Bank Account has {fmt(tp.find(t=>t.slug==="bank-account")?.pageViews||0)} page views vs. {fmt(tp.find(t=>t.slug==="bank-account")?.completed||0)} completions. Insurance has {fmt(tp.find(t=>t.slug==="get-insurance-home-contractor")?.pageViews||0)} views vs. {fmt(tp.find(t=>t.slug==="get-insurance-home-contractor")?.completed||0)} completions.</Insight>}
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
-        <Stat label="On Roadmaps (XLSX)" value={fmt(allTotal)} small />
-        {hasGA4&&<Stat label="Page Views (GA4)" value={fmt(totalPV)} sub={(totalPV/Math.max(allTotal,1)).toFixed(1)+"x the roadmap count"} color={C.cyan} small />}
-        <Stat label="Top 5 Tasks =" value={pct(top5Total,allTotal)} sub="of total roadmap appearances" color={C.green} small />
+        {hasGA4&&<Stat label="Page Views (GA4)" value={fmt(totalPV)} sub="Actual page loads — the most reliable engagement metric" color={C.cyan} small />}
+        <Stat label="On Roadmaps (XLSX)" value={fmt(allTotal)} sub="User roadmaps containing each task" small />
+        {hasGA4&&<Stat label="Views vs Roadmaps" value={(totalPV/Math.max(allTotal,1)).toFixed(1)+"x"} sub="Page views exceed roadmap count — users read content without checking boxes" color={C.green} small />}
         <Stat label="Tasks on <10 Roadmaps" value={under10.length} sub={pct(under10.length,tp.length)+" of "+tp.length+" tasks (includes "+tp.filter(t=>t.total===0).length+" with zero XLSX data)"} color={C.red} small />
         {staleTasks.length>0&&<Stat label="Likely Stale Tasks" value={staleTasks.length} sub="Completed exceeds GA4 page views — probably renamed or retired task IDs persisting in the database" color={C.red} small />}
         {retiredTasks.length>0&&<Stat label="Retired Task IDs" value={retiredTasks.length} sub="Task ID no longer exists in the codebase — XLSX shows historical data from old accounts" color={C.orange} small />}
@@ -532,8 +533,8 @@ export default function App() {
       <div style={{display:"grid",gap:3}}>
         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
           <span style={{fontSize:10,color:C.muted,fontFamily:C.sans}}>Sort by:</span>
-          <button onClick={()=>setTaskSort("total")} style={{padding:"4px 10px",background:taskSort==="total"?C.accentDim:"transparent",color:taskSort==="total"?C.text:C.muted,border:`1px solid ${C.border}`,borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:C.sans}}>Most Roadmaps</button>
           {hasGA4&&<button onClick={()=>setTaskSort("pageviews")} style={{padding:"4px 10px",background:taskSort==="pageviews"?C.accentDim:"transparent",color:taskSort==="pageviews"?C.text:C.muted,border:`1px solid ${C.border}`,borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:C.sans}}>Most Page Views</button>}
+          <button onClick={()=>setTaskSort("total")} style={{padding:"4px 10px",background:taskSort==="total"?C.accentDim:"transparent",color:taskSort==="total"?C.text:C.muted,border:`1px solid ${C.border}`,borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:C.sans}}>Most Roadmaps (XLSX)</button>
           <button onClick={()=>setTaskSort("time")} style={{padding:"4px 10px",background:taskSort==="time"?C.accentDim:"transparent",color:taskSort==="time"?C.text:C.muted,border:`1px solid ${C.border}`,borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:C.sans}}>Longest Avg Time</button>
         </div>
         <div style={{display:"flex",gap:16,marginBottom:8,fontSize:10,color:C.muted,fontFamily:C.sans,alignItems:"center",flexWrap:"wrap"}}>
@@ -555,31 +556,52 @@ export default function App() {
           <span style={{flex:1}}>Task <span style={{color:C.muted,fontSize:8,fontWeight:400}}>(click to open in Content Finder)</span></span>
           {hasGA4&&<span style={{width:70,textAlign:"right"}}>Views (GA4)</span>}
           <span style={{width:120,textAlign:"center"}}>{taskSort==="pageviews"?"PV bar":"Roadmap bar"}</span>
-          <span style={{width:65,textAlign:"right"}}>Roadmaps (XLSX)</span>
+          <span style={{width:65,textAlign:"right"}}>Roadmaps</span>
           <span style={{width:55,textAlign:"right"}}>Done</span>
           <span style={{width:40,textAlign:"right"}}>Avg Time</span>
         </div>
-        {sorted2.map((t,i)=>{const cc={universal:C.accent,shared:C.cyan,unique:C.red,uncategorized:C.muted}[t.category]||C.muted;const barVal=taskSort==="pageviews"?(t.pageViews||0)/topPV*100:t.total/topTotal*100;const isDupe=tp.filter(x=>x.task===t.task).length>1;const ctfInfo=ctf[t.slug];const isNeqOnly=ctfInfo&&ctfInfo.baseCount===0;return(
-        <div key={(t.slug||t.task)+i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",display:"flex",alignItems:"center",gap:8}}>
-          <span style={{width:22,fontSize:10,color:C.muted,fontFamily:C.mono,textAlign:"right"}}>{i+1}</span>
-          <span style={{width:10,height:10,borderRadius:"50%",background:cc,flexShrink:0,opacity:.9}} title={t.category+(t.isAddon?" (add-on)":"")}></span>
-          <div style={{flex:1,minWidth:0,display:"flex",alignItems:"center",gap:6}}>
-            <div style={{fontSize:12,color:cc,fontFamily:C.sans,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",cursor:"pointer",textDecoration:"underline",textDecorationColor:`${cc}44`,textUnderlineOffset:2}} onClick={()=>{setFinderSearch(t.task);setSelItem(null);setFinderOpen(true);setView("finder");}} title={"Open in Content Finder: "+t.task}>{t.task}{isDupe&&<span style={{color:C.muted,fontSize:9,fontFamily:C.mono,marginLeft:4}}>({t.slug?.split("-").slice(0,2).join("-")||"?"})</span>}</div>
-            {t.isAddon&&<span style={{background:`${C.purple}22`,color:C.purple,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.purple}33`,fontSize:8,flexShrink:0}}>ADD-ON{t.reachCount?` · ${t.reachCount}`:""}</span>}
-            {isNeqOnly&&!t.isAddon&&<span style={{background:`${C.purple}22`,color:C.purple,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.purple}33`,fontSize:8,flexShrink:0}}>NEQ</span>}
-            {(apiSlugs.has(t.task)||apiSlugs.has(t.slug||"")||apiSlugs.has(t.task.toLowerCase().replace(/ /g,"-")))&&<span style={{background:`${C.green}22`,color:C.green,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.green}33`,fontSize:8,flexShrink:0}}>API</span>}
-            {hasGA4&&t.stale&&<span style={{background:`${C.red}22`,color:C.red,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.red}33`,fontSize:8,flexShrink:0}} title="Completed exceeds page views — likely a renamed or retired task ID in the XLSX">STALE?</span>}
-            {t.dataQuality==="retired"&&<span style={{background:`${C.orange}22`,color:C.orange,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.orange}33`,fontSize:8,flexShrink:0}} title="Task ID no longer exists in the current codebase">RETIRED</span>}
-            {t.dataQuality==="orphaned"&&<span style={{background:`${C.muted}22`,color:C.muted,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.muted}33`,fontSize:8,flexShrink:0}} title="Confirmed dead content — markdown exists but not referenced by any roadmap, add-on, or code file">ORPHANED</span>}
-            {t.dataQuality==="noAnalytics"&&<span style={{background:`${C.cyan}22`,color:C.cyan,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.cyan}33`,fontSize:8,flexShrink:0}} title="Reachable in codebase but no analytics data in XLSX">NO XLSX</span>}
-          </div>
-          {hasGA4&&<span style={{width:70,textAlign:"right",fontFamily:C.mono,fontSize:10,color:t.pageViews>0?C.cyan:C.muted}}>{t.pageViews>0?fmt(t.pageViews):"—"}</span>}
-          <div style={{width:120,height:8,background:C.bg,borderRadius:4,overflow:"hidden"}}><div style={{width:`${barVal}%`,height:"100%",background:taskSort==="pageviews"?C.cyan:cc,borderRadius:4,opacity:.6}}/></div>
-          <span style={{width:65,textAlign:"right",fontFamily:C.mono,fontSize:12,color:C.accent}}>{fmt(t.total)}</span>
-          <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:10,color:C.green}}>{fmt(t.completed)}</span>
-          <span style={{width:40,textAlign:"right",fontSize:9,color:taskSort==="time"?C.orange:C.muted,fontWeight:taskSort==="time"?700:400}}>{t.avgTime}</span>
-        </div>
-      );})}</div>
+        {(()=>{
+          // Calculate the 80% cutoff index based on current sort metric
+          const metricFn = taskSort==="pageviews" ? (t=>t.pageViews||0) : taskSort==="time" ? (t=>parseTime(t.avgTime)) : (t=>t.total);
+          const grandTotal = sorted2.reduce((s,t)=>s+metricFn(t),0);
+          const threshold = grandTotal * 0.8;
+          let running = 0;
+          let cutoffIdx = -1;
+          for(let j=0;j<sorted2.length;j++){
+            running += metricFn(sorted2[j]);
+            if(running >= threshold){ cutoffIdx = j; break; }
+          }
+          const metricLabel = taskSort==="pageviews"?"page views":taskSort==="time"?"avg time":"roadmap appearances";
+
+          return sorted2.map((t,i)=>{const cc={universal:C.accent,shared:C.cyan,unique:C.red,uncategorized:C.muted}[t.category]||C.muted;const barVal=taskSort==="pageviews"?(t.pageViews||0)/topPV*100:t.total/topTotal*100;const isDupe=tp.filter(x=>x.task===t.task).length>1;const ctfInfo=ctf[t.slug];const isNeqOnly=ctfInfo&&ctfInfo.baseCount===0;return(
+          <React.Fragment key={(t.slug||t.task)+i}>
+            {i===cutoffIdx+1&&cutoffIdx>=0&&<div style={{display:"flex",alignItems:"center",gap:8,padding:"6px 14px"}}>
+              <div style={{flex:1,height:1,background:C.orange}}/>
+              <span style={{fontSize:10,color:C.orange,fontFamily:C.sans,whiteSpace:"nowrap"}}>80% line — top {cutoffIdx+1} tasks = 80% of {metricLabel} · remaining {sorted2.length-cutoffIdx-1} tasks = 20%</span>
+              <div style={{flex:1,height:1,background:C.orange}}/>
+            </div>}
+            <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px",display:"flex",alignItems:"center",gap:8}}>
+              <span style={{width:22,fontSize:10,color:C.muted,fontFamily:C.mono,textAlign:"right"}}>{i+1}</span>
+              <span style={{width:10,height:10,borderRadius:"50%",background:cc,flexShrink:0,opacity:.9}} title={t.category+(t.isAddon?" (add-on)":"")}></span>
+              <div style={{flex:1,minWidth:0,display:"flex",alignItems:"center",gap:6}}>
+                <div style={{fontSize:12,color:cc,fontFamily:C.sans,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",cursor:"pointer",textDecoration:"underline",textDecorationColor:`${cc}44`,textUnderlineOffset:2}} onClick={()=>{setFinderSearch(t.task);setSelItem(null);setFinderOpen(true);setView("finder");}} title={"Open in Content Finder: "+t.task}>{t.task}{isDupe&&<span style={{color:C.muted,fontSize:9,fontFamily:C.mono,marginLeft:4}}>({t.slug?.split("-").slice(0,2).join("-")||"?"})</span>}</div>
+                {t.isAddon&&<span style={{background:`${C.purple}22`,color:C.purple,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.purple}33`,fontSize:8,flexShrink:0}}>ADD-ON{t.reachCount?` · ${t.reachCount}`:""}</span>}
+                {isNeqOnly&&!t.isAddon&&<span style={{background:`${C.purple}22`,color:C.purple,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.purple}33`,fontSize:8,flexShrink:0}}>NEQ</span>}
+                {(apiSlugs.has(t.task)||apiSlugs.has(t.slug||"")||apiSlugs.has(t.task.toLowerCase().replace(/ /g,"-")))&&<span style={{background:`${C.green}22`,color:C.green,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.green}33`,fontSize:8,flexShrink:0}}>API</span>}
+                {hasGA4&&t.stale&&<span style={{background:`${C.red}22`,color:C.red,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.red}33`,fontSize:8,flexShrink:0}} title="Completed exceeds page views — likely a renamed or retired task ID in the XLSX">STALE?</span>}
+                {t.dataQuality==="retired"&&<span style={{background:`${C.orange}22`,color:C.orange,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.orange}33`,fontSize:8,flexShrink:0}} title="Task ID no longer exists in the current codebase">RETIRED</span>}
+                {t.dataQuality==="orphaned"&&<span style={{background:`${C.muted}22`,color:C.muted,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.muted}33`,fontSize:8,flexShrink:0}} title="Confirmed dead content — markdown exists but not referenced by any roadmap, add-on, or code file">ORPHANED</span>}
+                {t.dataQuality==="noAnalytics"&&<span style={{background:`${C.cyan}22`,color:C.cyan,padding:"1px 5px",borderRadius:3,border:`1px solid ${C.cyan}33`,fontSize:8,flexShrink:0}} title="Reachable in codebase but no analytics data in XLSX">NO XLSX</span>}
+              </div>
+              {hasGA4&&<span style={{width:70,textAlign:"right",fontFamily:C.mono,fontSize:10,color:t.pageViews>0?C.cyan:C.muted}}>{t.pageViews>0?fmt(t.pageViews):"—"}</span>}
+              <div style={{width:120,height:8,background:C.bg,borderRadius:4,overflow:"hidden"}}><div style={{width:`${barVal}%`,height:"100%",background:taskSort==="pageviews"?C.cyan:cc,borderRadius:4,opacity:.6}}/></div>
+              <span style={{width:65,textAlign:"right",fontFamily:C.mono,fontSize:12,color:C.accent}}>{fmt(t.total)}</span>
+              <span style={{width:55,textAlign:"right",fontFamily:C.mono,fontSize:10,color:C.green}}>{fmt(t.completed)}</span>
+              <span style={{width:40,textAlign:"right",fontSize:9,color:taskSort==="time"?C.orange:C.muted,fontWeight:taskSort==="time"?700:400}}>{t.avgTime}</span>
+            </div>
+          </React.Fragment>
+        );});
+        })()}</div>
     </div>);
   };
 
