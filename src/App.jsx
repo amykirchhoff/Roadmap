@@ -247,24 +247,36 @@ export default function App() {
 
   /* ═══ TAB: USER JOURNEY ═══ */
   const UserJourney = () => {
-    const po=[{id:"GUEST_MODE",label:"Guest Mode",g:"s"},{id:"GUEST_MODE_WITH_BUSINESS_STRUCTURE",label:"Guest + Structure",g:"s"},{id:"NEEDS_BUSINESS_STRUCTURE",label:"Needs Structure",g:"s"},{id:"NEEDS_TO_FORM",label:"Needs to Form",g:"s"},{id:"FORMED",label:"Formed",g:"s"},{id:"UP_AND_RUNNING",label:"Up & Running",g:"o"},{id:"GUEST_MODE_OWNING",label:"Guest Owning",g:"w"},{id:"UP_AND_RUNNING_OWNING",label:"Up & Running Owning",g:"w"},{id:"REMOTE_SELLER_WORKER",label:"Remote Seller/Worker",g:"x"},{id:"DOMESTIC_EMPLOYER",label:"Domestic Employer",g:"x"}];
+    const po=[{id:"GUEST_MODE",label:"Guest Mode",g:"s",exp:"roadmap"},{id:"GUEST_MODE_WITH_BUSINESS_STRUCTURE",label:"Guest + Structure",g:"s",exp:"roadmap"},{id:"NEEDS_BUSINESS_STRUCTURE",label:"Needs Structure",g:"s",exp:"roadmap"},{id:"NEEDS_TO_FORM",label:"Needs to Form",g:"s",exp:"roadmap"},{id:"FORMED",label:"Formed",g:"s",exp:"roadmap"},{id:"UP_AND_RUNNING",label:"Up & Running",g:"o",exp:"operate"},{id:"GUEST_MODE_OWNING",label:"Guest Owning",g:"w",exp:"operate"},{id:"UP_AND_RUNNING_OWNING",label:"Up & Running Owning",g:"w",exp:"operate"},{id:"REMOTE_SELLER_WORKER",label:"Remote Seller/Worker",g:"x",exp:"roadmap"},{id:"DOMESTIC_EMPLOYER",label:"Domestic Employer",g:"x",exp:"roadmap"}];
     const pm={};for(const p of phases.phases)pm[p.phase]=p.count;const mx=Math.max(...Object.values(pm));
     const ft={GUEST_MODE:{r:1,a:0,f:0,c:"none"},GUEST_MODE_WITH_BUSINESS_STRUCTURE:{r:1,a:0,f:0,c:"none"},NEEDS_BUSINESS_STRUCTURE:{r:1,a:0,f:0,c:"none"},NEEDS_TO_FORM:{r:1,a:0,f:0,c:"none"},FORMED:{r:1,a:0,f:0,c:"list"},UP_AND_RUNNING:{r:0,a:1,f:1,c:"full"},GUEST_MODE_OWNING:{r:0,a:1,f:1,c:"full"},UP_AND_RUNNING_OWNING:{r:0,a:1,f:1,c:"full"},REMOTE_SELLER_WORKER:{r:1,a:0,f:0,c:"none"},DOMESTIC_EMPLOYER:{r:1,a:0,f:0,c:"none"}};
     const gc={s:C.accent,o:C.green,w:C.purple,x:C.muted};
+    const roadmapExp = po.filter(p=>p.exp==="roadmap").reduce((s,p)=>s+(pm[p.id]||0),0);
+    const operateExp = po.filter(p=>p.exp==="operate").reduce((s,p)=>s+(pm[p.id]||0),0);
     const formed=pm["FORMED"]||0,upR=pm["UP_AND_RUNNING"]||0;
     return (<div>
-      <Alert color={C.orange}><strong>The graduation cliff:</strong> {fmt(formed)} users are in FORMED but only {fmt(upR)} graduated to UP_AND_RUNNING — a <strong>{pct(upR,formed)}</strong> conversion. The operate content serves just <strong>{pct(phases.seesAAFunding,totalBiz)}</strong> of all users.</Alert>
-      <Insight><strong>Two products in one:</strong> The roadmap system (plan/start tasks) serves ~{fmt(phases.seesRoadmap)} users and is clearly working — {fmt((tp.find(t=>t.task==="Select Your Business Structure")||{}).completed||0)} completed business structure, {fmt((tp.find(t=>t.task.includes("Authorize Your Business"))||{}).completed||0)} formed entities. But the operate system (AAs, fundings, calendar) only reaches ~{fmt(phases.seesAAFunding)} users. We've effectively built two content systems: one serves {pct(phases.seesRoadmap,totalBiz)} of our base and one serves {pct(phases.seesAAFunding,totalBiz)}. The investment in the second — {DATA.anytimeActions.length} AAs, {DATA.fundingCount||71} fundings, {DATA.certificationCount||9} certifications — is large relative to its audience.</Insight>
-      <Insight><strong>Where users stall:</strong> {fmt(pm["GUEST_MODE"]||0)} in Guest Mode + {fmt(pm["GUEST_MODE_WITH_BUSINESS_STRUCTURE"]||0)} picked a structure but stopped = ~{fmt((pm["GUEST_MODE"]||0)+(pm["GUEST_MODE_WITH_BUSINESS_STRUCTURE"]||0))} stalled early. Another {fmt(pm["NEEDS_TO_FORM"]||0)} know they need to form but haven't. These {fmt((pm["GUEST_MODE"]||0)+(pm["GUEST_MODE_WITH_BUSINESS_STRUCTURE"]||0)+(pm["NEEDS_TO_FORM"]||0))} users have no access to fundings or anytime actions at their current operating phase.</Insight>
+      <Alert color={C.orange}><strong>Two experiences, one platform:</strong> {fmt(roadmapExp)} users ({pct(roadmapExp,totalBiz)}) are in the <strong>roadmap experience</strong> — they see a step-by-step checklist but no AAs or fundings. {fmt(operateExp)} users ({pct(operateExp,totalBiz)}) are in the <strong>operate experience</strong> — they see AAs, fundings, and the full calendar but the roadmap is hidden. Only {fmt(upR)} users graduated from roadmap → operate via FORMED.</Alert>
+      <Insight><strong>Two products in one:</strong> The roadmap experience serves {fmt(roadmapExp)} users — formation tasks dominate (8.9 page views/user in Steps 1–2) but engagement drops to 0.9 views/user in Steps 3–4. The operate experience serves {fmt(operateExp)} users with 1.8 views/user on AAs and filings — <strong>2x the per-user engagement</strong> of post-formation roadmap content. The operate dashboard model ("here's what you need") outperforms the linear checklist model for post-formation content.</Insight>
+      <Insight><strong>Where users stall:</strong> {fmt(pm["GUEST_MODE"]||0)} in Guest Mode + {fmt(pm["GUEST_MODE_WITH_BUSINESS_STRUCTURE"]||0)} picked a structure but stopped = ~{fmt((pm["GUEST_MODE"]||0)+(pm["GUEST_MODE_WITH_BUSINESS_STRUCTURE"]||0))} stalled early. Another {fmt(pm["NEEDS_TO_FORM"]||0)} know they need to form but haven't. {fmt(formed)} completed formation but are stuck in FORMED — they see their roadmap Steps 3–4 but have no access to AAs, fundings, or the full calendar.</Insight>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
         <Stat label="Total Businesses" value={fmt(totalBiz)} small />
-        <Stat label="See Roadmap" value={fmt(phases.seesRoadmap)} sub={pct(phases.seesRoadmap,totalBiz)} color={C.accent} small />
-        <Stat label="See AA + Fundings" value={fmt(phases.seesAAFunding)} sub={pct(phases.seesAAFunding,totalBiz)} color={C.green} small />
+        <Stat label="Roadmap Experience" value={fmt(roadmapExp)} sub={pct(roadmapExp,totalBiz)+" — see step-by-step roadmap, no AAs or fundings"} color={C.accent} small />
+        <Stat label="Operate Experience" value={fmt(operateExp)} sub={pct(operateExp,totalBiz)+" — see AAs, fundings, full calendar (roadmap hidden)"} color={C.green} small />
         <Stat label="FORMED→Up&Running" value={pct(upR,formed)} sub={fmt(formed)+"→"+fmt(upR)} color={C.red} small />
       </div>
       <Sec title="Operating Phase Distribution">
-        <div style={{display:"grid",gap:4}}>{po.map(p=>{const c=pm[p.id]||0;const f=ft[p.id]||{};return(
-          <div key={p.id} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px"}}>
+        <div style={{display:"flex",gap:16,marginBottom:8,fontSize:10,color:C.muted,fontFamily:C.sans}}>
+          <span><span style={{background:`${C.accent}22`,color:C.accent,padding:"1px 6px",borderRadius:3,border:`1px solid ${C.accent}33`,fontSize:9,marginRight:4,fontWeight:600}}>ROADMAP</span>{fmt(roadmapExp)} users ({pct(roadmapExp,totalBiz)}) — step-by-step roadmap visible</span>
+          <span><span style={{background:`${C.green}22`,color:C.green,padding:"1px 6px",borderRadius:3,border:`1px solid ${C.green}33`,fontSize:9,marginRight:4,fontWeight:600}}>OPERATE</span>{fmt(operateExp)} users ({pct(operateExp,totalBiz)}) — AAs, fundings, full calendar</span>
+        </div>
+        <div style={{display:"grid",gap:4}}>{po.map((p,pi)=>{const c=pm[p.id]||0;const f=ft[p.id]||{};const prevExp=pi>0?po[pi-1].exp:null;const showDivider=prevExp&&prevExp!==p.exp;return(
+          <React.Fragment key={p.id}>
+            {showDivider&&<div style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0"}}>
+              <div style={{flex:1,height:1,background:C.border}}/>
+              <span style={{fontSize:9,color:C.muted}}>↓ Operate experience ↓</span>
+              <div style={{flex:1,height:1,background:C.border}}/>
+            </div>}
+            <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"8px 14px"}}>
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:4}}>
               <span style={{width:180,fontSize:12,fontWeight:600,color:gc[p.g],fontFamily:C.sans}}>{p.label}</span>
               <span style={{fontSize:14,fontWeight:800,color:C.text,fontFamily:C.mono,width:70,textAlign:"right"}}>{fmt(c)}</span>
@@ -272,19 +284,22 @@ export default function App() {
               <span style={{fontSize:10,color:C.muted,width:40,textAlign:"right"}}>{pct(c,totalBiz)}</span>
             </div>
             <div style={{display:"flex",gap:8,marginLeft:190,fontSize:9,color:C.muted,fontFamily:C.sans}}>
+              <span style={{background:p.exp==="operate"?`${C.green}22`:`${C.accent}22`,color:p.exp==="operate"?C.green:C.accent,padding:"1px 6px",borderRadius:3,border:`1px solid ${p.exp==="operate"?C.green:C.accent}33`,fontWeight:600}}>{p.exp==="operate"?"OPERATE":"ROADMAP"}</span>
               <span style={{color:f.r?C.accent:C.muted,opacity:f.r?1:.3}}>Roadmap {f.r?"✓":"✗"}</span>
               <span style={{color:f.a?C.green:C.muted,opacity:f.a?1:.3}}>AAs {f.a?"✓":"✗"}</span>
               <span style={{color:f.f?C.green:C.muted,opacity:f.f?1:.3}}>Fundings {f.f?"✓":"✗"}</span>
               <span style={{color:f.c!=="none"?C.cyan:C.muted,opacity:f.c!=="none"?1:.3}}>Cal: {f.c}</span>
             </div>
           </div>
+          </React.Fragment>
         );})}</div>
       </Sec>
-      <Sec title="Where Content Actually Lands">
+      <Sec title="Two Experiences Compared">
+        <Insight><strong>The platform serves two distinct user experiences.</strong> The <span style={{color:C.accent}}>Roadmap Experience</span> ({fmt(roadmapExp)} users, {pct(roadmapExp,totalBiz)}) shows a step-by-step checklist for starting a business — roadmap tasks are visible, but AAs, fundings, and the full calendar are hidden. The <span style={{color:C.green}}>Operate Experience</span> ({fmt(operateExp)} users, {pct(operateExp,totalBiz)}) hides the roadmap and shows anytime actions, fundings, certifications, and the full filings calendar. These are completely different interfaces serving different needs. UP_AND_RUNNING users see the operate experience — the roadmap is hidden by default (toggleable) and replaced by the operate dashboard.</Insight>
         <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-          <Stat label="Businesses that see roadmap tasks" value={fmt(phases.seesRoadmap)} sub={"~"+pct(phases.seesRoadmap,totalBiz)+" of businesses are in phases where the step-by-step roadmap is displayed"} color={C.accent} />
-          <Stat label="Businesses that see operate content" value={fmt(phases.seesAAFunding)} sub={"~"+pct(phases.seesAAFunding,totalBiz)+" are in phases where anytime actions, fundings, and the full calendar appear"} color={C.green} />
-          <Stat label="Operate content not displayed" value={DATA.anytimeActions.length+" AAs + "+(DATA.fundingCount||71)+" fundings"} sub={pct(totalBiz-phases.seesAAFunding,totalBiz)+" of businesses are in phases where this content is hidden"} color={C.red} />
+          <Stat label="Roadmap Experience" value={fmt(roadmapExp)} sub={pct(roadmapExp,totalBiz)+" of accounts. Content: "+tp.length+" roadmap tasks across 4 steps. Users see a linear formation checklist."} color={C.accent} />
+          <Stat label="Operate Experience" value={fmt(operateExp)} sub={pct(operateExp,totalBiz)+" of accounts. Content: "+DATA.anytimeActions.length+" AAs + "+(DATA.fundingCount||71)+" fundings + "+(DATA.certificationCount||9)+" certs + full calendar."} color={C.green} />
+          <Stat label="Transition Rate" value={pct(upR,formed)} sub={"FORMED ("+fmt(formed)+") → UP_AND_RUNNING ("+fmt(upR)+"). This is the only path from roadmap to operate for STARTING users."} color={C.red} />
         </div>
       </Sec>
       {DATA.unknowns && <div style={{fontSize:11,color:C.muted,fontFamily:C.sans,background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 14px"}}>
