@@ -346,34 +346,56 @@ export default function App() {
         </div>
       </Sec>}
 
-      {hasGA4&&<Sec title="Top Content: Roadmap Post-Formation vs. Operate" sub="The apples-to-apples comparison — both serve users who have finished (or skipped) formation. Which content model drives more engagement?">
+      {hasGA4&&<Sec title="Top Content: Roadmap Post-Formation vs. Operate" sub="The apples-to-apples comparison — both serve users who have finished (or skipped) formation. 'Could see' = on how many roadmaps (XLSX) or how many operate users (for universal AAs).">
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
           <div>
             <div style={{fontSize:12,fontWeight:700,color:C.accent,marginBottom:8,fontFamily:C.sans}}>Post-Formation Roadmap (Steps 3–4)</div>
-            <div style={{fontSize:10,color:C.muted,marginBottom:8}}>{fmt(roadmapExp)} users · {stepBuckets[3].length+stepBuckets[4].length} tasks · {fmt(postPV)} total PV</div>
+            <div style={{fontSize:10,color:C.muted,marginBottom:4}}>{fmt(roadmapExp)} users in roadmap experience · {stepBuckets[3].length+stepBuckets[4].length} tasks · {fmt(postPV)} total PV</div>
+            <div style={{display:"flex",alignItems:"center",gap:6,padding:"4px 10px",fontSize:8,color:C.muted,fontFamily:C.sans,marginBottom:4}}>
+              <span style={{width:16}}>#</span>
+              <span style={{flex:1}}>Task</span>
+              <span style={{width:50,textAlign:"right"}}>PV (GA4)</span>
+              <span style={{width:65,textAlign:"right"}}>On roadmaps</span>
+              <span style={{width:38,textAlign:"right"}}>PV ratio</span>
+            </div>
             <div style={{display:"grid",gap:3}}>
-              {postTasks.map((t,i)=>{const pv=t.pageViews||0;const pu=t.pageUsers||0;const reach=pu/Math.max(roadmapExp,1)*100;return(
-                <div key={t.slug||i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:5,padding:"6px 10px",display:"flex",alignItems:"center",gap:8,cursor:"pointer"}} onClick={()=>{setFinderSearch(t.task);setSelItem(null);setFinderOpen(true);setView("finder");}} onMouseEnter={e=>e.currentTarget.style.background=C.cardHover} onMouseLeave={e=>e.currentTarget.style.background=C.card}>
+              {postTasks.map((t,i)=>{const pv=t.pageViews||0;const onRoadmaps=t.total||0;const ratio=onRoadmaps>0?(pv/onRoadmaps).toFixed(1):"∞";return(
+                <div key={t.slug||i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:5,padding:"6px 10px",display:"flex",alignItems:"center",gap:6,cursor:"pointer"}} onClick={()=>{setFinderSearch(t.task);setSelItem(null);setFinderOpen(true);setView("finder");}} onMouseEnter={e=>e.currentTarget.style.background=C.cardHover} onMouseLeave={e=>e.currentTarget.style.background=C.card}>
                   <span style={{width:16,fontSize:9,color:C.muted,fontFamily:C.mono}}>{i+1}</span>
                   <span style={{flex:1,fontSize:11,color:C.accent,fontFamily:C.sans,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{t.task}</span>
-                  <span style={{fontSize:10,fontFamily:C.mono,color:C.cyan,flexShrink:0}}>{fmt(pv)}</span>
-                  <span style={{fontSize:9,color:C.muted,flexShrink:0,width:45,textAlign:"right"}}>{reach.toFixed(1)}%</span>
+                  <span style={{fontSize:10,fontFamily:C.mono,color:C.cyan,flexShrink:0,width:50,textAlign:"right"}}>{fmt(pv)}</span>
+                  <span style={{fontSize:10,fontFamily:C.mono,color:onRoadmaps>0?C.text:C.muted,flexShrink:0,width:65,textAlign:"right"}}>{onRoadmaps>0?fmt(onRoadmaps):"—"}</span>
+                  <span style={{fontSize:9,fontFamily:C.mono,color:C.orange,flexShrink:0,width:38,textAlign:"right"}}>{ratio}x</span>
                 </div>
               );})}
+            </div>
+            <div style={{fontSize:9,color:C.muted,fontFamily:C.sans,marginTop:6,padding:"0 10px"}}>
+              "On roadmaps" (XLSX) = how many user roadmaps include this task. PV ratio {'>'} 1x means users are viewing the page more than their roadmap count — via search, direct links, or repeat visits.
             </div>
           </div>
           <div>
             <div style={{fontSize:12,fontWeight:700,color:C.green,marginBottom:8,fontFamily:C.sans}}>Anytime Actions (Operate)</div>
-            <div style={{fontSize:10,color:C.muted,marginBottom:8}}>{fmt(operateExp)} users · {DATA.anytimeActions.length} AAs · {fmt(aaPV)} total PV</div>
+            <div style={{fontSize:10,color:C.muted,marginBottom:4}}>{fmt(operateExp)} users in operate experience · {DATA.anytimeActions.length} AAs · {fmt(aaPV)} total PV</div>
+            <div style={{display:"flex",alignItems:"center",gap:6,padding:"4px 10px",fontSize:8,color:C.muted,fontFamily:C.sans,marginBottom:4}}>
+              <span style={{width:16}}>#</span>
+              <span style={{flex:1}}>Anytime Action</span>
+              <span style={{width:50,textAlign:"right"}}>PV (GA4)</span>
+              <span style={{width:65,textAlign:"right"}}>Could see</span>
+              <span style={{width:38,textAlign:"right"}}>Reach</span>
+            </div>
             <div style={{display:"grid",gap:3}}>
-              {topAAs.map((a,i)=>{const pv=a.pageViews||0;const pu=a.pageUsers||0;const reach=pu/Math.max(operateExp,1)*100;return(
-                <div key={a.id||i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:5,padding:"6px 10px",display:"flex",alignItems:"center",gap:8,cursor:"pointer"}} onClick={()=>{setFinderSearch(a.name);setSelItem(null);setFinderOpen(true);setView("finder");}} onMouseEnter={e=>e.currentTarget.style.background=C.cardHover} onMouseLeave={e=>e.currentTarget.style.background=C.card}>
+              {topAAs.map((a,i)=>{const pv=a.pageViews||0;const pu=a.pageUsers||0;const isUniversal=a.applyToAllUsers;const couldSee=isUniversal?operateExp:null;const reach=couldSee?pu/Math.max(couldSee,1)*100:null;return(
+                <div key={a.id||i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:5,padding:"6px 10px",display:"flex",alignItems:"center",gap:6,cursor:"pointer"}} onClick={()=>{setFinderSearch(a.name);setSelItem(null);setFinderOpen(true);setView("finder");}} onMouseEnter={e=>e.currentTarget.style.background=C.cardHover} onMouseLeave={e=>e.currentTarget.style.background=C.card}>
                   <span style={{width:16,fontSize:9,color:C.muted,fontFamily:C.mono}}>{i+1}</span>
                   <span style={{flex:1,fontSize:11,color:C.green,fontFamily:C.sans,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{a.name}</span>
-                  <span style={{fontSize:10,fontFamily:C.mono,color:C.cyan,flexShrink:0}}>{fmt(pv)}</span>
-                  <span style={{fontSize:9,color:C.muted,flexShrink:0,width:45,textAlign:"right"}}>{reach.toFixed(1)}%</span>
+                  <span style={{fontSize:10,fontFamily:C.mono,color:C.cyan,flexShrink:0,width:50,textAlign:"right"}}>{fmt(pv)}</span>
+                  <span style={{fontSize:10,fontFamily:C.mono,color:C.text,flexShrink:0,width:65,textAlign:"right"}}>{isUniversal?fmt(operateExp):a.reachCount+" of 64 ind."}</span>
+                  <span style={{fontSize:9,fontFamily:C.mono,color:C.orange,flexShrink:0,width:38,textAlign:"right"}}>{reach!==null?reach.toFixed(0)+"%":fmt(pu)+" u"}</span>
                 </div>
               );})}
+            </div>
+            <div style={{fontSize:9,color:C.muted,fontFamily:C.sans,marginTop:6,padding:"0 10px"}}>
+              "Could see" = all {fmt(operateExp)} operate users for universal AAs, or the number of industries whose sector matches for sector-filtered AAs. Reach = unique page visitors (GA4) ÷ audience.
             </div>
           </div>
         </div>
