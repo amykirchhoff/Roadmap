@@ -744,17 +744,26 @@ export default function App() {
       const ratio = p.publicViews>0&&p.accountViews>0?(p.publicViews/p.accountViews).toFixed(1)+"x":p.publicViews>0?"public only":p.accountViews>0?"account only":"—";
       const winner = p.publicViews>p.accountViews?"public":"account";
       return(
-        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"10px 14px",display:"grid",gridTemplateColumns:"140px 1fr 70px 1fr 70px 55px",alignItems:"center",gap:8}}>
-          <span style={{fontSize:12,fontWeight:600,color:C.text,fontFamily:C.sans}}>{p.topic}</span>
-          <div style={{height:10,background:C.bg,borderRadius:5,overflow:"hidden",direction:"rtl"}}>
-            <div style={{width:`${pubW}%`,height:"100%",background:C.orange,borderRadius:5,opacity:.7}}/>
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:6,padding:"10px 14px"}}>
+          <div style={{display:"grid",gridTemplateColumns:"140px 1fr 70px 1fr 70px 55px",alignItems:"center",gap:8}}>
+            <span style={{fontSize:12,fontWeight:600,color:C.text,fontFamily:C.sans}}>{p.topic}</span>
+            <div style={{height:10,background:C.bg,borderRadius:5,overflow:"hidden",direction:"rtl"}}>
+              <div style={{width:`${pubW}%`,height:"100%",background:C.orange,borderRadius:5,opacity:.7}}/>
+            </div>
+            <span style={{fontSize:10,fontFamily:C.mono,color:p.publicViews>0?C.orange:C.muted,textAlign:"right"}}>{p.publicViews>0?fmt(p.publicViews):"—"}</span>
+            <div style={{height:10,background:C.bg,borderRadius:5,overflow:"hidden"}}>
+              <div style={{width:`${acctW}%`,height:"100%",background:C.accent,borderRadius:5,opacity:.7}}/>
+            </div>
+            <span style={{fontSize:10,fontFamily:C.mono,color:p.accountViews>0?C.accent:C.muted}}>{p.accountViews>0?fmt(p.accountViews):"—"}</span>
+            <span style={{fontSize:9,fontFamily:C.mono,color:winner==="public"?C.orange:C.green,textAlign:"right"}}>{ratio}</span>
           </div>
-          <span style={{fontSize:10,fontFamily:C.mono,color:p.publicViews>0?C.orange:C.muted,textAlign:"right"}}>{p.publicViews>0?fmt(p.publicViews):"—"}</span>
-          <div style={{height:10,background:C.bg,borderRadius:5,overflow:"hidden"}}>
-            <div style={{width:`${acctW}%`,height:"100%",background:C.accent,borderRadius:5,opacity:.7}}/>
+          <div style={{display:"grid",gridTemplateColumns:"140px 1fr 70px 1fr 70px 55px",gap:8,marginTop:3}}>
+            <span/>
+            <span style={{fontSize:8,color:C.muted,fontFamily:C.mono,textAlign:"right",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.publicPath||"(none)"}</span>
+            <span/>
+            <span style={{fontSize:8,color:C.muted,fontFamily:C.mono,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.accountPath||"(none)"}</span>
+            <span/><span/>
           </div>
-          <span style={{fontSize:10,fontFamily:C.mono,color:p.accountViews>0?C.accent:C.muted}}>{p.accountViews>0?fmt(p.accountViews):"—"}</span>
-          <span style={{fontSize:9,fontFamily:C.mono,color:winner==="public"?C.orange:C.green,textAlign:"right"}}>{ratio}</span>
         </div>
       );
     };
