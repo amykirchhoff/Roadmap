@@ -832,6 +832,74 @@ export default function App() {
         </div>
       </Sec>}
 
+      {DATA.starterKits&&DATA.starterKits.length>0&&<Sec title="Starter Kits: Public Traffic vs. Account Roadmaps" sub="Each starter kit is a public industry guide on the Webflow site. How does its traffic compare to the number of Navigator accounts with that industry's roadmap?">
+        {(()=>{
+          const sk = DATA.starterKits.filter(s=>s.skSessions>5);
+          const maxSK = Math.max(...sk.map(s=>s.skSessions));
+          const maxRM = Math.max(...sk.map(s=>s.roadmapUsers));
+          // Top 20 for the bar chart
+          const top = sk.slice(0,20);
+          // Scatter data
+          const scatter = sk.map(s=>({...s,ratio:s.roadmapUsers>0?+(s.skSessions/s.roadmapUsers).toFixed(2):0}));
+          return(<div>
+            <Insight><strong>A few starter kits dramatically outperform their roadmap base.</strong> Food Truck has 33.8K sessions but only 2.9K roadmaps — an 11.6x ratio, meaning the public page attracts ~12 visitors for every account with that roadmap. Home Health Aide (16.9x), Non-Medical Transport (11.1x), and Employment Agency (5.5x) show similar patterns. Meanwhile, large-roadmap industries like Real Estate Investing (12.9K roadmaps, 390 sessions) and Management Consulting (7.4K roadmaps, 466 sessions) have almost no starter kit traffic.</Insight>
+
+            <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:14,marginBottom:16}}>
+              <div style={{fontSize:11,color:C.muted,fontFamily:C.sans,marginBottom:8,textAlign:"center"}}>Starter Kit Sessions (public) vs. Roadmap Users (account) — top 20 by sessions</div>
+              <div style={{display:"grid",gap:2}}>
+                <div style={{display:"grid",gridTemplateColumns:"180px 1fr 65px 1fr 65px 50px",gap:6,padding:"0 4px",fontSize:8,color:C.muted,fontFamily:C.sans}}>
+                  <span>Industry</span><span style={{textAlign:"right"}}>← SK Sessions (public)</span><span style={{textAlign:"right"}}></span><span>Roadmap Users (acct) →</span><span></span><span style={{textAlign:"right"}}>Ratio</span>
+                </div>
+                {top.map((s,i)=>{
+                  const skW=s.skSessions/maxSK*100;
+                  const rmW=s.roadmapUsers/maxRM*100;
+                  const ratio=s.roadmapUsers>0?(s.skSessions/s.roadmapUsers).toFixed(1)+"x":"—";
+                  const hot=s.roadmapUsers>0&&s.skSessions/s.roadmapUsers>2;
+                  return(
+                    <div key={s.slug} style={{display:"grid",gridTemplateColumns:"180px 1fr 65px 1fr 65px 50px",gap:6,alignItems:"center",padding:"3px 4px",background:i%2===0?C.card:"transparent",borderRadius:4}}>
+                      <span style={{fontSize:11,fontFamily:C.sans,color:C.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.name}</span>
+                      <div style={{height:8,background:C.bg,borderRadius:4,overflow:"hidden",direction:"rtl"}}>
+                        <div style={{width:`${skW}%`,height:"100%",background:C.orange,borderRadius:4,opacity:.7}}/>
+                      </div>
+                      <span style={{fontSize:10,fontFamily:C.mono,color:C.orange,textAlign:"right"}}>{fmt(s.skSessions)}</span>
+                      <div style={{height:8,background:C.bg,borderRadius:4,overflow:"hidden"}}>
+                        <div style={{width:`${rmW}%`,height:"100%",background:C.accent,borderRadius:4,opacity:.7}}/>
+                      </div>
+                      <span style={{fontSize:10,fontFamily:C.mono,color:C.accent}}>{fmt(s.roadmapUsers)}</span>
+                      <span style={{fontSize:9,fontFamily:C.mono,color:hot?C.orange:C.muted,textAlign:"right",fontWeight:hot?700:400}}>{ratio}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <div style={{display:"flex",gap:16,justifyContent:"center",marginTop:10,fontSize:9,color:C.muted}}>
+                <span><span style={{display:"inline-block",width:10,height:8,background:C.orange,borderRadius:2,marginRight:4,verticalAlign:"middle",opacity:.7}}/>Starter kit sessions (public Webflow site)</span>
+                <span><span style={{display:"inline-block",width:10,height:8,background:C.accent,borderRadius:2,marginRight:4,verticalAlign:"middle",opacity:.7}}/>Navigator accounts with this industry's roadmap</span>
+              </div>
+            </div>
+
+            <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:14}}>
+              <div style={{fontSize:11,color:C.muted,fontFamily:C.sans,marginBottom:4,textAlign:"center"}}>Scatter: each dot is one industry. X = roadmap accounts, Y = starter kit sessions</div>
+              <ResponsiveContainer width="100%" height={300}>
+                <ScatterChart margin={{left:10,right:20,top:10,bottom:30}}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
+                  <XAxis dataKey="roadmapUsers" type="number" stroke={C.muted} tick={{fontSize:9,fontFamily:C.mono}} label={{value:"Roadmap accounts (Navigator)",position:"bottom",offset:10,fill:C.muted,fontSize:10}} />
+                  <YAxis dataKey="skSessions" type="number" stroke={C.muted} tick={{fontSize:9,fontFamily:C.mono}} label={{value:"Starter kit sessions (public)",angle:-90,position:"insideLeft",offset:0,fill:C.muted,fontSize:10}} />
+                  <Tooltip content={({payload})=>{if(!payload?.[0])return null;const s=payload[0].payload;const ratio=s.roadmapUsers>0?(s.skSessions/s.roadmapUsers).toFixed(1)+"x":"—";return <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:10,fontSize:11,color:C.text,fontFamily:C.sans}}><div style={{fontWeight:700}}>{s.name}</div><div style={{color:C.orange}}>SK sessions: {fmt(s.skSessions)}</div><div style={{color:C.accent}}>Roadmap accounts: {fmt(s.roadmapUsers)}</div><div>Ratio: <strong>{ratio}</strong></div></div>;}} />
+                  <Scatter data={scatter}>
+                    {scatter.map((s,i)=><Cell key={i} fill={s.ratio>2?C.orange:s.ratio>0.5?C.cyan:C.accent} fillOpacity={.7} r={Math.max(4,Math.min(12,Math.sqrt(s.skSessions)/4))}/>)}
+                  </Scatter>
+                </ScatterChart>
+              </ResponsiveContainer>
+              <div style={{display:"flex",gap:16,justifyContent:"center",marginTop:4,fontSize:9,color:C.muted}}>
+                <span><span style={{display:"inline-block",width:10,height:10,background:C.orange,borderRadius:10,marginRight:4,verticalAlign:"middle",opacity:.7}}/>SK overperforms ({'>'}2x roadmaps)</span>
+                <span><span style={{display:"inline-block",width:10,height:10,background:C.cyan,borderRadius:10,marginRight:4,verticalAlign:"middle",opacity:.7}}/>Roughly proportional</span>
+                <span><span style={{display:"inline-block",width:10,height:10,background:C.accent,borderRadius:10,marginRight:4,verticalAlign:"middle",opacity:.7}}/>Roadmaps outpace SK ({'<'}0.5x)</span>
+              </div>
+            </div>
+          </div>);
+        })()}
+      </Sec>}
+
       <Sec title="What This Means">
         <Insight><strong>The account wall helps formation, hurts operate.</strong> For formation, the account adds real functionality — progress tracking, form pre-fill, NJ FAST integration. Users sign up because the account provides value the public site can't. For operate content, the account adds minimal value — an AA page contains roughly the same information as its public equivalent, plus a login requirement. Users searching "NJ food truck license" land on the starter kit (35K views), not the account task (1.4K views).</Insight>
         <Insight><strong>The content isn't missing — it's in the wrong place.</strong> The team has built extensive post-formation content inside accounts: {DATA.anytimeActions.length} AAs, {DATA.fundingCount||71} fundings, 162 post-formation roadmap tasks. But users seeking this information are consuming it on the public Webflow site instead. The licensing guide serves {fmt(pva.pairs.find(p=>p.topic==="Licensing Guide")?.publicUsers||0)} unique users — most of whom never create an account.</Insight>
