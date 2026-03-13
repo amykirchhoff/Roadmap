@@ -1335,12 +1335,12 @@ GA4_DIR = os.path.join(ROOT, "data")
 ga4_data = None
 
 def parse_ga4_csv(filepath):
-    """Parse GA4 CSV, skipping comment lines starting with #"""
+    """Parse GA4 CSV, skipping comment lines starting with # and blank lines"""
     if not os.path.isfile(filepath):
         return []
     rows = []
     with open(filepath, "r", encoding="utf-8-sig") as f:
-        lines = [l for l in f if not l.startswith("#")]
+        lines = [l for l in f if not l.startswith("#") and l.strip()]
     reader = _csv.DictReader(lines)
     for r in reader:
         rows.append(r)
@@ -1745,6 +1745,8 @@ output = {
     "permitCoverage": plurmit_data,
     "ga4": ga4_data,
     "publicVsAccount": None,  # populated below if GA4 data exists
+    "starterKits": None,  # populated below if origination.csv exists
+    "starterKits": None,  # populated below if GA4 session data exists
     "unknowns": {
         "industry": unknown_industry,
         "sector": unknown_sector,
@@ -1811,6 +1813,83 @@ if ga4_data and os.path.isfile(ga4_pages_file):
         "actionTotal": action_total, "filingTotal": filing_total,
     }
     print(f"  Public vs Account: {len(pva_out)} topic pairs")
+
+# Build starter kit vs roadmap comparison from session data
+ga4_sessions_file = os.path.join(GA4_DIR, "ga4_sessions_by_page.csv")
+origination_file = os.path.join(GA4_DIR, "origination.csv")
+sk_source_file = ga4_sessions_file if os.path.isfile(ga4_sessions_file) else origination_file if os.path.isfile(origination_file) else None
+if sk_source_file:
+    sess_map = {}
+    for r in parse_ga4_csv(sk_source_file):
+        path = r.get("Page path and screen class", "").strip()
+        sess = safe_int(r.get("Sessions"))
+        users = safe_int(r.get("Active users"))
+        if path and path not in sess_map:
+            sess_map[path] = {"sessions": 0, "users": 0}
+        if path:
+            sess_map[path]["sessions"] += sess
+            sess_map[path]["users"] += users
+
+    ind_map_sk = {ind["id"]: ind for ind in combined_industries}
+
+    # Map starter kit slugs to industry IDs
+    slug_to_ind = {
+        "food-truck":"food-truck","recreational-cannabis":"cannabis","restaurant-and-catering":"restaurant",
+        "online-business":"e-commerce","non-medical-transport":"non-medical-transport",
+        "homemaker-home-health-aide":"home-health-aide","employment-agency":"employment-agency",
+        "home-improvement-contractor":"home-contractor","trucking":"trucking","cannabis":"cannabis",
+        "e-commerce":"e-commerce","home-contractor":"home-contractor","restaurant":"restaurant",
+        "auto-body-repair":"auto-body-repair","home-health-aide":"home-health-aide",
+        "vending-machine":"vending-machine","healthcare":"healthcare","retail":"retail",
+        "management-consulting":"management-consulting","real-estate-investor":"real-estate-investor",
+        "health-club":"health-club","cleaning-janitorial-services":"cleaning-janitorial-services",
+        "residential-landlord":"residential-landlord","commercial-construction":"commercial-construction",
+        "car-rental":"car-rental","cosmetology":"cosmetology","daycare":"daycare",
+        "massage-therapy":"massage-therapy","car-service":"car-service","school-bus":"school-bus",
+        "architecture":"architecture","petcare":"petcare","travel-agent":"travel-agent",
+        "pharmacy":"pharmacy","moving-company":"moving-company","notary-public":"notary-public",
+        "electrical-contractor":"electrical-contractor","hvac-contractor":"hvac-contractor",
+        "home-baker":"home-baker","telemarketing":"telemarketing","pest-control":"pest-control",
+        "engineering":"engineering","courier":"courier","certified-public-accountant":"certified-public-accountant",
+        "lawn-care":"lawn-care","acupuncture":"acupuncture","real-estate-broker":"real-estate-broker",
+        "event-planning":"event-planning","law-firm":"law-firm","it-consultant":"it-consultant",
+        "marketing-pr-consulting":"marketing-pr-consulting","funeral":"funeral","logistics":"logistics",
+        "domestic-employer":"domestic-employer","interior-designer":"interior-designer",
+        "photography":"photography","security":"security","independent-artist":"independent-artist",
+        "finance-insurance":"finance-insurance","freight-forwarding":"freight-forwarding",
+        "printing-business":"printing-business","detective":"detective","graphic-design":"graphic-design",
+        "lodging":"lodging","cemetery":"cemetery",
+    }
+
+    ind_sessions = {}
+    for path, data in sess_map.items():
+        if not path.startswith("/starter-kits/"):
+            continue
+        slug = path.replace("/starter-kits/", "").rstrip("/")
+        if "?" in slug or not slug:
+            continue
+        ind_id = slug_to_ind.get(slug)
+        if not ind_id or ind_id not in ind_map_sk:
+            continue
+        if ind_id not in ind_sessions:
+            ind_sessions[ind_id] = {"sessions": 0, "users": 0}
+        ind_sessions[ind_id]["sessions"] += data["sessions"]
+        ind_sessions[ind_id]["users"] += data["users"]
+
+    sk_data = []
+    for ind_id, sd in ind_sessions.items():
+        ind = ind_map_sk.get(ind_id)
+        if not ind:
+            continue
+        sk_data.append({
+            "slug": ind_id, "name": ind.get("name", ind_id),
+            "skSessions": sd["sessions"], "skUsers": sd["users"],
+            "roadmapUsers": ind.get("users", 0), "matched": True,
+        })
+    sk_data.sort(key=lambda x: -x["skSessions"])
+    output["starterKits"] = sk_data
+    print(f"  Starter Kits: {len(sk_data)} matched to industries")
+
 with open(OUT, "w") as fh:
     json.dump(output, fh)
 
